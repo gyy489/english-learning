@@ -307,6 +307,12 @@ h2 {
   filter: blur(0);
 }
 
+.sentence:hover .word-gloss.translation-faded,
+.sentence:focus-within .word-gloss.translation-faded {
+  opacity: 0.82;
+  filter: blur(0);
+}
+
 .word-pair {
   display: inline-flex;
   flex-direction: column;

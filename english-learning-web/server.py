@@ -57,7 +57,7 @@ SESSION_TIMEOUT_SECONDS = 18.0
 
 # ECDICT does not contain every short function word. These direct glosses keep
 # the word-order view useful without asking an API for each sentence.
-HARD_GLOSS_WORDS = {
+BASIC_WORDS_TO_SKIP = {
     "a": "一个", "an": "一个", "the": "这/该", "i": "我", "you": "你/你们",
     "he": "他", "she": "她", "it": "它", "we": "我们", "they": "他们",
     "me": "我", "him": "他", "her": "她", "us": "我们", "them": "他们",
@@ -78,7 +78,10 @@ HARD_GLOSS_WORDS = {
     "who": "谁", "what": "什么", "which": "哪个", "all": "全部", "some": "一些",
     "any": "任何", "more": "更多", "most": "大多数", "less": "更少", "many": "许多",
     "few": "少数", "each": "每个", "every": "每一个", "both": "两者都",
+    "art": "艺术", "world": "世界", "common": "通常的", "daily": "每天的",
+    "simple": "简单的", "quiet": "安静的", "small": "小的", "great": "伟大的",
 }
+HARD_GLOSS_TAGS = {"cet6", "toefl", "gre"}
 
 
 def register_session(token: str, server: ThreadingHTTPServer) -> None:
@@ -491,8 +494,8 @@ def lookup_dictionary(raw_word: str) -> dict[str, object]:
 
 def hard_gloss_for_word(raw_word: str) -> str:
     requested = raw_word.lower().replace("’", "'")
-    if requested in HARD_GLOSS_WORDS:
-        return HARD_GLOSS_WORDS[requested]
+    if requested in BASIC_WORDS_TO_SKIP:
+        return ""
     try:
         index = dictionary_index()
         lemma = normalize_word(requested)
@@ -505,7 +508,17 @@ def hard_gloss_for_word(raw_word: str) -> str:
     translation = str(entry.get("t", "")).strip()
     if not translation:
         return ""
+    tags = {str(tag).lower() for tag in entry.get("tags", [])}
     first_sense = re.split(r"[；;，,]", translation, maxsplit=1)[0].strip()
+    is_content_word = bool(
+        re.match(r"^(?:n|v|vt|vi|a|ad|adv)\.\s*", first_sense, re.IGNORECASE)
+    )
+    if not is_content_word:
+        return ""
+    # Keep simple everyday words visually clean; retain longer or IELTS-level
+    # content words that are more useful for deliberate vocabulary study.
+    if len(lemma) < 6 and not tags.intersection(HARD_GLOSS_TAGS):
+        return ""
     # ECDICT prefixes senses with labels such as n., v. and prep.
     first_sense = re.sub(r"^[A-Za-z]+\.\s*", "", first_sense)
     return first_sense
