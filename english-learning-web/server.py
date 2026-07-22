@@ -55,6 +55,31 @@ SESSION_HAS_CONNECTED = False
 SESSION_GRACE_SECONDS = 4.0
 SESSION_TIMEOUT_SECONDS = 18.0
 
+# ECDICT does not contain every short function word. These direct glosses keep
+# the word-order view useful without asking an API for each sentence.
+HARD_GLOSS_WORDS = {
+    "a": "一个", "an": "一个", "the": "这/该", "i": "我", "you": "你/你们",
+    "he": "他", "she": "她", "it": "它", "we": "我们", "they": "他们",
+    "me": "我", "him": "他", "her": "她", "us": "我们", "them": "他们",
+    "my": "我的", "your": "你的", "his": "他的", "its": "它的", "our": "我们的",
+    "their": "他们的", "this": "这", "that": "那", "these": "这些", "those": "那些",
+    "am": "是", "is": "是", "are": "是", "was": "是/在", "were": "是/在",
+    "be": "是", "been": "是过", "being": "正在是", "do": "做", "does": "做",
+    "did": "做了", "done": "做完", "have": "有", "has": "有", "had": "有过",
+    "will": "将", "would": "会", "can": "能", "could": "能够", "may": "可能",
+    "might": "可能", "must": "必须", "should": "应该", "to": "去/向",
+    "of": "的", "in": "在...里", "on": "在...上", "at": "在", "by": "被/通过",
+    "for": "为了/给", "with": "和/用", "from": "从", "into": "进入", "about": "关于",
+    "over": "在...上方", "under": "在...下方", "between": "在...之间", "before": "在...之前",
+    "after": "在...之后", "and": "和", "or": "或", "but": "但是", "if": "如果",
+    "because": "因为", "so": "所以", "as": "作为/当", "than": "比", "not": "不",
+    "no": "不/没有", "very": "非常", "also": "也", "just": "只是", "there": "那里/有",
+    "here": "这里", "when": "当...时", "where": "哪里", "why": "为什么", "how": "如何",
+    "who": "谁", "what": "什么", "which": "哪个", "all": "全部", "some": "一些",
+    "any": "任何", "more": "更多", "most": "大多数", "less": "更少", "many": "许多",
+    "few": "少数", "each": "每个", "every": "每一个", "both": "两者都",
+}
+
 
 def register_session(token: str, server: ThreadingHTTPServer) -> None:
     """Register or refresh a browser tab using the local app."""
@@ -346,7 +371,12 @@ def parse_article(path: Path) -> dict[str, object]:
         if not chinese and not match:
             continue
         sentences.append(
-            {"number": number, "english": english, "chinese": chinese}
+            {
+                "number": number,
+                "english": english,
+                "chinese": chinese,
+                "glosses": build_hard_glosses(english),
+            }
         )
 
     audio_path = path.with_suffix(".mp3")
@@ -457,6 +487,49 @@ def lookup_dictionary(raw_word: str) -> dict[str, object]:
         "definition": entry.get("d", ""),
         "source": "ECDICT",
     }
+
+
+def hard_gloss_for_word(raw_word: str) -> str:
+    requested = raw_word.lower().replace("’", "'")
+    if requested in HARD_GLOSS_WORDS:
+        return HARD_GLOSS_WORDS[requested]
+    try:
+        index = dictionary_index()
+        lemma = normalize_word(requested)
+        entry = index.get(lemma) or index.get(requested)
+    except (FileNotFoundError, RuntimeError):
+        return ""
+    if not entry:
+        return ""
+
+    translation = str(entry.get("t", "")).strip()
+    if not translation:
+        return ""
+    first_sense = re.split(r"[；;，,]", translation, maxsplit=1)[0].strip()
+    # ECDICT prefixes senses with labels such as n., v. and prep.
+    first_sense = re.sub(r"^[A-Za-z]+\.\s*", "", first_sense)
+    return first_sense
+
+
+def build_hard_glosses(english: str) -> list[dict[str, object]]:
+    """Split an English sentence into words and punctuation with direct glosses."""
+    segments: list[dict[str, object]] = []
+    cursor = 0
+    for match in re.finditer(r"[A-Za-z]+(?:['’][A-Za-z]+)?", english):
+        if match.start() > cursor:
+            segments.append({"text": english[cursor : match.start()], "isWord": False})
+        word = match.group(0)
+        segments.append(
+            {
+                "text": word,
+                "gloss": hard_gloss_for_word(word),
+                "isWord": True,
+            }
+        )
+        cursor = match.end()
+    if cursor < len(english):
+        segments.append({"text": english[cursor:], "isWord": False})
+    return segments
 
 
 def dedupe_words(words: list[object]) -> list[str]:

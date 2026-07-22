@@ -393,31 +393,43 @@ function localLemma(rawWord) {
   return word;
 }
 
-function createTokenizedSentence(text) {
+function createWordToken(part) {
+  const token = document.createElement("span");
+  token.className = "word-token";
+  token.textContent = part;
+  token.dataset.original = part.toLowerCase();
+  token.dataset.lemma = localLemma(part);
+  token.addEventListener("click", (event) => {
+    event.stopPropagation();
+    scheduleDictionary(part, token);
+  });
+  token.addEventListener("dblclick", (event) => {
+    event.preventDefault();
+    window.clearTimeout(state.dictionaryClickTimer);
+    closeDictionary();
+    window.getSelection()?.removeAllRanges();
+    toggleWord(part);
+  });
+  return token;
+}
+
+function createHardTranslatedSentence(entry) {
   const fragment = document.createDocumentFragment();
-  const parts = text.split(/([A-Za-z]+(?:['’][A-Za-z]+)?)/g);
-  for (const part of parts) {
-    if (!/^[A-Za-z]/.test(part)) {
-      fragment.append(document.createTextNode(part));
+  const segments = Array.isArray(entry.glosses) ? entry.glosses : [];
+  if (!segments.length) return fragment;
+  for (const segment of segments) {
+    if (!segment.isWord) {
+      fragment.append(document.createTextNode(segment.text || ""));
       continue;
     }
-    const token = document.createElement("span");
-    token.className = "word-token";
-    token.textContent = part;
-    token.dataset.original = part.toLowerCase();
-    token.dataset.lemma = localLemma(part);
-    token.addEventListener("click", (event) => {
-      event.stopPropagation();
-      scheduleDictionary(part, token);
-    });
-    token.addEventListener("dblclick", (event) => {
-      event.preventDefault();
-      window.clearTimeout(state.dictionaryClickTimer);
-      closeDictionary();
-      window.getSelection()?.removeAllRanges();
-      toggleWord(part);
-    });
-    fragment.append(token);
+    const pair = document.createElement("span");
+    pair.className = "word-pair";
+    pair.append(createWordToken(segment.text));
+    const gloss = document.createElement("span");
+    gloss.className = "word-gloss translation-faded";
+    gloss.textContent = segment.gloss || "";
+    pair.append(gloss);
+    fragment.append(pair);
   }
   return fragment;
 }
@@ -454,13 +466,10 @@ function renderArticle(article) {
     number.className = "sentence-number";
     number.textContent = entry.number;
     const text = document.createElement("div");
-    const english = document.createElement("p");
+    const english = document.createElement("div");
     english.className = "english";
-    english.append(createTokenizedSentence(entry.english));
-    const chinese = document.createElement("p");
-    chinese.className = "chinese translation-faded";
-    chinese.textContent = entry.chinese;
-    text.append(english, chinese);
+    english.append(createHardTranslatedSentence(entry));
+    text.append(english);
     row.append(number, text);
     elements.articleBody.append(row);
   }
