@@ -117,7 +117,7 @@ uv run --with openai python scripts/article_to_speech.py "作文素材/按时间
 - `gpt-4o-mini-tts-2025-12-15`：固定版本，适合需要保持声音效果一致的情况。
 - `tts-1-hd`：旧款高质量模型；不支持 `--instructions`。
 
-生成音频需要本机设置 `OPENAI_API_KEY`。脚本会优先读取环境变量；如果没有，也会读取项目根目录的 `.env`。
+生成音频需要本机设置 `OPENAI_API_KEY`。脚本会优先读取环境变量；如果没有，也会读取项目根目录的 `.env`。从“应用程序”启动“每日英语”时，启动脚本会读取 `~/.zshrc` 中的 OpenAI 配置，但不会把 key 写入项目或 GitHub。
 
 Web 应用生成文章默认使用 `gpt-4o-mini`，生成音频默认使用 `tts-1`。可以在 `.env` 中分别设置 `OPENAI_TEXT_MODEL` 和 `OPENAI_TTS_MODEL` 覆盖。
 
