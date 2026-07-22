@@ -79,16 +79,6 @@ function closeSession() {
   });
 }
 
-function refreshSession() {
-  if (!sessionRegistered) return;
-  request("/api/session", {
-    method: "POST",
-    body: JSON.stringify({ token: SESSION_TOKEN }),
-  }).catch(() => {
-    // The watchdog on the server will clean up if this page disappears.
-  });
-}
-
 function applyTheme(theme, persist = false) {
   const resolvedTheme = theme === "dark" ? "dark" : "light";
   document.documentElement.dataset.theme = resolvedTheme;
@@ -702,7 +692,6 @@ async function initialize() {
 
 initialize();
 window.setInterval(checkExternalChanges, 3000);
-window.setInterval(refreshSession, 8000);
 window.addEventListener("pageshow", registerSession);
 window.addEventListener("pagehide", (event) => {
   if (!event.persisted) closeSession();

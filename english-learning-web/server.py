@@ -15,7 +15,6 @@ import shutil
 import subprocess
 import tempfile
 import threading
-import time
 from urllib.parse import parse_qs, unquote, urlparse
 
 
@@ -49,11 +48,10 @@ WRITE_LOCK = threading.Lock()
 DICTIONARY_LOCK = threading.Lock()
 DICTIONARY_INDEX: dict[str, dict[str, object]] | None = None
 SESSION_LOCK = threading.Lock()
-ACTIVE_SESSIONS: dict[str, float] = {}
+ACTIVE_SESSIONS: set[str] = set()
 SHUTDOWN_TIMER: threading.Timer | None = None
 SESSION_HAS_CONNECTED = False
 SESSION_GRACE_SECONDS = 4.0
-SESSION_TIMEOUT_SECONDS = 18.0
 
 # ECDICT does not contain every short function word. These direct glosses keep
 # the word-order view useful without asking an API for each sentence.
@@ -91,7 +89,7 @@ def register_session(token: str, server: ThreadingHTTPServer) -> None:
     if not token:
         raise ValueError("session token 不能为空")
     with SESSION_LOCK:
-        ACTIVE_SESSIONS[token] = time.monotonic()
+        ACTIVE_SESSIONS.add(token)
         SESSION_HAS_CONNECTED = True
         if SHUTDOWN_TIMER is not None:
             SHUTDOWN_TIMER.cancel()
@@ -115,7 +113,7 @@ def schedule_shutdown_if_idle(server: ThreadingHTTPServer) -> None:
 
 def close_session(token: str, server: ThreadingHTTPServer) -> None:
     with SESSION_LOCK:
-        ACTIVE_SESSIONS.pop(token.strip(), None)
+        ACTIVE_SESSIONS.discard(token.strip())
     schedule_shutdown_if_idle(server)
 
 
@@ -128,22 +126,6 @@ def shutdown_if_idle(server: ThreadingHTTPServer) -> None:
     print("No browser sessions remain; stopping the English learning app.", flush=True)
     # shutdown() must run outside the request handler thread.
     threading.Thread(target=server.shutdown, daemon=True).start()
-
-
-def session_watchdog(server: ThreadingHTTPServer) -> None:
-    """Recover from a browser crash where pagehide cannot send its beacon."""
-    while True:
-        time.sleep(5)
-        now = time.monotonic()
-        with SESSION_LOCK:
-            stale_tokens = [
-                token
-                for token, last_seen in ACTIVE_SESSIONS.items()
-                if now - last_seen > SESSION_TIMEOUT_SECONDS
-            ]
-            for token in stale_tokens:
-                ACTIVE_SESSIONS.pop(token, None)
-        schedule_shutdown_if_idle(server)
 
 
 IRREGULAR_FORMS = {
@@ -1009,7 +991,6 @@ def main() -> None:
     load_project_env()
     server = ThreadingHTTPServer((args.host, args.port), AppHandler)
     server.daemon_threads = True
-    threading.Thread(target=session_watchdog, args=(server,), daemon=True).start()
     print(f"English learning app: http://{args.host}:{args.port}", flush=True)
     try:
         server.serve_forever()
