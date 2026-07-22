@@ -29,7 +29,7 @@ python3 english-learning-web/server.py
 
 ## 生成下一天
 
-生成文章会优先使用项目 `.env` 中的 OpenAI API；没有 API Key 时，会自动使用本机已登录的 Codex CLI。生成 MP3 仍需要在项目根目录的 `.env` 中配置：
+生成文章会优先使用项目 `.env` 中的 OpenAI API；没有 API Key 时，会自动寻找本机已登录的 Codex CLI，包括从 macOS App 启动时无法继承到 PATH 的 VS Code Codex。生成 MP3 仍需要在项目根目录的 `.env` 中配置：
 
 ```text
 OPENAI_API_KEY=你的_API_Key

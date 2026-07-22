@@ -626,6 +626,30 @@ def build_generation_prompt(
 """
 
 
+def find_codex() -> str | None:
+    """Find Codex even when the app is launched outside VS Code or a shell."""
+    configured = os.getenv("CODEX_BIN", "").strip()
+    if configured:
+        configured_path = Path(configured).expanduser()
+        if configured_path.is_file() and os.access(configured_path, os.X_OK):
+            return str(configured_path)
+
+    available = shutil.which("codex")
+    if available:
+        return available
+
+    # macOS GUI apps do not inherit VS Code's extension directory in PATH.
+    # Search installed OpenAI VS Code extensions and use the newest one.
+    extension_candidates = sorted(
+        Path.home().glob(".vscode/extensions/openai.chatgpt-*/bin/*/codex"),
+        reverse=True,
+    )
+    for candidate in extension_candidates:
+        if candidate.is_file() and os.access(candidate, os.X_OK):
+            return str(candidate)
+    return None
+
+
 def request_generated_markdown(prompt: str) -> tuple[str, str]:
     if os.getenv("OPENAI_API_KEY"):
         try:
@@ -641,7 +665,7 @@ def request_generated_markdown(prompt: str) -> tuple[str, str]:
             )
             return response.output_text, model
 
-    codex = shutil.which("codex")
+    codex = find_codex()
     if not codex:
         raise RuntimeError(
             "没有可用的文章生成方式：请配置 OPENAI_API_KEY，或安装并登录 Codex CLI。"
