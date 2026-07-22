@@ -92,6 +92,15 @@ BASIC_WORDS_TO_SKIP = {
 HARD_GLOSS_TAGS = {"cet6", "toefl", "gre"}
 
 
+def persistent_server_enabled() -> bool:
+    return os.getenv("ENGLISH_LEARNING_PERSISTENT", "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+
+
 def register_session(token: str, server: ThreadingHTTPServer) -> None:
     """Register or refresh a browser tab using the local app."""
     global SHUTDOWN_TIMER, SESSION_HAS_CONNECTED
@@ -109,6 +118,8 @@ def register_session(token: str, server: ThreadingHTTPServer) -> None:
 def schedule_shutdown_if_idle(server: ThreadingHTTPServer) -> None:
     """Stop the local server after the last browser tab has closed."""
     global SHUTDOWN_TIMER
+    if persistent_server_enabled():
+        return
     with SESSION_LOCK:
         if not SESSION_HAS_CONNECTED or ACTIVE_SESSIONS or SHUTDOWN_TIMER is not None:
             return

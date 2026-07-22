@@ -1,11 +1,16 @@
 from pathlib import Path
 import sys
 import unittest
+from unittest.mock import patch
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "english-learning-web"))
 
-from server import generation_mode, review_dashboard_payload  # noqa: E402
+from server import (  # noqa: E402
+    generation_mode,
+    persistent_server_enabled,
+    review_dashboard_payload,
+)
 
 
 class GenerationModeTests(unittest.TestCase):
@@ -44,6 +49,12 @@ class GenerationModeTests(unittest.TestCase):
         }
         payload = review_dashboard_payload(history)
         self.assertFalse(payload["generationMode"]["usesSource"])
+
+    def test_persistent_remote_mode_is_controlled_by_environment(self) -> None:
+        with patch.dict("os.environ", {"ENGLISH_LEARNING_PERSISTENT": "1"}):
+            self.assertTrue(persistent_server_enabled())
+        with patch.dict("os.environ", {"ENGLISH_LEARNING_PERSISTENT": "0"}):
+            self.assertFalse(persistent_server_enabled())
 
 
 if __name__ == "__main__":

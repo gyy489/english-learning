@@ -38,6 +38,7 @@
 - `作文素材/`：AI 生成的英语短文章、中文解释和生词积累。
 - `作文素材/按时间排序/`：每日练习目录，一天一个文件夹；每个文件夹内放当天 Markdown 文章和对应听力音频。
 - `作文素材/单词复习/`：间隔复习策略、JSON 词库和自动生成的 Markdown 复习历史。
+- `english-learning-web/REMOTE_ACCESS.md`：手机远程访问、private tunnel/reverse proxy 链路和运维说明。
 - `雅思真题/`：雅思真题原始资料和转换后的 AI 可读 Markdown 数据。
 - `雅思真题/Markdown资料/`：由 PDF/DOCX 转换得到的 Markdown 数据层，后续生成学习文章时优先使用这里的资料。
 - `skills/ielts-daily-article/SKILL.md`：项目内的每日文章生成 skill，后续 agent 可按这个文件执行“更新”流程。

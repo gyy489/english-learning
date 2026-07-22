@@ -24,7 +24,9 @@ uv run --with openai python english-learning-web/server.py
 python3 english-learning-web/server.py
 ```
 
-网页加载后会登记当前浏览器页面；关闭网页时会通知后端。最后一个页面正常关闭后，后端会等待几秒并自动退出。页面静置、切到后台或电脑休眠不会触发超时退出；如果浏览器异常崩溃而没有发出关闭通知，后端会暂时保留，下一次打开 `/Applications/每日英语.app` 时直接复用，不会重复启动。
+网页加载后会登记当前浏览器页面。普通本地模式下，最后一个页面正常关闭后，后端会等待几秒并自动退出；设置 `ENGLISH_LEARNING_PERSISTENT=1` 的远程模式不会随页面关闭，用于手机随时访问。页面静置、切到后台或电脑休眠不会触发超时退出。
+
+手机远程访问、HTTPS 登录、private tunnel 端口和重启方法见 `REMOTE_ACCESS.md`。
 
 为了方便回忆，复习生词释义和正文中文默认显示得很淡并带有轻微模糊；鼠标移到中文解释上时会暂时恢复可读状态。
 
