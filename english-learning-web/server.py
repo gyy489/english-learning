@@ -17,6 +17,12 @@ import tempfile
 import threading
 from urllib.parse import parse_qs, unquote, urlparse
 
+from review_scheduler import (
+    build_review_state,
+    dashboard_payload,
+    render_markdown_report,
+)
+
 
 APP_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = Path(
@@ -43,9 +49,13 @@ DICTIONARY_BUNDLE = (
     / "ecdict_reading.bundle.js"
 )
 ENV_FILE = PROJECT_ROOT / ".env"
+REVIEW_DIR = PROJECT_ROOT / "作文素材" / "单词复习"
+REVIEW_JSON = REVIEW_DIR / "vocabulary.json"
+REVIEW_REPORT = REVIEW_DIR / "review-history.md"
 TEXT_MODEL = os.getenv("OPENAI_TEXT_MODEL", "gpt-4o-mini")
-WRITE_LOCK = threading.Lock()
+WRITE_LOCK = threading.RLock()
 DICTIONARY_LOCK = threading.Lock()
+REVIEW_LOCK = threading.Lock()
 DICTIONARY_INDEX: dict[str, dict[str, object]] | None = None
 SESSION_LOCK = threading.Lock()
 ACTIVE_SESSIONS: set[str] = set()
@@ -150,6 +160,7 @@ IRREGULAR_FORMS = {
     "given": "give",
     "gone": "go",
     "got": "get",
+    "held": "hold",
     "had": "have",
     "has": "have",
     "kept": "keep",
@@ -163,6 +174,7 @@ IRREGULAR_FORMS = {
     "ran": "run",
     "read": "read",
     "reached": "reach",
+    "rode": "ride",
     "said": "say",
     "saw": "see",
     "seen": "see",
@@ -178,6 +190,10 @@ IRREGULAR_FORMS = {
     "wrote": "write",
     "written": "write",
     "argued": "argue",
+    "described": "describe",
+    "drawn": "draw",
+    "frustrating": "frustrate",
+    "smoother": "smooth",
 }
 
 S_ENDING_BASE_FORMS = {
@@ -206,6 +222,7 @@ INVARIANT_BASE_FORMS = {
     "something",
     "spring",
     "thus",
+    "unexpected",
 }
 
 def load_project_env() -> None:
@@ -425,8 +442,9 @@ def normalize_word(raw_word: str) -> str:
 
 def normalize_entry(raw_entry: str) -> str:
     entry = re.sub(r"\s+", " ", raw_entry.strip().lower().replace("’", "'"))
-    if re.fullmatch(r"[a-z]+(?:'[a-z]+)?", entry):
-        return normalize_word(entry)
+    single_word = re.fullmatch(r"[^a-z]*([a-z]+(?:'[a-z]+)?)[^a-z]*", entry)
+    if single_word:
+        return normalize_word(single_word.group(1))
     return entry
 
 
@@ -527,6 +545,64 @@ def build_hard_glosses(english: str) -> list[dict[str, object]]:
     return segments
 
 
+def concise_dictionary_meaning(word: str) -> str:
+    try:
+        result = lookup_dictionary(word)
+    except (FileNotFoundError, ValueError, RuntimeError):
+        return ""
+    translation = str(result.get("translation", "")).strip()
+    first_sense = re.split(r"[；;]", translation, maxsplit=1)[0].strip()
+    first_sense = re.sub(r"^[A-Za-z]+\.\s*", "", first_sense)
+    return first_sense
+
+
+def article_review_snapshot(day: int, path: Path) -> dict[str, object]:
+    text = path.read_text(encoding="utf-8")
+    review_text = section_between(text, "## 复习生词", "## 正文")
+    review_words: list[str] = []
+    meanings: dict[str, str] = {}
+    for line in review_text.splitlines():
+        match = re.match(r"^\s*-\s+(.+?)(?:\s+-\s+(.+))?$", line)
+        if not match:
+            continue
+        word = normalize_entry(match.group(1))
+        if not word or word == "无":
+            continue
+        review_words.append(word)
+        meaning = (match.group(2) or "").strip()
+        if meaning and meaning != "无":
+            meanings[word] = meaning
+
+    marked_words = dedupe_words(clean_today_entries(text))
+    for word in marked_words:
+        if word not in meanings:
+            meanings[word] = concise_dictionary_meaning(word)
+    return {
+        "day": day,
+        "reviewWords": dedupe_words(review_words),
+        "markedWords": marked_words,
+        "meanings": meanings,
+    }
+
+
+def write_text_if_changed(path: Path, content: str) -> None:
+    if path.exists() and path.read_text(encoding="utf-8") == content:
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+
+
+def refresh_review_documents() -> tuple[dict[str, object], dict[str, object]]:
+    with WRITE_LOCK, REVIEW_LOCK:
+        snapshots = [article_review_snapshot(day, path) for day, path in article_files()]
+        history, plan = build_review_state(snapshots)
+        json_content = json.dumps(history, ensure_ascii=False, indent=2) + "\n"
+        report_content = render_markdown_report(history)
+        write_text_if_changed(REVIEW_JSON, json_content)
+        write_text_if_changed(REVIEW_REPORT, report_content)
+        return history, plan
+
+
 def dedupe_words(words: list[object]) -> list[str]:
     cleaned: list[str] = []
     seen: set[str] = set()
@@ -572,25 +648,48 @@ def choose_source() -> dict[str, object]:
     return candidates[0]
 
 
-def generation_mode(word_count: int) -> dict[str, object]:
-    if word_count > 15:
+def generation_mode(
+    target_count: int,
+    recent_count: int,
+    deferred_due_count: int = 0,
+) -> dict[str, object]:
+    if recent_count >= 11:
         return {
-            "name": "纯生词复习",
+            "name": "高负荷纯复习",
             "sentenceCount": "约 25-30",
+            "minimumSentences": 25,
             "newWords": "0",
             "usesSource": False,
         }
-    if word_count <= 5:
+    if deferred_due_count > 0:
+        return {
+            "name": "到期词清理",
+            "sentenceCount": "至少 30",
+            "minimumSentences": 30,
+            "newWords": "0",
+            "usesSource": True,
+        }
+    if target_count <= 7:
         return {
             "name": "轻负荷题库扩展",
-            "sentenceCount": "约 40",
-            "newWords": "6-10",
+            "sentenceCount": "约 36-40",
+            "minimumSentences": 36,
+            "newWords": "3-5",
+            "usesSource": True,
+        }
+    if target_count <= 11:
+        return {
+            "name": "正常间隔复习",
+            "sentenceCount": "至少 30",
+            "minimumSentences": 30,
+            "newWords": "1-2",
             "usesSource": True,
         }
     return {
-        "name": "正常题库学习",
+        "name": "高复习负荷",
         "sentenceCount": "至少 30",
-        "newWords": "4-8",
+        "minimumSentences": 30,
+        "newWords": "0",
         "usesSource": True,
     }
 
@@ -615,7 +714,7 @@ def validate_generated_article(text: str, expected_day: int, mode: dict[str, obj
     if missing:
         raise RuntimeError(f"模型输出缺少必要格式：{', '.join(missing)}")
     count = len(re.findall(r"^\d+\.\s+", section_between(text, "## 正文", "生单词:"), re.MULTILINE))
-    minimum = 25 if not mode["usesSource"] else (36 if mode["sentenceCount"] == "约 40" else 30)
+    minimum = int(mode["minimumSentences"])
     if count < minimum:
         raise RuntimeError(f"模型只生成了 {count} 句，低于当前模式要求的 {minimum} 句")
     if text.rsplit("生单词:", 1)[1].strip():
@@ -630,10 +729,13 @@ def build_generation_prompt(
     previous_day: int,
     next_day: int,
     words: list[str],
+    review_plan: dict[str, object],
     mode: dict[str, object],
     source: dict[str, object] | None,
 ) -> str:
     word_text = "、".join(words) if words else "（无）"
+    recent_text = "、".join(review_plan.get("recentWords", [])) or "（无）"
+    due_text = "、".join(review_plan.get("dueWords", [])) or "（无）"
     if source:
         source_path = PROJECT_ROOT / str(source["markdown_path"])
         source_text = source_path.read_text(encoding="utf-8", errors="replace")[:12000]
@@ -656,17 +758,19 @@ def build_generation_prompt(
 
 当前模式：{mode['name']}
 前一天：第 {previous_day} 天
-前一天生词（已转原形）：{word_text}
+前一天仍不会的词（最高优先）：{recent_text}
+间隔复习到期旧词：{due_text}
+本篇全部目标复习词（已转原形，最多 15 个）：{word_text}
 目标句数：{mode['sentenceCount']}
 允许的新 IELTS 目标词数量：{mode['newWords']}
 
 {source_context}
 
 要求：
-1. 每个旧生词至少在英文正文中自然出现一次，可以按语境变形。
+1. 每个目标复习词至少在英文正文中自然出现一次，可以按语境变形。
 2. {source_rule}
 3. 句子自然、具体、适合朗读；难度不要超过 IELTS 6.0。纯复习模式要明显更简单。
-4. `## 复习生词` 列出全部旧生词的词典原形和简洁中文释义；没有旧生词时写 `- 无 - 无`。
+4. `## 复习生词` 严格列出全部目标复习词的词典原形和简洁中文释义；没有目标词时写 `- 无 - 无`。
 5. 每句英文下面紧跟中文解释，使用下面的固定 Markdown 格式。
 6. 末尾 `生单词:` 必须留空。
 7. 只输出 Markdown，不要代码围栏、前言或解释。
@@ -677,7 +781,7 @@ def build_generation_prompt(
 - 天数：第 {next_day} 天
 - 来源真题：<题目；纯复习模式写“无（纯生词复习）”>
 - 来源文件：<相对路径；纯复习模式写“无（纯生词复习）”>
-- 复习内容：D{previous_day} 生词复用 + <当前模式>
+- 复习内容：D{previous_day} 当前生词 + 到期旧词 + <当前模式>
 
 ## 复习生词
 
@@ -774,13 +878,25 @@ def request_generated_markdown(prompt: str) -> tuple[str, str]:
 
 def generate_next_article() -> dict[str, object]:
     load_project_env()
-    previous_day, previous_path = latest_article()
-    previous_text = previous_path.read_text(encoding="utf-8")
-    words = dedupe_words(clean_today_entries(previous_text))
-    mode = generation_mode(len(words))
+    previous_day, _ = latest_article()
+    _, review_plan = refresh_review_documents()
+    words = dedupe_words(list(review_plan.get("targetWords", [])))
+    recent_words = list(review_plan.get("recentWords", []))
+    mode = generation_mode(
+        len(words),
+        len(recent_words),
+        int(review_plan.get("deferredDueCount", 0)),
+    )
     source = choose_source() if mode["usesSource"] else None
     next_day = previous_day + 1
-    prompt = build_generation_prompt(previous_day, next_day, words, mode, source)
+    prompt = build_generation_prompt(
+        previous_day,
+        next_day,
+        words,
+        review_plan,
+        mode,
+        source,
+    )
 
     generated_text, generator = request_generated_markdown(prompt)
     markdown = strip_model_fences(generated_text)
@@ -817,6 +933,8 @@ def generate_next_article() -> dict[str, object]:
         if audio_result.returncode != 0:
             audio_warning = (audio_result.stderr or audio_result.stdout).strip()[-800:]
 
+    updated_history, _ = refresh_review_documents()
+
     return {
         "day": next_day,
         "title": title,
@@ -825,6 +943,7 @@ def generate_next_article() -> dict[str, object]:
         "audioGenerated": article_path.with_suffix(".mp3").exists(),
         "warning": audio_warning,
         "generator": generator,
+        "reviewPlan": dashboard_payload(updated_history),
     }
 
 
@@ -921,6 +1040,9 @@ class AppHandler(BaseHTTPRequestHandler):
                 self.send_json(
                     {"day": day_number, "updatedAt": article_path.stat().st_mtime_ns}
                 )
+            elif path == "/api/review-plan":
+                history, _ = refresh_review_documents()
+                self.send_json(dashboard_payload(history))
             elif path == "/api/dictionary":
                 self.send_json(lookup_dictionary(query.get("word", [""])[0]))
             elif path == "/api/audio":
@@ -956,12 +1078,14 @@ class AppHandler(BaseHTTPRequestHandler):
                 with WRITE_LOCK:
                     day, article_path = article_for_day(payload.get("day"))
                     saved = save_today_words(article_path, words)
+                history, _ = refresh_review_documents()
                 self.send_json(
                     {
                         "day": day,
                         "words": saved,
                         "saved": True,
                         "updatedAt": article_path.stat().st_mtime_ns,
+                        "reviewPlan": dashboard_payload(history),
                     }
                 )
                 return
@@ -989,6 +1113,10 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     load_project_env()
+    try:
+        refresh_review_documents()
+    except (FileNotFoundError, ValueError, RuntimeError, OSError) as exc:
+        print(f"Review history initialization skipped: {exc}", flush=True)
     server = ThreadingHTTPServer((args.host, args.port), AppHandler)
     server.daemon_threads = True
     print(f"English learning app: http://{args.host}:{args.port}", flush=True)

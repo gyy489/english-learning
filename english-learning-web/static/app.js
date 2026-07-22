@@ -16,6 +16,14 @@ const elements = {
   daySelect: document.querySelector("#daySelect"),
   articleTitle: document.querySelector("#articleTitle"),
   sourceLabel: document.querySelector("#sourceLabel"),
+  reviewPlanDay: document.querySelector("#reviewPlanDay"),
+  vocabularyCount: document.querySelector("#vocabularyCount"),
+  dueWordCount: document.querySelector("#dueWordCount"),
+  currentMarkedCount: document.querySelector("#currentMarkedCount"),
+  masteredWordCount: document.querySelector("#masteredWordCount"),
+  reviewPlanMessage: document.querySelector("#reviewPlanMessage"),
+  reviewHabitMessage: document.querySelector("#reviewHabitMessage"),
+  reviewPlanWords: document.querySelector("#reviewPlanWords"),
   reviewCount: document.querySelector("#reviewCount"),
   reviewWords: document.querySelector("#reviewWords"),
   sentenceCount: document.querySelector("#sentenceCount"),
@@ -113,6 +121,53 @@ async function request(url, options = {}) {
     throw new Error(payload.error || `请求失败 (${response.status})`);
   }
   return payload;
+}
+
+function renderReviewPlan(payload) {
+  const summary = payload?.summary || {};
+  const habits = payload?.habits || {};
+  const plan = payload?.nextPlan || {};
+  const recentWords = Array.isArray(plan.recentWords) ? plan.recentWords : [];
+  const dueWords = Array.isArray(plan.dueWords) ? plan.dueWords : [];
+  const targetWords = Array.isArray(plan.targetWords) ? plan.targetWords : [];
+  const dueSet = new Set(dueWords);
+
+  elements.reviewPlanDay.textContent = `第 ${plan.nextDay || "—"} 天计划`;
+  elements.vocabularyCount.textContent = String(summary.totalWords ?? 0);
+  elements.dueWordCount.textContent = String(plan.totalDueCount ?? 0);
+  elements.currentMarkedCount.textContent = String(summary.currentMarkedWords ?? 0);
+  elements.masteredWordCount.textContent = String(summary.masteredWords ?? 0);
+
+  const deferred = Number(plan.deferredDueCount || 0);
+  const deferredRecent = Number(plan.deferredRecentCount || 0);
+  const deferredParts = [];
+  if (deferredRecent) deferredParts.push(`${deferredRecent} 个本篇生词`);
+  if (deferred) deferredParts.push(`${deferred} 个到期旧词`);
+  const deferredText = deferredParts.length ? `，另有 ${deferredParts.join("、")}顺延` : "";
+  elements.reviewPlanMessage.textContent = targetWords.length
+    ? `下一篇安排 ${targetWords.length} 个目标词：本篇生词 ${recentWords.length} 个 + 到期旧词 ${dueWords.length} 个${deferredText}。`
+    : "下一篇当前没有必须复习的目标词，可以加入少量新词。";
+  const recentWindow = Number(habits.recentWindow || 0);
+  elements.reviewHabitMessage.textContent = recentWindow
+    ? `最近 ${recentWindow} 篇回忆成功率 ${habits.recentRecallRate ?? 0}%，平均每篇标记 ${habits.averageMarkedWords ?? 0} 个生词。`
+    : "完成下一篇学习后，这里会开始记录你的复习习惯。";
+
+  elements.reviewPlanWords.replaceChildren();
+  for (const word of targetWords) {
+    const chip = document.createElement("span");
+    chip.className = `review-plan-word${dueSet.has(word) ? " due" : ""}`;
+    chip.textContent = word;
+    chip.title = dueSet.has(word) ? "到期旧词" : "本篇标记生词";
+    elements.reviewPlanWords.append(chip);
+  }
+}
+
+async function loadReviewPlan() {
+  try {
+    renderReviewPlan(await request("/api/review-plan"));
+  } catch (error) {
+    elements.reviewPlanMessage.textContent = `无法读取复习计划：${error.message}`;
+  }
 }
 
 function showToast(message) {
@@ -287,6 +342,7 @@ async function saveTodayWords(words = state.todayWords) {
       elements.saveStatus.textContent = "已保存";
       elements.saveStatus.className = "save-status";
     }
+    if (result.reviewPlan) renderReviewPlan(result.reviewPlan);
     return true;
   } catch (error) {
     elements.saveStatus.textContent = "保存失败";
@@ -517,6 +573,7 @@ async function checkExternalChanges() {
     ) {
       const day = state.article.day;
       if (await loadCurrentArticle(day)) {
+        await loadReviewPlan();
         showToast("已从项目文件同步最新内容");
       }
     }
@@ -668,6 +725,8 @@ elements.generateButton.addEventListener("click", async () => {
     showToast(`${result.mode}：第 ${result.day} 天已生成`);
     await loadDayOptions(result.day);
     await loadCurrentArticle(result.day);
+    if (result.reviewPlan) renderReviewPlan(result.reviewPlan);
+    else await loadReviewPlan();
   } catch (error) {
     const message = conciseError(error, "文章生成失败，请稍后重试");
     elements.generateStatus.textContent = message;
@@ -684,6 +743,7 @@ async function initialize() {
     await registerSession();
     await loadDayOptions();
     await loadCurrentArticle(state.latestDay);
+    await loadReviewPlan();
   } catch (error) {
     elements.articleTitle.textContent = "无法读取文章";
     showToast(error.message);

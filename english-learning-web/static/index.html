@@ -49,9 +49,37 @@
         </div>
       </header>
 
+      <section class="content-section review-plan-section" aria-labelledby="reviewPlanHeading">
+        <div class="section-heading">
+          <h2 id="reviewPlanHeading">长期复习计划</h2>
+          <span id="reviewPlanDay" class="count">读取中</span>
+        </div>
+        <div class="review-plan-stats">
+          <div class="review-stat">
+            <strong id="vocabularyCount">—</strong>
+            <span>词库总数</span>
+          </div>
+          <div class="review-stat">
+            <strong id="dueWordCount">—</strong>
+            <span>到期旧词</span>
+          </div>
+          <div class="review-stat">
+            <strong id="currentMarkedCount">—</strong>
+            <span>本篇生词</span>
+          </div>
+          <div class="review-stat">
+            <strong id="masteredWordCount">—</strong>
+            <span>已掌握</span>
+          </div>
+        </div>
+        <p id="reviewPlanMessage" class="review-plan-message">正在计算下一篇文章的复习负荷...</p>
+        <p id="reviewHabitMessage" class="review-habit-message"></p>
+        <div id="reviewPlanWords" class="review-plan-words" aria-label="下一篇目标词"></div>
+      </section>
+
       <section class="content-section review-section" aria-labelledby="reviewHeading">
         <div class="section-heading">
-          <h2 id="reviewHeading">上一天的单词</h2>
+          <h2 id="reviewHeading">本篇复习单词</h2>
           <span id="reviewCount" class="count"></span>
         </div>
         <div id="reviewWords" class="review-list"></div>

@@ -11,11 +11,12 @@ Use this skill inside `/path/to/user` to continue the user's daily English-learn
 
 Generate one readable English article per day for IELTS 6.0-oriented practice. Each new article must:
 
-- reuse the unresolved words from the previous article's `生单词:` section;
-- use a converted IELTS reading source only when the previous unresolved vocabulary count is 15 or fewer;
+- reuse unresolved words from the previous article and add a small number of due words from `作文素材/单词复习/vocabulary.json`;
+- keep the complete target review list at 15 words or fewer;
+- use a converted IELTS reading source only when the review load allows new input;
 - paraphrase and simplify source ideas instead of copying long passages;
 - keep the user's stable format: vocabulary review, numbered English sentences, Chinese explanation under each sentence, and an empty `生单词:` section at the end;
-- adjust article length and new vocabulary load according to the previous article's unresolved word count;
+- adjust article length and new vocabulary load according to the combined current-word and due-word load;
 - include a listening audio file in the same day folder as the Markdown article.
 
 ## Data Sources
@@ -32,20 +33,29 @@ Read `references/source-data.md` only when dataset details, selection policy, or
 ## Daily Update Workflow
 
 1. Find the latest numbered day folder or Markdown file in `作文素材/按时间排序/`.
-2. Read the previous file's bottom `生单词:` section.
-3. Count the previous unresolved words/phrases, then choose the vocabulary-load mode. Count each non-empty entry under `生单词:`; if one line contains multiple comma- or semicolon-separated words/phrases, count each item separately.
-   - **Vocabulary-only review mode**: if the previous `生单词:` count is greater than 15, do not read or use an IELTS source. Build a simple, coherent article only around the previous words, introduce no new target vocabulary, and keep the language easier than normal.
-   - **Light-load source mode**: if the previous `生单词:` count is 0-5, combine the previous words with a new IELTS source, make the article longer with about 40 numbered English sentences, and allow a modest amount of new IELTS-style vocabulary from the source.
-   - **Normal source mode**: if the previous `生单词:` count is 6-15, combine the previous words with a new IELTS source, write at least 30 numbered English sentences, and introduce a small set of useful IELTS-style words or phrases.
-4. Normalize the previous words to dictionary forms where appropriate, then add concise Chinese meanings in the new article's `## 复习生词`.
-5. If the previous word count is 15 or fewer, select one IELTS source from `readingpractice-index.json`. If it is greater than 15, skip source selection completely and write `无（纯生词复习）` in both source metadata fields.
+2. Read the previous file's bottom `生单词:` section and rebuild the document-backed review state in `作文素材/单词复习/` from all daily Markdown files.
+3. Select no more than 15 target review words, in this order:
+   - Put the previous article's marked words first.
+   - With 0-5 current words, add up to 5 due historical words.
+   - With 6-10 current words, add up to 4 due historical words.
+   - With 11 or more current words, add no historical due words.
+   - Defer all words that do not fit; never discard them.
+4. Normalize all selected words to dictionary forms, then add concise Chinese meanings in the new article's `## 复习生词`.
+5. Choose the vocabulary-load mode from the total selected load:
+   - **High-load review mode**: 11 or more current words; no IELTS source and 0 new target words.
+   - **Due-backlog cleanup mode**: any due historical words remain deferred; use an IELTS source, write at least 30 sentences, and add 0 new target words until the backlog is cleared.
+   - **Light-load source mode**: 0-7 total target words; about 36-40 sentences and 3-5 new IELTS target words.
+   - **Normal spaced-review mode**: 8-11 total target words; at least 30 sentences and 1-2 new IELTS target words.
+   - **High review load with source**: 12-15 total target words but fewer than 11 current words; at least 30 sentences and 0 new target words.
+6. In a source mode, select one IELTS source from `readingpractice-index.json`. In high-load review mode, skip source selection and write `无（纯生词复习）` in both source metadata fields.
    - Prefer `P1` or accessible `P2` for IELTS 6.0 practice.
    - Use `P3` only when the user asks for harder reading, or when simplifying a difficult topic.
    - Avoid using the same source repeatedly if recent articles already used it.
-6. In a source mode, read the selected source Markdown. In vocabulary-only review mode, use only the previous words and their meanings as content input.
-7. Generate a new article using the selected load mode. In a source mode, use the source topic and facts while keeping the text original and easier. In vocabulary-only review mode, create a simple everyday narrative or explanation that naturally reuses all previous words without introducing a new subject vocabulary set.
-8. Save the next article in a day folder under `作文素材/按时间排序/` using the next two-digit number and an English slug, e.g. `17_food_traditions/17_food_traditions.md`.
-9. Generate listening audio from the Markdown article and save it in the same day folder as `17_food_traditions.mp3`.
+7. In a source mode, read the selected source Markdown. In high-load review mode, use only the target review words and their meanings as content input.
+8. Generate a new article using the selected load mode. Every target review word must appear naturally at least once.
+9. Save the next article in a day folder under `作文素材/按时间排序/` using the next two-digit number and an English slug, e.g. `17_food_traditions/17_food_traditions.md`.
+10. Generate listening audio from the Markdown article and save it in the same day folder as `17_food_traditions.mp3`.
+11. Rebuild `vocabulary.json` and `review-history.md` after the new article is saved.
 
 ## Article Format
 
@@ -57,7 +67,7 @@ Use this exact structure:
 - 天数：第 N 天
 - 来源真题：<IELTS source title>
 - 来源文件：<relative markdown path>
-- 复习内容：D(N-1) 生词复用 + IELTS 阅读主题改写
+- 复习内容：D(N-1) 当前生词 + 到期旧词 + 当前模式
 
 ## 复习生词
 
@@ -80,17 +90,17 @@ Use this exact structure:
 
 ## Writing Rules
 
-- Use the selected vocabulary-load mode to set length, source usage, and new vocabulary pressure:
-  - Previous `生单词:` count greater than 15: do not use an IELTS source, write about 25-30 simple English sentences, and introduce no new target vocabulary.
-  - Previous `生单词:` count 0-5: combine the words with a new IELTS source and write about 40 English sentences.
-  - Previous `生单词:` count 6-15: combine the words with a new IELTS source and write at least 30 English sentences.
+- Never put more than 15 target review words into one article.
+- Use the selected spaced-review mode to set length, source usage, and new vocabulary pressure.
 - Target IELTS 5.5-6.0 readability even when the source is harder.
 - Keep sentences natural, concrete, and suitable for reading aloud.
-- Reuse every previous unresolved word at least once in the English body, with correct inflection if needed.
+- Reuse every selected target word at least once in the English body, with correct inflection if needed.
 - Introduce new IELTS-style words or phrases according to the selected load mode:
-  - Vocabulary-only review mode: 0 new target words and no IELTS source; keep vocabulary familiar and reuse-focused.
-  - Light-load source mode: 6-10 useful IELTS-style words or phrases from the source topic.
-  - Normal source mode: 4-8 useful IELTS-style words or phrases from the source topic.
+  - High-load review mode: 0 new target words and no IELTS source.
+  - Due-backlog cleanup mode: 0 new target words while any due historical words remain deferred.
+  - Light-load source mode: 3-5 useful IELTS-style target words.
+  - Normal spaced-review mode: 1-2 useful IELTS-style target words.
+  - 12-15 total target words: 0 new target words.
 - Put Chinese explanations directly under each English sentence.
 - Do not fill in the final `生单词:` section for the user.
 - Do not copy more than one short phrase from the source. Summarize and adapt ideas in original wording.
