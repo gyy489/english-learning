@@ -257,7 +257,7 @@ h1 {
 
 .review-plan-stats {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -309,6 +309,11 @@ h1 {
 .review-plan-word.due {
   border-color: var(--amber);
   color: var(--amber);
+}
+
+.review-plan-word.admitted {
+  border-color: var(--green);
+  color: var(--green);
 }
 
 .review-section {

@@ -35,17 +35,18 @@ Read `references/source-data.md` only when dataset details, selection policy, or
 1. Find the latest numbered day folder or Markdown file in `作文素材/按时间排序/`.
 2. Read the previous file's bottom `生单词:` section and rebuild the document-backed review state in `作文素材/单词复习/` from all daily Markdown files.
 3. Select no more than 15 target review words, in this order:
-   - Put the previous article's marked words first.
-   - With 0-5 current words, add up to 5 due historical words.
-   - With 6-10 current words, add up to 4 due historical words.
-   - With 11 or more current words, add no historical due words.
-   - Defer all words that do not fit; never discard them.
+   - Keep bounded pools: inbox 120, active learning 60, maintenance 120, then archive.
+   - Put still-forgotten or resurfaced words first, up to 10.
+   - Reserve at most 2 positions for due maintenance words.
+   - Fill remaining positions with due active-pool words.
+   - Only when no due word is deferred and the active pool has room, activate at most 2 inbox words.
+   - Archive overflow instead of scheduling it; preserve its history and reactivate it if the user marks it again.
 4. Normalize all selected words to dictionary forms, then add concise Chinese meanings in the new article's `## 复习生词`.
 5. Choose the vocabulary-load mode from the total selected load:
    - **High-load review mode**: 11 or more current words; no IELTS source and 0 new target words.
    - **Due-backlog cleanup mode**: any due historical words remain deferred; use an IELTS source, write at least 30 sentences, and add 0 new target words until the backlog is cleared.
-   - **Light-load source mode**: 0-7 total target words; about 36-40 sentences and 3-5 new IELTS target words.
-   - **Normal spaced-review mode**: 8-11 total target words; at least 30 sentences and 1-2 new IELTS target words.
+   - **Light-load source mode**: 0-7 total target words; about 36-40 sentences and use only the scheduler's 0-2 new-word allowance.
+   - **Normal spaced-review mode**: 8-11 total target words; at least 30 sentences and use only the scheduler's 0-2 new-word allowance.
    - **High review load with source**: 12-15 total target words but fewer than 11 current words; at least 30 sentences and 0 new target words.
 6. In a source mode, select one IELTS source from `readingpractice-index.json`. In high-load review mode, skip source selection and write `无（纯生词复习）` in both source metadata fields.
    - Prefer `P1` or accessible `P2` for IELTS 6.0 practice.
@@ -98,8 +99,8 @@ Use this exact structure:
 - Introduce new IELTS-style words or phrases according to the selected load mode:
   - High-load review mode: 0 new target words and no IELTS source.
   - Due-backlog cleanup mode: 0 new target words while any due historical words remain deferred.
-  - Light-load source mode: 3-5 useful IELTS-style target words.
-  - Normal spaced-review mode: 1-2 useful IELTS-style target words.
+  - Light-load source mode: never exceed the scheduler's 0-2 new-word allowance.
+  - Normal spaced-review mode: never exceed the scheduler's 0-2 new-word allowance.
   - 12-15 total target words: 0 new target words.
 - Put Chinese explanations directly under each English sentence.
 - Do not fill in the final `生单词:` section for the user.

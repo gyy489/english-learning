@@ -18,9 +18,11 @@ const elements = {
   sourceLabel: document.querySelector("#sourceLabel"),
   reviewPlanDay: document.querySelector("#reviewPlanDay"),
   vocabularyCount: document.querySelector("#vocabularyCount"),
+  activePoolCount: document.querySelector("#activePoolCount"),
+  inboxWordCount: document.querySelector("#inboxWordCount"),
   dueWordCount: document.querySelector("#dueWordCount"),
-  currentMarkedCount: document.querySelector("#currentMarkedCount"),
-  masteredWordCount: document.querySelector("#masteredWordCount"),
+  maintenancePoolCount: document.querySelector("#maintenancePoolCount"),
+  archivedWordCount: document.querySelector("#archivedWordCount"),
   reviewPlanMessage: document.querySelector("#reviewPlanMessage"),
   reviewHabitMessage: document.querySelector("#reviewHabitMessage"),
   reviewPlanWords: document.querySelector("#reviewPlanWords"),
@@ -129,14 +131,20 @@ function renderReviewPlan(payload) {
   const plan = payload?.nextPlan || {};
   const recentWords = Array.isArray(plan.recentWords) ? plan.recentWords : [];
   const dueWords = Array.isArray(plan.dueWords) ? plan.dueWords : [];
+  const admittedWords = Array.isArray(plan.admittedWords) ? plan.admittedWords : [];
+  const maintenanceWords = Array.isArray(plan.maintenanceWords) ? plan.maintenanceWords : [];
   const targetWords = Array.isArray(plan.targetWords) ? plan.targetWords : [];
   const dueSet = new Set(dueWords);
+  const admittedSet = new Set(admittedWords);
+  const maintenanceSet = new Set(maintenanceWords);
 
   elements.reviewPlanDay.textContent = `第 ${plan.nextDay || "—"} 天计划`;
   elements.vocabularyCount.textContent = String(summary.totalWords ?? 0);
+  elements.activePoolCount.textContent = `${summary.activePoolWords ?? 0}/60`;
+  elements.inboxWordCount.textContent = String(summary.inboxWords ?? 0);
   elements.dueWordCount.textContent = String(plan.totalDueCount ?? 0);
-  elements.currentMarkedCount.textContent = String(summary.currentMarkedWords ?? 0);
-  elements.masteredWordCount.textContent = String(summary.masteredWords ?? 0);
+  elements.maintenancePoolCount.textContent = `${summary.maintenancePoolWords ?? 0}/120`;
+  elements.archivedWordCount.textContent = String(summary.archivedWords ?? 0);
 
   const deferred = Number(plan.deferredDueCount || 0);
   const deferredRecent = Number(plan.deferredRecentCount || 0);
@@ -145,8 +153,8 @@ function renderReviewPlan(payload) {
   if (deferred) deferredParts.push(`${deferred} 个到期旧词`);
   const deferredText = deferredParts.length ? `，另有 ${deferredParts.join("、")}顺延` : "";
   elements.reviewPlanMessage.textContent = targetWords.length
-    ? `下一篇安排 ${targetWords.length} 个目标词：本篇生词 ${recentWords.length} 个 + 到期旧词 ${dueWords.length} 个${deferredText}。`
-    : "下一篇当前没有必须复习的目标词，可以加入少量新词。";
+    ? `下一篇固定不超过 15 个：重学/本篇词 ${recentWords.length} 个，到期词 ${dueWords.length} 个，收件箱新激活 ${admittedWords.length} 个${deferredText}。`
+    : "下一篇当前没有必须复习的目标词；系统最多只会激活 2 个新词。";
   const recentWindow = Number(habits.recentWindow || 0);
   elements.reviewHabitMessage.textContent = recentWindow
     ? `最近 ${recentWindow} 篇回忆成功率 ${habits.recentRecallRate ?? 0}%，平均每篇标记 ${habits.averageMarkedWords ?? 0} 个生词。`
@@ -155,9 +163,16 @@ function renderReviewPlan(payload) {
   elements.reviewPlanWords.replaceChildren();
   for (const word of targetWords) {
     const chip = document.createElement("span");
-    chip.className = `review-plan-word${dueSet.has(word) ? " due" : ""}`;
+    const kind = admittedSet.has(word) ? " admitted" : dueSet.has(word) ? " due" : "";
+    chip.className = `review-plan-word${kind}`;
     chip.textContent = word;
-    chip.title = dueSet.has(word) ? "到期旧词" : "本篇标记生词";
+    chip.title = admittedSet.has(word)
+      ? "从收件箱新激活"
+      : maintenanceSet.has(word)
+        ? "长期维护词"
+        : dueSet.has(word)
+          ? "活跃池到期词"
+          : "仍不会，优先重学";
     elements.reviewPlanWords.append(chip);
   }
 }

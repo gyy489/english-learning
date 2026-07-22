@@ -652,6 +652,7 @@ def generation_mode(
     target_count: int,
     recent_count: int,
     deferred_due_count: int = 0,
+    new_word_allowance: int = 0,
 ) -> dict[str, object]:
     if recent_count >= 11:
         return {
@@ -674,7 +675,7 @@ def generation_mode(
             "name": "轻负荷题库扩展",
             "sentenceCount": "约 36-40",
             "minimumSentences": 36,
-            "newWords": "3-5",
+            "newWords": f"最多 {max(0, new_word_allowance)}",
             "usesSource": True,
         }
     if target_count <= 11:
@@ -682,7 +683,7 @@ def generation_mode(
             "name": "正常间隔复习",
             "sentenceCount": "至少 30",
             "minimumSentences": 30,
-            "newWords": "1-2",
+            "newWords": f"最多 {max(0, new_word_allowance)}",
             "usesSource": True,
         }
     return {
@@ -886,6 +887,7 @@ def generate_next_article() -> dict[str, object]:
         len(words),
         len(recent_words),
         int(review_plan.get("deferredDueCount", 0)),
+        int(review_plan.get("newWordAllowance", 0)),
     )
     source = choose_source() if mode["usesSource"] else None
     next_day = previous_day + 1

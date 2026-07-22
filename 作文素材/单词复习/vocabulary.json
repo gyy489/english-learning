@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "strategy": {
     "intervals": [
       1,
@@ -10,8 +10,12 @@
       60
     ],
     "maxArticleTargets": 15,
-    "lightDueLimit": 5,
-    "normalDueLimit": 4
+    "activePoolLimit": 60,
+    "maintenancePoolLimit": 120,
+    "inboxLimit": 120,
+    "urgentDailyLimit": 10,
+    "maintenanceDailyLimit": 2,
+    "newActivationLimit": 2
   },
   "words": {
     "restriction": {
@@ -20,13 +24,16 @@
       "firstSeenDay": 11,
       "lastSeenDay": 14,
       "lastReviewedDay": 14,
+      "activationDay": 11,
       "nextReviewDay": 17,
       "intervalIndex": 1,
       "reviewCount": 4,
       "successCount": 2,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 2,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "frustrate": {
       "word": "frustrate",
@@ -34,13 +41,16 @@
       "firstSeenDay": 11,
       "lastSeenDay": 12,
       "lastReviewedDay": 12,
+      "activationDay": 11,
       "nextReviewDay": 19,
       "intervalIndex": 2,
       "reviewCount": 2,
       "successCount": 2,
       "successStreak": 2,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "unexpected": {
       "word": "unexpected",
@@ -48,13 +58,16 @@
       "firstSeenDay": 11,
       "lastSeenDay": 12,
       "lastReviewedDay": 12,
+      "activationDay": 11,
       "nextReviewDay": 19,
       "intervalIndex": 2,
       "reviewCount": 2,
       "successCount": 2,
       "successStreak": 2,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "endless": {
       "word": "endless",
@@ -62,13 +75,16 @@
       "firstSeenDay": 11,
       "lastSeenDay": 12,
       "lastReviewedDay": 12,
+      "activationDay": 11,
       "nextReviewDay": 19,
       "intervalIndex": 2,
       "reviewCount": 2,
       "successCount": 2,
       "successStreak": 2,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "uncertainty": {
       "word": "uncertainty",
@@ -76,13 +92,16 @@
       "firstSeenDay": 11,
       "lastSeenDay": 14,
       "lastReviewedDay": 14,
+      "activationDay": 11,
       "nextReviewDay": 17,
       "intervalIndex": 1,
       "reviewCount": 4,
       "successCount": 2,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 2,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "force": {
       "word": "force",
@@ -90,13 +109,16 @@
       "firstSeenDay": 11,
       "lastSeenDay": 12,
       "lastReviewedDay": 12,
+      "activationDay": 11,
       "nextReviewDay": 19,
       "intervalIndex": 2,
       "reviewCount": 2,
       "successCount": 2,
       "successStreak": 2,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "reminder": {
       "word": "reminder",
@@ -104,13 +126,16 @@
       "firstSeenDay": 11,
       "lastSeenDay": 12,
       "lastReviewedDay": 12,
+      "activationDay": 11,
       "nextReviewDay": 19,
       "intervalIndex": 2,
       "reviewCount": 2,
       "successCount": 2,
       "successStreak": 2,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "contrast": {
       "word": "contrast",
@@ -118,13 +143,16 @@
       "firstSeenDay": 11,
       "lastSeenDay": 13,
       "lastReviewedDay": 13,
+      "activationDay": 11,
       "nextReviewDay": 16,
       "intervalIndex": 1,
       "reviewCount": 3,
       "successCount": 2,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 1,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "disappoint": {
       "word": "disappoint",
@@ -132,13 +160,16 @@
       "firstSeenDay": 11,
       "lastSeenDay": 12,
       "lastReviewedDay": 12,
+      "activationDay": 11,
       "nextReviewDay": 19,
       "intervalIndex": 2,
       "reviewCount": 2,
       "successCount": 2,
       "successStreak": 2,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "gradually": {
       "word": "gradually",
@@ -146,13 +177,16 @@
       "firstSeenDay": 11,
       "lastSeenDay": 12,
       "lastReviewedDay": 12,
+      "activationDay": 11,
       "nextReviewDay": 19,
       "intervalIndex": 2,
       "reviewCount": 2,
       "successCount": 2,
       "successStreak": 2,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "appear": {
       "word": "appear",
@@ -160,13 +194,16 @@
       "firstSeenDay": 11,
       "lastSeenDay": 12,
       "lastReviewedDay": 12,
+      "activationDay": 11,
       "nextReviewDay": 19,
       "intervalIndex": 2,
       "reviewCount": 2,
       "successCount": 2,
       "successStreak": 2,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "unpredictably": {
       "word": "unpredictably",
@@ -174,13 +211,16 @@
       "firstSeenDay": 11,
       "lastSeenDay": 14,
       "lastReviewedDay": 14,
+      "activationDay": 11,
       "nextReviewDay": 17,
       "intervalIndex": 1,
       "reviewCount": 4,
       "successCount": 2,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 2,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "ordinary": {
       "word": "ordinary",
@@ -188,13 +228,16 @@
       "firstSeenDay": 11,
       "lastSeenDay": 17,
       "lastReviewedDay": 17,
+      "activationDay": 11,
       "nextReviewDay": 20,
       "intervalIndex": 1,
       "reviewCount": 4,
       "successCount": 3,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 1,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "surround": {
       "word": "surround",
@@ -202,13 +245,16 @@
       "firstSeenDay": 11,
       "lastSeenDay": 12,
       "lastReviewedDay": 12,
+      "activationDay": 11,
       "nextReviewDay": 19,
       "intervalIndex": 2,
       "reviewCount": 2,
       "successCount": 2,
       "successStreak": 2,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "communicate": {
       "word": "communicate",
@@ -216,13 +262,16 @@
       "firstSeenDay": 11,
       "lastSeenDay": 12,
       "lastReviewedDay": 12,
+      "activationDay": 11,
       "nextReviewDay": 19,
       "intervalIndex": 2,
       "reviewCount": 2,
       "successCount": 2,
       "successStreak": 2,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "describe": {
       "word": "describe",
@@ -230,13 +279,16 @@
       "firstSeenDay": 11,
       "lastSeenDay": 13,
       "lastReviewedDay": 13,
+      "activationDay": 11,
       "nextReviewDay": 16,
       "intervalIndex": 1,
       "reviewCount": 3,
       "successCount": 2,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 1,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "quite": {
       "word": "quite",
@@ -244,13 +296,16 @@
       "firstSeenDay": 11,
       "lastSeenDay": 12,
       "lastReviewedDay": 12,
+      "activationDay": 11,
       "nextReviewDay": 19,
       "intervalIndex": 2,
       "reviewCount": 2,
       "successCount": 2,
       "successStreak": 2,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "record": {
       "word": "record",
@@ -258,13 +313,16 @@
       "firstSeenDay": 11,
       "lastSeenDay": 12,
       "lastReviewedDay": 12,
+      "activationDay": 11,
       "nextReviewDay": 19,
       "intervalIndex": 2,
       "reviewCount": 2,
       "successCount": 2,
       "successStreak": 2,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "blank": {
       "word": "blank",
@@ -272,13 +330,16 @@
       "firstSeenDay": 11,
       "lastSeenDay": 12,
       "lastReviewedDay": 12,
+      "activationDay": 11,
       "nextReviewDay": 19,
       "intervalIndex": 2,
       "reviewCount": 2,
       "successCount": 2,
       "successStreak": 2,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "doubt": {
       "word": "doubt",
@@ -286,13 +347,16 @@
       "firstSeenDay": 11,
       "lastSeenDay": 12,
       "lastReviewedDay": 12,
+      "activationDay": 11,
       "nextReviewDay": 19,
       "intervalIndex": 2,
       "reviewCount": 2,
       "successCount": 2,
       "successStreak": 2,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "during": {
       "word": "during",
@@ -300,13 +364,16 @@
       "firstSeenDay": 12,
       "lastSeenDay": 13,
       "lastReviewedDay": 13,
+      "activationDay": 13,
       "nextReviewDay": 16,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "aware": {
       "word": "aware",
@@ -314,13 +381,16 @@
       "firstSeenDay": 12,
       "lastSeenDay": 13,
       "lastReviewedDay": 13,
+      "activationDay": 13,
       "nextReviewDay": 16,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "paragraph": {
       "word": "paragraph",
@@ -328,13 +398,16 @@
       "firstSeenDay": 12,
       "lastSeenDay": 13,
       "lastReviewedDay": 13,
+      "activationDay": 13,
       "nextReviewDay": 16,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "sound": {
       "word": "sound",
@@ -342,13 +415,16 @@
       "firstSeenDay": 12,
       "lastSeenDay": 14,
       "lastReviewedDay": 14,
+      "activationDay": 13,
       "nextReviewDay": 17,
       "intervalIndex": 1,
       "reviewCount": 2,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 1,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "through": {
       "word": "through",
@@ -356,13 +432,16 @@
       "firstSeenDay": 12,
       "lastSeenDay": 16,
       "lastReviewedDay": 16,
+      "activationDay": 13,
       "nextReviewDay": 19,
       "intervalIndex": 1,
       "reviewCount": 4,
       "successCount": 2,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 2,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "bring": {
       "word": "bring",
@@ -370,13 +449,16 @@
       "firstSeenDay": 12,
       "lastSeenDay": 15,
       "lastReviewedDay": 15,
+      "activationDay": 13,
       "nextReviewDay": 18,
       "intervalIndex": 1,
       "reviewCount": 3,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 2,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "nervous": {
       "word": "nervous",
@@ -384,13 +466,16 @@
       "firstSeenDay": 13,
       "lastSeenDay": 14,
       "lastReviewedDay": 14,
+      "activationDay": 14,
       "nextReviewDay": 17,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "forward": {
       "word": "forward",
@@ -398,13 +483,16 @@
       "firstSeenDay": 13,
       "lastSeenDay": 14,
       "lastReviewedDay": 14,
+      "activationDay": 14,
       "nextReviewDay": 17,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "pronunciation": {
       "word": "pronunciation",
@@ -412,13 +500,16 @@
       "firstSeenDay": 13,
       "lastSeenDay": 14,
       "lastReviewedDay": 14,
+      "activationDay": 14,
       "nextReviewDay": 17,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "discovery": {
       "word": "discovery",
@@ -426,13 +517,16 @@
       "firstSeenDay": 13,
       "lastSeenDay": 14,
       "lastReviewedDay": 14,
+      "activationDay": 14,
       "nextReviewDay": 17,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "weak": {
       "word": "weak",
@@ -440,13 +534,16 @@
       "firstSeenDay": 13,
       "lastSeenDay": 19,
       "lastReviewedDay": 19,
+      "activationDay": 14,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 2,
       "successCount": 1,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 1,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "whole": {
       "word": "whole",
@@ -454,13 +551,16 @@
       "firstSeenDay": 13,
       "lastSeenDay": 14,
       "lastReviewedDay": 14,
+      "activationDay": 14,
       "nextReviewDay": 17,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "improvement": {
       "word": "improvement",
@@ -468,13 +568,16 @@
       "firstSeenDay": 13,
       "lastSeenDay": 14,
       "lastReviewedDay": 14,
+      "activationDay": 14,
       "nextReviewDay": 17,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "ride": {
       "word": "ride",
@@ -482,13 +585,16 @@
       "firstSeenDay": 14,
       "lastSeenDay": 15,
       "lastReviewedDay": 15,
+      "activationDay": 15,
       "nextReviewDay": 18,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "wheel": {
       "word": "wheel",
@@ -496,13 +602,16 @@
       "firstSeenDay": 14,
       "lastSeenDay": 15,
       "lastReviewedDay": 15,
+      "activationDay": 15,
       "nextReviewDay": 18,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "hit": {
       "word": "hit",
@@ -510,13 +619,16 @@
       "firstSeenDay": 14,
       "lastSeenDay": 15,
       "lastReviewedDay": 15,
+      "activationDay": 15,
       "nextReviewDay": 18,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "wet": {
       "word": "wet",
@@ -524,13 +636,16 @@
       "firstSeenDay": 14,
       "lastSeenDay": 15,
       "lastReviewedDay": 15,
+      "activationDay": 15,
       "nextReviewDay": 18,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "smooth": {
       "word": "smooth",
@@ -538,13 +653,16 @@
       "firstSeenDay": 14,
       "lastSeenDay": 15,
       "lastReviewedDay": 15,
+      "activationDay": 15,
       "nextReviewDay": 18,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "ignore": {
       "word": "ignore",
@@ -552,13 +670,16 @@
       "firstSeenDay": 14,
       "lastSeenDay": 15,
       "lastReviewedDay": 15,
+      "activationDay": 15,
       "nextReviewDay": 18,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "suddenly": {
       "word": "suddenly",
@@ -566,13 +687,16 @@
       "firstSeenDay": 14,
       "lastSeenDay": 15,
       "lastReviewedDay": 15,
+      "activationDay": 15,
       "nextReviewDay": 18,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "chain": {
       "word": "chain",
@@ -580,13 +704,16 @@
       "firstSeenDay": 14,
       "lastSeenDay": 15,
       "lastReviewedDay": 15,
+      "activationDay": 15,
       "nextReviewDay": 18,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "mechanic": {
       "word": "mechanic",
@@ -594,13 +721,16 @@
       "firstSeenDay": 14,
       "lastSeenDay": 15,
       "lastReviewedDay": 15,
+      "activationDay": 15,
       "nextReviewDay": 18,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "repair": {
       "word": "repair",
@@ -608,13 +738,16 @@
       "firstSeenDay": 14,
       "lastSeenDay": 15,
       "lastReviewedDay": 15,
+      "activationDay": 15,
       "nextReviewDay": 18,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "road": {
       "word": "road",
@@ -622,13 +755,16 @@
       "firstSeenDay": 14,
       "lastSeenDay": 15,
       "lastReviewedDay": 15,
+      "activationDay": 15,
       "nextReviewDay": 18,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "slide": {
       "word": "slide",
@@ -636,13 +772,16 @@
       "firstSeenDay": 15,
       "lastSeenDay": 17,
       "lastReviewedDay": 17,
+      "activationDay": 16,
       "nextReviewDay": 20,
       "intervalIndex": 1,
       "reviewCount": 2,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 1,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "glad": {
       "word": "glad",
@@ -650,13 +789,16 @@
       "firstSeenDay": 15,
       "lastSeenDay": 16,
       "lastReviewedDay": 16,
+      "activationDay": 16,
       "nextReviewDay": 19,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "hold": {
       "word": "hold",
@@ -664,13 +806,16 @@
       "firstSeenDay": 15,
       "lastSeenDay": 16,
       "lastReviewedDay": 16,
+      "activationDay": 16,
       "nextReviewDay": 19,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "warm": {
       "word": "warm",
@@ -678,13 +823,17 @@
       "firstSeenDay": 16,
       "lastSeenDay": 17,
       "lastReviewedDay": 17,
+      "activationDay": 17,
       "nextReviewDay": 20,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox",
+      "poolReason": "active_pool_overflow"
     },
     "common": {
       "word": "common",
@@ -692,13 +841,16 @@
       "firstSeenDay": 16,
       "lastSeenDay": 17,
       "lastReviewedDay": 17,
+      "activationDay": 17,
       "nextReviewDay": 20,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "trade": {
       "word": "trade",
@@ -706,13 +858,17 @@
       "firstSeenDay": 16,
       "lastSeenDay": 19,
       "lastReviewedDay": 19,
+      "activationDay": 17,
       "nextReviewDay": 22,
       "intervalIndex": 1,
       "reviewCount": 3,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 2,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox",
+      "poolReason": "active_pool_overflow"
     },
     "remind": {
       "word": "remind",
@@ -720,13 +876,17 @@
       "firstSeenDay": 16,
       "lastSeenDay": 17,
       "lastReviewedDay": 17,
+      "activationDay": 17,
       "nextReviewDay": 20,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox",
+      "poolReason": "active_pool_overflow"
     },
     "reach": {
       "word": "reach",
@@ -734,13 +894,17 @@
       "firstSeenDay": 16,
       "lastSeenDay": 19,
       "lastReviewedDay": 19,
+      "activationDay": 17,
       "nextReviewDay": 22,
       "intervalIndex": 1,
       "reviewCount": 3,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 2,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox",
+      "poolReason": "active_pool_overflow"
     },
     "awake": {
       "word": "awake",
@@ -748,13 +912,17 @@
       "firstSeenDay": 16,
       "lastSeenDay": 18,
       "lastReviewedDay": 18,
+      "activationDay": 17,
       "nextReviewDay": 21,
       "intervalIndex": 1,
       "reviewCount": 2,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 1,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox",
+      "poolReason": "active_pool_overflow"
     },
     "journey": {
       "word": "journey",
@@ -762,13 +930,16 @@
       "firstSeenDay": 16,
       "lastSeenDay": 17,
       "lastReviewedDay": 17,
+      "activationDay": 17,
       "nextReviewDay": 20,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "ceremony": {
       "word": "ceremony",
@@ -776,13 +947,16 @@
       "firstSeenDay": 16,
       "lastSeenDay": 17,
       "lastReviewedDay": 17,
+      "activationDay": 17,
       "nextReviewDay": 20,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "behind": {
       "word": "behind",
@@ -790,13 +964,16 @@
       "firstSeenDay": 16,
       "lastSeenDay": 17,
       "lastReviewedDay": 17,
+      "activationDay": 17,
       "nextReviewDay": 20,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "museum": {
       "word": "museum",
@@ -804,13 +981,17 @@
       "firstSeenDay": 16,
       "lastSeenDay": 17,
       "lastReviewedDay": 17,
+      "activationDay": 17,
       "nextReviewDay": 20,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox",
+      "poolReason": "active_pool_overflow"
     },
     "leaf": {
       "word": "leaf",
@@ -818,13 +999,16 @@
       "firstSeenDay": 16,
       "lastSeenDay": 17,
       "lastReviewedDay": 17,
+      "activationDay": 17,
       "nextReviewDay": 20,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "debate": {
       "word": "debate",
@@ -832,13 +1016,16 @@
       "firstSeenDay": 16,
       "lastSeenDay": 17,
       "lastReviewedDay": 17,
+      "activationDay": 17,
       "nextReviewDay": 20,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "fall": {
       "word": "fall",
@@ -846,13 +1033,16 @@
       "firstSeenDay": 16,
       "lastSeenDay": 17,
       "lastReviewedDay": 17,
+      "activationDay": 17,
       "nextReviewDay": 20,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "religious": {
       "word": "religious",
@@ -860,13 +1050,17 @@
       "firstSeenDay": 16,
       "lastSeenDay": 17,
       "lastReviewedDay": 17,
+      "activationDay": 17,
       "nextReviewDay": 20,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox",
+      "poolReason": "active_pool_overflow"
     },
     "gently": {
       "word": "gently",
@@ -874,13 +1068,16 @@
       "firstSeenDay": 16,
       "lastSeenDay": 17,
       "lastReviewedDay": 17,
+      "activationDay": 17,
       "nextReviewDay": 20,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "practise": {
       "word": "practise",
@@ -888,13 +1085,17 @@
       "firstSeenDay": 16,
       "lastSeenDay": 17,
       "lastReviewedDay": 17,
+      "activationDay": 17,
       "nextReviewDay": 20,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox",
+      "poolReason": "active_pool_overflow"
     },
     "prepare": {
       "word": "prepare",
@@ -902,13 +1103,17 @@
       "firstSeenDay": 16,
       "lastSeenDay": 17,
       "lastReviewedDay": 17,
+      "activationDay": 17,
       "nextReviewDay": 20,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox",
+      "poolReason": "active_pool_overflow"
     },
     "harmful": {
       "word": "harmful",
@@ -916,13 +1121,17 @@
       "firstSeenDay": 16,
       "lastSeenDay": 19,
       "lastReviewedDay": 19,
+      "activationDay": 17,
       "nextReviewDay": 22,
       "intervalIndex": 1,
       "reviewCount": 3,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 2,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox",
+      "poolReason": "active_pool_overflow"
     },
     "across": {
       "word": "across",
@@ -930,13 +1139,16 @@
       "firstSeenDay": 16,
       "lastSeenDay": 17,
       "lastReviewedDay": 17,
+      "activationDay": 17,
       "nextReviewDay": 20,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "garden": {
       "word": "garden",
@@ -944,13 +1156,17 @@
       "firstSeenDay": 16,
       "lastSeenDay": 18,
       "lastReviewedDay": 18,
+      "activationDay": 17,
       "nextReviewDay": 21,
       "intervalIndex": 1,
       "reviewCount": 2,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 1,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox",
+      "poolReason": "active_pool_overflow"
     },
     "argue": {
       "word": "argue",
@@ -958,13 +1174,17 @@
       "firstSeenDay": 16,
       "lastSeenDay": 19,
       "lastReviewedDay": 19,
+      "activationDay": 17,
       "nextReviewDay": 22,
       "intervalIndex": 1,
       "reviewCount": 3,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 2,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox",
+      "poolReason": "active_pool_overflow"
     },
     "spoon": {
       "word": "spoon",
@@ -972,13 +1192,17 @@
       "firstSeenDay": 16,
       "lastSeenDay": 19,
       "lastReviewedDay": 19,
+      "activationDay": 17,
       "nextReviewDay": 22,
       "intervalIndex": 1,
       "reviewCount": 3,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 2,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox",
+      "poolReason": "active_pool_overflow"
     },
     "shake": {
       "word": "shake",
@@ -986,13 +1210,17 @@
       "firstSeenDay": 16,
       "lastSeenDay": 17,
       "lastReviewedDay": 17,
+      "activationDay": 17,
       "nextReviewDay": 20,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox",
+      "poolReason": "active_pool_overflow"
     },
     "expect": {
       "word": "expect",
@@ -1000,13 +1228,17 @@
       "firstSeenDay": 17,
       "lastSeenDay": 18,
       "lastReviewedDay": 18,
+      "activationDay": 18,
       "nextReviewDay": 21,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox",
+      "poolReason": "active_pool_overflow"
     },
     "uneven": {
       "word": "uneven",
@@ -1014,13 +1246,17 @@
       "firstSeenDay": 17,
       "lastSeenDay": 18,
       "lastReviewedDay": 18,
+      "activationDay": 18,
       "nextReviewDay": 21,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox",
+      "poolReason": "active_pool_overflow"
     },
     "round": {
       "word": "round",
@@ -1028,13 +1264,17 @@
       "firstSeenDay": 17,
       "lastSeenDay": 19,
       "lastReviewedDay": 19,
+      "activationDay": 18,
       "nextReviewDay": 22,
       "intervalIndex": 1,
       "reviewCount": 2,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 1,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox",
+      "poolReason": "active_pool_overflow"
     },
     "warmly": {
       "word": "warmly",
@@ -1042,13 +1282,17 @@
       "firstSeenDay": 17,
       "lastSeenDay": 18,
       "lastReviewedDay": 18,
+      "activationDay": 18,
       "nextReviewDay": 21,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox",
+      "poolReason": "active_pool_overflow"
     },
     "bone": {
       "word": "bone",
@@ -1056,13 +1300,17 @@
       "firstSeenDay": 17,
       "lastSeenDay": 19,
       "lastReviewedDay": 19,
+      "activationDay": 18,
       "nextReviewDay": 22,
       "intervalIndex": 1,
       "reviewCount": 2,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 1,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox",
+      "poolReason": "active_pool_overflow"
     },
     "tie": {
       "word": "tie",
@@ -1070,13 +1318,16 @@
       "firstSeenDay": 17,
       "lastSeenDay": 19,
       "lastReviewedDay": 19,
+      "activationDay": 18,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 2,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 2,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "dry": {
       "word": "dry",
@@ -1084,13 +1335,17 @@
       "firstSeenDay": 17,
       "lastSeenDay": 19,
       "lastReviewedDay": 19,
+      "activationDay": 18,
       "nextReviewDay": 22,
       "intervalIndex": 1,
       "reviewCount": 2,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 1,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox",
+      "poolReason": "active_pool_overflow"
     },
     "shape": {
       "word": "shape",
@@ -1098,13 +1353,17 @@
       "firstSeenDay": 17,
       "lastSeenDay": 18,
       "lastReviewedDay": 18,
+      "activationDay": 18,
       "nextReviewDay": 21,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox",
+      "poolReason": "active_pool_overflow"
     },
     "modern": {
       "word": "modern",
@@ -1112,13 +1371,17 @@
       "firstSeenDay": 17,
       "lastSeenDay": 18,
       "lastReviewedDay": 18,
+      "activationDay": 18,
       "nextReviewDay": 21,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox",
+      "poolReason": "active_pool_overflow"
     },
     "stir": {
       "word": "stir",
@@ -1126,13 +1389,16 @@
       "firstSeenDay": 17,
       "lastSeenDay": 19,
       "lastReviewedDay": 19,
+      "activationDay": 18,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 2,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 2,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "branch": {
       "word": "branch",
@@ -1140,13 +1406,16 @@
       "firstSeenDay": 18,
       "lastSeenDay": 19,
       "lastReviewedDay": 19,
+      "activationDay": 19,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 1,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 1,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "fence": {
       "word": "fence",
@@ -1154,13 +1423,17 @@
       "firstSeenDay": 18,
       "lastSeenDay": 19,
       "lastReviewedDay": 19,
+      "activationDay": 19,
       "nextReviewDay": 22,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox",
+      "poolReason": "active_pool_overflow"
     },
     "chew": {
       "word": "chew",
@@ -1168,13 +1441,17 @@
       "firstSeenDay": 18,
       "lastSeenDay": 19,
       "lastReviewedDay": 19,
+      "activationDay": 19,
       "nextReviewDay": 22,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox",
+      "poolReason": "active_pool_overflow"
     },
     "sharp": {
       "word": "sharp",
@@ -1182,13 +1459,16 @@
       "firstSeenDay": 18,
       "lastSeenDay": 19,
       "lastReviewedDay": 19,
+      "activationDay": 19,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 1,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 1,
-      "status": "learning"
+      "status": "learning",
+      "pool": "active"
     },
     "soil": {
       "word": "soil",
@@ -1196,13 +1476,17 @@
       "firstSeenDay": 18,
       "lastSeenDay": 19,
       "lastReviewedDay": 19,
+      "activationDay": 19,
       "nextReviewDay": 22,
       "intervalIndex": 1,
       "reviewCount": 1,
       "successCount": 1,
       "successStreak": 1,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox",
+      "poolReason": "active_pool_overflow"
     },
     "portrait": {
       "word": "portrait",
@@ -1210,13 +1494,16 @@
       "firstSeenDay": 19,
       "lastSeenDay": 19,
       "lastReviewedDay": null,
+      "activationDay": null,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 0,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox"
     },
     "excitement": {
       "word": "excitement",
@@ -1224,13 +1511,16 @@
       "firstSeenDay": 19,
       "lastSeenDay": 19,
       "lastReviewedDay": null,
+      "activationDay": null,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 0,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox"
     },
     "sum": {
       "word": "sum",
@@ -1238,13 +1528,16 @@
       "firstSeenDay": 19,
       "lastSeenDay": 19,
       "lastReviewedDay": null,
+      "activationDay": null,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 0,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox"
     },
     "modest": {
       "word": "modest",
@@ -1252,13 +1545,16 @@
       "firstSeenDay": 19,
       "lastSeenDay": 19,
       "lastReviewedDay": null,
+      "activationDay": null,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 0,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox"
     },
     "auction": {
       "word": "auction",
@@ -1266,13 +1562,16 @@
       "firstSeenDay": 19,
       "lastSeenDay": 19,
       "lastReviewedDay": null,
+      "activationDay": null,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 0,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox"
     },
     "expert": {
       "word": "expert",
@@ -1280,13 +1579,16 @@
       "firstSeenDay": 19,
       "lastSeenDay": 19,
       "lastReviewedDay": null,
+      "activationDay": null,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 0,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox"
     },
     "authentic": {
       "word": "authentic",
@@ -1294,13 +1596,16 @@
       "firstSeenDay": 19,
       "lastSeenDay": 19,
       "lastReviewedDay": null,
+      "activationDay": null,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 0,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox"
     },
     "shadow": {
       "word": "shadow",
@@ -1308,13 +1613,16 @@
       "firstSeenDay": 19,
       "lastSeenDay": 19,
       "lastReviewedDay": null,
+      "activationDay": null,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 0,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox"
     },
     "draw": {
       "word": "draw",
@@ -1322,13 +1630,16 @@
       "firstSeenDay": 19,
       "lastSeenDay": 19,
       "lastReviewedDay": null,
+      "activationDay": null,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 0,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox"
     },
     "therefore": {
       "word": "therefore",
@@ -1336,13 +1647,16 @@
       "firstSeenDay": 19,
       "lastSeenDay": 19,
       "lastReviewedDay": null,
+      "activationDay": null,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 0,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox"
     },
     "match": {
       "word": "match",
@@ -1350,13 +1664,16 @@
       "firstSeenDay": 19,
       "lastSeenDay": 19,
       "lastReviewedDay": null,
+      "activationDay": null,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 0,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox"
     },
     "area": {
       "word": "area",
@@ -1364,13 +1681,16 @@
       "firstSeenDay": 19,
       "lastSeenDay": 19,
       "lastReviewedDay": null,
+      "activationDay": null,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 0,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox"
     },
     "vellum": {
       "word": "vellum",
@@ -1378,13 +1698,16 @@
       "firstSeenDay": 19,
       "lastSeenDay": 19,
       "lastReviewedDay": null,
+      "activationDay": null,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 0,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox"
     },
     "period": {
       "word": "period",
@@ -1392,13 +1715,16 @@
       "firstSeenDay": 19,
       "lastSeenDay": 19,
       "lastReviewedDay": null,
+      "activationDay": null,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 0,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox"
     },
     "burn": {
       "word": "burn",
@@ -1406,13 +1732,16 @@
       "firstSeenDay": 19,
       "lastSeenDay": 19,
       "lastReviewedDay": null,
+      "activationDay": null,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 0,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox"
     },
     "tiny": {
       "word": "tiny",
@@ -1420,13 +1749,16 @@
       "firstSeenDay": 19,
       "lastSeenDay": 19,
       "lastReviewedDay": null,
+      "activationDay": null,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 0,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox"
     },
     "reveal": {
       "word": "reveal",
@@ -1434,13 +1766,16 @@
       "firstSeenDay": 19,
       "lastSeenDay": 19,
       "lastReviewedDay": null,
+      "activationDay": null,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 0,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox"
     },
     "fingerprint": {
       "word": "fingerprint",
@@ -1448,13 +1783,16 @@
       "firstSeenDay": 19,
       "lastSeenDay": 19,
       "lastReviewedDay": null,
+      "activationDay": null,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 0,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox"
     },
     "paint": {
       "word": "paint",
@@ -1462,13 +1800,16 @@
       "firstSeenDay": 19,
       "lastSeenDay": 19,
       "lastReviewedDay": null,
+      "activationDay": null,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 0,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox"
     },
     "provid": {
       "word": "provid",
@@ -1476,13 +1817,16 @@
       "firstSeenDay": 19,
       "lastSeenDay": 19,
       "lastReviewedDay": null,
+      "activationDay": null,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 0,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox"
     },
     "although": {
       "word": "although",
@@ -1490,13 +1834,16 @@
       "firstSeenDay": 19,
       "lastSeenDay": 19,
       "lastReviewedDay": null,
+      "activationDay": null,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 0,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox"
     },
     "prove": {
       "word": "prove",
@@ -1504,13 +1851,16 @@
       "firstSeenDay": 19,
       "lastSeenDay": 19,
       "lastReviewedDay": null,
+      "activationDay": null,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 0,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox"
     },
     "authorship": {
       "word": "authorship",
@@ -1518,13 +1868,16 @@
       "firstSeenDay": 19,
       "lastSeenDay": 19,
       "lastReviewedDay": null,
+      "activationDay": null,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 0,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox"
     },
     "nevertheless": {
       "word": "nevertheless",
@@ -1532,13 +1885,16 @@
       "firstSeenDay": 19,
       "lastSeenDay": 19,
       "lastReviewedDay": null,
+      "activationDay": null,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 0,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox"
     },
     "claim": {
       "word": "claim",
@@ -1546,13 +1902,16 @@
       "firstSeenDay": 19,
       "lastSeenDay": 19,
       "lastReviewedDay": null,
+      "activationDay": null,
       "nextReviewDay": 20,
       "intervalIndex": 0,
       "reviewCount": 0,
       "successCount": 0,
       "successStreak": 0,
+      "longIntervalSuccessCount": 0,
       "lapseCount": 0,
-      "status": "learning"
+      "status": "learning",
+      "pool": "inbox"
     }
   },
   "sessions": [
@@ -2436,43 +2795,73 @@
   },
   "nextPlan": {
     "recentWords": [
-      "portrait",
       "stir",
-      "excitement",
-      "sum",
-      "modest",
-      "auction",
-      "expert",
-      "authentic",
-      "shadow",
-      "draw",
-      "sharp",
+      "branch",
       "tie",
-      "therefore",
-      "match",
-      "area"
+      "sharp",
+      "weak"
     ],
-    "dueWords": [],
+    "dueWords": [
+      "contrast",
+      "describe",
+      "aware",
+      "during",
+      "paragraph",
+      "restriction",
+      "uncertainty",
+      "unpredictably",
+      "sound",
+      "discovery"
+    ],
+    "urgentWords": [
+      "stir",
+      "branch",
+      "tie",
+      "sharp",
+      "weak"
+    ],
+    "activeDueWords": [
+      "contrast",
+      "describe",
+      "aware",
+      "during",
+      "paragraph",
+      "restriction",
+      "uncertainty",
+      "unpredictably",
+      "sound",
+      "discovery"
+    ],
+    "maintenanceWords": [],
+    "admittedWords": [],
     "targetWords": [
-      "portrait",
       "stir",
-      "excitement",
-      "sum",
-      "modest",
-      "auction",
-      "expert",
-      "authentic",
-      "shadow",
-      "draw",
-      "sharp",
+      "branch",
       "tie",
-      "therefore",
-      "match",
-      "area"
+      "sharp",
+      "weak",
+      "contrast",
+      "describe",
+      "aware",
+      "during",
+      "paragraph",
+      "restriction",
+      "uncertainty",
+      "unpredictably",
+      "sound",
+      "discovery"
     ],
-    "deferredRecentCount": 15,
-    "deferredDueCount": 62,
-    "totalDueCount": 62,
+    "deferredRecentCount": 25,
+    "deferredDueCount": 45,
+    "totalDueCount": 60,
+    "newWordAllowance": 0,
+    "poolCounts": {
+      "active": 60,
+      "maintenance": 0,
+      "inbox": 50,
+      "archive": 0
+    },
+    "inboxWaitingCount": 50,
     "maxTargets": 15,
     "currentDay": 19,
     "nextDay": 20
@@ -2491,6 +2880,10 @@
     "familiarWords": 0,
     "masteredWords": 0,
     "currentMarkedWords": 30,
-    "dueForNextDay": 62
+    "dueForNextDay": 60,
+    "activePoolWords": 60,
+    "maintenancePoolWords": 0,
+    "inboxWords": 50,
+    "archivedWords": 0
   }
 }
