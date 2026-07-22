@@ -653,46 +653,54 @@ def generation_mode(
     recent_count: int,
     deferred_due_count: int = 0,
     new_word_allowance: int = 0,
+    current_marked_count: int = 0,
+    inbox_waiting_count: int = 0,
 ) -> dict[str, object]:
-    if recent_count >= 11:
+    source_allowed = (
+        target_count <= 7
+        and recent_count <= 5
+        and current_marked_count <= 5
+        and deferred_due_count == 0
+        and inbox_waiting_count <= 15
+    )
+    if not source_allowed:
+        if deferred_due_count > 0:
+            name = "积压清理（纯单词）"
+        elif target_count >= 8 or current_marked_count >= 6:
+            name = "高负荷纯单词复习"
+        else:
+            name = "收件箱减压（纯单词）"
         return {
-            "name": "高负荷纯复习",
+            "name": name,
             "sentenceCount": "约 25-30",
             "minimumSentences": 25,
             "newWords": "0",
             "usesSource": False,
         }
-    if deferred_due_count > 0:
-        return {
-            "name": "到期词清理",
-            "sentenceCount": "至少 30",
-            "minimumSentences": 30,
-            "newWords": "0",
-            "usesSource": True,
-        }
-    if target_count <= 7:
-        return {
-            "name": "轻负荷题库扩展",
-            "sentenceCount": "约 36-40",
-            "minimumSentences": 36,
-            "newWords": f"最多 {max(0, new_word_allowance)}",
-            "usesSource": True,
-        }
-    if target_count <= 11:
-        return {
-            "name": "正常间隔复习",
-            "sentenceCount": "至少 30",
-            "minimumSentences": 30,
-            "newWords": f"最多 {max(0, new_word_allowance)}",
-            "usesSource": True,
-        }
     return {
-        "name": "高复习负荷",
-        "sentenceCount": "至少 30",
-        "minimumSentences": 30,
-        "newWords": "0",
+        "name": "低负荷雅思题库扩展",
+        "sentenceCount": "约 36-40",
+        "minimumSentences": 36,
+        "newWords": f"最多 {max(0, new_word_allowance)}",
         "usesSource": True,
     }
+
+
+def review_dashboard_payload(history: dict[str, object]) -> dict[str, object]:
+    payload = dashboard_payload(history)
+    summary = dict(history.get("summary", {}))
+    plan = dict(history.get("nextPlan", {}))
+    targets = list(plan.get("targetWords", []))
+    recent = list(plan.get("recentWords", []))
+    payload["generationMode"] = generation_mode(
+        len(targets),
+        len(recent),
+        int(plan.get("deferredDueCount", 0)),
+        int(plan.get("newWordAllowance", 0)),
+        int(summary.get("currentMarkedWords", 0)),
+        int(plan.get("inboxWaitingCount", 0)),
+    )
+    return payload
 
 
 def strip_model_fences(text: str) -> str:
@@ -752,7 +760,8 @@ def build_generation_prompt(
         source_context = "来源真题：无（纯生词复习）\n来源文件：无（纯生词复习）"
         source_rule = (
             "不要使用题库、外部材料或专业新主题。只根据旧生词构造一个简单、连贯的日常故事或说明，"
-            "除必要基础词外不引入新的目标词。"
+            "除列出的目标词外，尽量只使用常见基础词和简单连接词；不要为了丰富文章而加入生僻名词、"
+            "专业术语或复杂形容词。"
         )
 
     return f"""你正在为一名 IELTS 5.5-6.0 学习者生成第 {next_day} 天的英语文章。
@@ -880,7 +889,7 @@ def request_generated_markdown(prompt: str) -> tuple[str, str]:
 def generate_next_article() -> dict[str, object]:
     load_project_env()
     previous_day, _ = latest_article()
-    _, review_plan = refresh_review_documents()
+    review_history, review_plan = refresh_review_documents()
     words = dedupe_words(list(review_plan.get("targetWords", [])))
     recent_words = list(review_plan.get("recentWords", []))
     mode = generation_mode(
@@ -888,6 +897,8 @@ def generate_next_article() -> dict[str, object]:
         len(recent_words),
         int(review_plan.get("deferredDueCount", 0)),
         int(review_plan.get("newWordAllowance", 0)),
+        int(dict(review_history.get("summary", {})).get("currentMarkedWords", 0)),
+        int(review_plan.get("inboxWaitingCount", 0)),
     )
     source = choose_source() if mode["usesSource"] else None
     next_day = previous_day + 1
@@ -945,7 +956,7 @@ def generate_next_article() -> dict[str, object]:
         "audioGenerated": article_path.with_suffix(".mp3").exists(),
         "warning": audio_warning,
         "generator": generator,
-        "reviewPlan": dashboard_payload(updated_history),
+        "reviewPlan": review_dashboard_payload(updated_history),
     }
 
 
@@ -1044,7 +1055,7 @@ class AppHandler(BaseHTTPRequestHandler):
                 )
             elif path == "/api/review-plan":
                 history, _ = refresh_review_documents()
-                self.send_json(dashboard_payload(history))
+                self.send_json(review_dashboard_payload(history))
             elif path == "/api/dictionary":
                 self.send_json(lookup_dictionary(query.get("word", [""])[0]))
             elif path == "/api/audio":
@@ -1087,7 +1098,7 @@ class AppHandler(BaseHTTPRequestHandler):
                         "words": saved,
                         "saved": True,
                         "updatedAt": article_path.stat().st_mtime_ns,
-                        "reviewPlan": dashboard_payload(history),
+                        "reviewPlan": review_dashboard_payload(history),
                     }
                 )
                 return

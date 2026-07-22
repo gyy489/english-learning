@@ -43,16 +43,13 @@ Read `references/source-data.md` only when dataset details, selection policy, or
    - Archive overflow instead of scheduling it; preserve its history and reactivate it if the user marks it again.
 4. Normalize all selected words to dictionary forms, then add concise Chinese meanings in the new article's `## 复习生词`.
 5. Choose the vocabulary-load mode from the total selected load:
-   - **High-load review mode**: 11 or more current words; no IELTS source and 0 new target words.
-   - **Due-backlog cleanup mode**: any due historical words remain deferred; use an IELTS source, write at least 30 sentences, and add 0 new target words until the backlog is cleared.
-   - **Light-load source mode**: 0-7 total target words; about 36-40 sentences and use only the scheduler's 0-2 new-word allowance.
-   - **Normal spaced-review mode**: 8-11 total target words; at least 30 sentences and use only the scheduler's 0-2 new-word allowance.
-   - **High review load with source**: 12-15 total target words but fewer than 11 current words; at least 30 sentences and 0 new target words.
-6. In a source mode, select one IELTS source from `readingpractice-index.json`. In high-load review mode, skip source selection and write `无（纯生词复习）` in both source metadata fields.
+   - **Low-load IELTS source mode**: use a source only when total targets are at most 7, current marked words are at most 5, no due word is deferred, and inbox waiting is at most 15; write about 36-40 sentences and obey the scheduler's 0-2 new-word allowance.
+   - **Pure vocabulary mode**: if any source threshold is exceeded, use no IELTS source, add 0 new target words, and write about 25-30 simpler sentences around the target words.
+6. Only in low-load source mode, select one IELTS source from `readingpractice-index.json`. In pure vocabulary mode, skip source selection and write `无（纯生词复习）` in both source metadata fields.
    - Prefer `P1` or accessible `P2` for IELTS 6.0 practice.
    - Use `P3` only when the user asks for harder reading, or when simplifying a difficult topic.
    - Avoid using the same source repeatedly if recent articles already used it.
-7. In a source mode, read the selected source Markdown. In high-load review mode, use only the target review words and their meanings as content input.
+7. In source mode, read the selected source Markdown. In pure vocabulary mode, use only the target words and meanings as content input, plus common basic vocabulary and simple connectors.
 8. Generate a new article using the selected load mode. Every target review word must appear naturally at least once.
 9. Save the next article in a day folder under `作文素材/按时间排序/` using the next two-digit number and an English slug, e.g. `17_food_traditions/17_food_traditions.md`.
 10. Generate listening audio from the Markdown article and save it in the same day folder as `17_food_traditions.mp3`.
@@ -97,11 +94,8 @@ Use this exact structure:
 - Keep sentences natural, concrete, and suitable for reading aloud.
 - Reuse every selected target word at least once in the English body, with correct inflection if needed.
 - Introduce new IELTS-style words or phrases according to the selected load mode:
-  - High-load review mode: 0 new target words and no IELTS source.
-  - Due-backlog cleanup mode: 0 new target words while any due historical words remain deferred.
-  - Light-load source mode: never exceed the scheduler's 0-2 new-word allowance.
-  - Normal spaced-review mode: never exceed the scheduler's 0-2 new-word allowance.
-  - 12-15 total target words: 0 new target words.
+  - Pure vocabulary mode: 0 new target words and no IELTS source.
+  - Low-load source mode: never exceed the scheduler's 0-2 new-word allowance.
 - Put Chinese explanations directly under each English sentence.
 - Do not fill in the final `生单词:` section for the user.
 - Do not copy more than one short phrase from the source. Summarize and adapt ideas in original wording.

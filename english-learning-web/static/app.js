@@ -129,6 +129,7 @@ function renderReviewPlan(payload) {
   const summary = payload?.summary || {};
   const habits = payload?.habits || {};
   const plan = payload?.nextPlan || {};
+  const generationMode = payload?.generationMode || {};
   const recentWords = Array.isArray(plan.recentWords) ? plan.recentWords : [];
   const dueWords = Array.isArray(plan.dueWords) ? plan.dueWords : [];
   const admittedWords = Array.isArray(plan.admittedWords) ? plan.admittedWords : [];
@@ -152,9 +153,13 @@ function renderReviewPlan(payload) {
   if (deferredRecent) deferredParts.push(`${deferredRecent} 个本篇生词`);
   if (deferred) deferredParts.push(`${deferred} 个到期旧词`);
   const deferredText = deferredParts.length ? `，另有 ${deferredParts.join("、")}顺延` : "";
-  elements.reviewPlanMessage.textContent = targetWords.length
+  const sourceText = generationMode.usesSource
+    ? "低负荷：会使用雅思原文"
+    : "高负荷：不使用雅思原文，只围绕单词生成";
+  const planText = targetWords.length
     ? `下一篇固定不超过 15 个：重学/本篇词 ${recentWords.length} 个，到期词 ${dueWords.length} 个，收件箱新激活 ${admittedWords.length} 个${deferredText}。`
     : "下一篇当前没有必须复习的目标词；系统最多只会激活 2 个新词。";
+  elements.reviewPlanMessage.textContent = `${sourceText}。${planText}`;
   const recentWindow = Number(habits.recentWindow || 0);
   elements.reviewHabitMessage.textContent = recentWindow
     ? `最近 ${recentWindow} 篇回忆成功率 ${habits.recentRecallRate ?? 0}%，平均每篇标记 ${habits.averageMarkedWords ?? 0} 个生词。`
