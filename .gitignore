@@ -1,0 +1,16 @@
+.env
+.DS_Store
+__pycache__/
+*.py[cod]
+*.log
+*.log.*
+
+# 本地原始题库和转换测试产物不进入公开仓库。
+雅思真题/
+临时skill测试/
+artifacts/
+默写/
+
+# 本地构建/安装产物。
+*.app/
+*.iconset/

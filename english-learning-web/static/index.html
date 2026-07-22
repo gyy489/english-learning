@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta id="themeColor" name="theme-color" content="#f4f3ee">
+    <title>每日英语</title>
+    <script>
+      try {
+        const savedTheme = localStorage.getItem("english-learning-theme");
+        const systemTheme = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.dataset.theme = savedTheme || systemTheme;
+      } catch {
+        document.documentElement.dataset.theme = "light";
+      }
+    </script>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="page-header">
+        <button id="themeButton" class="theme-button" type="button" title="切换到暗色主题" aria-label="切换到暗色主题">
+          <span id="themeIcon" aria-hidden="true">☾</span>
+        </button>
+        <div class="article-heading">
+          <select id="daySelect" class="day-select" aria-label="选择学习天数">
+            <option>读取中</option>
+          </select>
+          <h1 id="articleTitle">正在读取文章...</h1>
+          <p id="sourceLabel" class="source-label"></p>
+        </div>
+
+        <div class="audio-panel" aria-label="音频播放器">
+          <audio id="audio" preload="metadata"></audio>
+          <div class="audio-actions">
+            <button id="backButton" class="icon-button" type="button" title="后退 5 秒" aria-label="后退 5 秒">−5</button>
+            <button id="playButton" class="play-button" type="button" title="播放或暂停" aria-label="播放或暂停">▶</button>
+            <button id="forwardButton" class="icon-button" type="button" title="前进 5 秒" aria-label="前进 5 秒">+5</button>
+          </div>
+          <div class="audio-timeline">
+            <span id="currentTime">0:00</span>
+            <input id="progress" type="range" min="0" max="100" value="0" step="0.1" aria-label="播放进度">
+            <span id="duration">0:00</span>
+          </div>
+          <div class="volume-row">
+            <span aria-hidden="true">音量</span>
+            <input id="volume" type="range" min="0" max="1" value="0.8" step="0.05" aria-label="音量">
+          </div>
+        </div>
+      </header>
+
+      <section class="content-section review-section" aria-labelledby="reviewHeading">
+        <div class="section-heading">
+          <h2 id="reviewHeading">上一天的单词</h2>
+          <span id="reviewCount" class="count"></span>
+        </div>
+        <div id="reviewWords" class="review-list"></div>
+      </section>
+
+      <section class="content-section" aria-labelledby="bodyHeading">
+        <div class="section-heading">
+          <h2 id="bodyHeading">正文</h2>
+          <span id="sentenceCount" class="count"></span>
+        </div>
+        <div id="articleBody" class="article-body"></div>
+      </section>
+
+      <section class="content-section today-section" aria-labelledby="todayHeading">
+        <div class="section-heading">
+          <h2 id="todayHeading">今天的生单词</h2>
+          <span id="saveStatus" class="save-status">已保存</span>
+        </div>
+        <div id="todayWordsList" class="review-list"></div>
+      </section>
+
+      <footer class="page-footer">
+        <p id="generateStatus" class="generate-status" role="status"></p>
+        <button id="generateButton" class="generate-button" type="button">生成下一天的内容</button>
+      </footer>
+    </main>
+
+    <aside id="dictionaryPopover" class="dictionary-popover" hidden aria-live="polite">
+      <div class="dictionary-header">
+        <div>
+          <strong id="dictionaryWord" class="dictionary-word"></strong>
+          <span id="dictionaryPhonetic" class="dictionary-phonetic"></span>
+        </div>
+        <button id="dictionaryClose" class="dictionary-close" type="button" title="关闭词典" aria-label="关闭词典">×</button>
+      </div>
+      <div id="dictionaryLoading" class="dictionary-loading">查询中...</div>
+      <div id="dictionaryContent" hidden>
+        <section class="dictionary-section" aria-labelledby="dictionaryChineseHeading">
+          <h3 id="dictionaryChineseHeading">中文释义</h3>
+          <p id="dictionaryChinese"></p>
+        </section>
+        <section class="dictionary-section" aria-labelledby="dictionaryEnglishHeading">
+          <h3 id="dictionaryEnglishHeading">English definition</h3>
+          <p id="dictionaryEnglish"></p>
+        </section>
+        <span class="dictionary-source">ECDICT</span>
+      </div>
+    </aside>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>

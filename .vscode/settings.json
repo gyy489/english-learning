@@ -1,0 +1,10 @@
+{
+    "vscode-office.openOutline": true,
+    "vscode-office.hideToolbar": false,
+    "vscode-office.editorTheme": "Github Dark",
+    "workbench.editorAssociations": {
+        "*.md": "cweijan.markdownViewer",
+        "*.markdown": "cweijan.markdownViewer",
+        "*.mp3": "asurance.soundplayer"
+    }
+}

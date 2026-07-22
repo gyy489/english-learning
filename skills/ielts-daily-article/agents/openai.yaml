@@ -1,0 +1,4 @@
+interface:
+  display_name: "IELTS Daily Article"
+  short_description: "Daily IELTS-based article practice"
+  default_prompt: "Use $ielts-daily-article to generate today’s IELTS-based English learning article."
