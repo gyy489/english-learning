@@ -48,6 +48,46 @@ const elements = {
 
 const THEME_STORAGE_KEY = "english-learning-theme";
 const dictionaryCache = new Map();
+const SESSION_TOKEN = globalThis.crypto?.randomUUID?.()
+  || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+let sessionRegistered = false;
+
+async function registerSession() {
+  try {
+    await request("/api/session", {
+      method: "POST",
+      body: JSON.stringify({ token: SESSION_TOKEN }),
+    });
+    sessionRegistered = true;
+  } catch {
+    // The normal page requests will show the useful connection error.
+  }
+}
+
+function closeSession() {
+  sessionRegistered = false;
+  const body = JSON.stringify({ token: SESSION_TOKEN });
+  const beacon = new Blob([body], { type: "application/json" });
+  if (navigator.sendBeacon?.("/api/session-close", beacon)) return;
+  fetch("/api/session-close", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body,
+    keepalive: true,
+  }).catch(() => {
+    // Closing the page must not show an error to the user.
+  });
+}
+
+function refreshSession() {
+  if (!sessionRegistered) return;
+  request("/api/session", {
+    method: "POST",
+    body: JSON.stringify({ token: SESSION_TOKEN }),
+  }).catch(() => {
+    // The watchdog on the server will clean up if this page disappears.
+  });
+}
 
 function applyTheme(theme, persist = false) {
   const resolvedTheme = theme === "dark" ? "dark" : "light";
@@ -203,7 +243,7 @@ function renderTodayWords() {
     });
 
     const meaning = document.createElement("div");
-    meaning.className = "review-meaning";
+    meaning.className = "review-meaning translation-faded";
     meaning.textContent = "查询中...";
 
     const removeButton = document.createElement("button");
@@ -399,7 +439,7 @@ function renderArticle(article) {
     word.className = "review-word";
     word.textContent = entry.word;
     const meaning = document.createElement("div");
-    meaning.className = "review-meaning";
+    meaning.className = "review-meaning translation-faded";
     meaning.textContent = entry.meaning;
     item.append(word, meaning);
     elements.reviewWords.append(item);
@@ -418,7 +458,7 @@ function renderArticle(article) {
     english.className = "english";
     english.append(createTokenizedSentence(entry.english));
     const chinese = document.createElement("p");
-    chinese.className = "chinese";
+    chinese.className = "chinese translation-faded";
     chinese.textContent = entry.chinese;
     text.append(english, chinese);
     row.append(number, text);
@@ -642,6 +682,7 @@ elements.generateButton.addEventListener("click", async () => {
 
 async function initialize() {
   try {
+    await registerSession();
     await loadDayOptions();
     await loadCurrentArticle(state.latestDay);
   } catch (error) {
@@ -652,3 +693,8 @@ async function initialize() {
 
 initialize();
 window.setInterval(checkExternalChanges, 3000);
+window.setInterval(refreshSession, 8000);
+window.addEventListener("pageshow", registerSession);
+window.addEventListener("pagehide", (event) => {
+  if (!event.persisted) closeSession();
+});

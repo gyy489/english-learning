@@ -15,6 +15,7 @@ import shutil
 import subprocess
 import tempfile
 import threading
+import time
 from urllib.parse import parse_qs, unquote, urlparse
 
 
@@ -47,6 +48,74 @@ TEXT_MODEL = os.getenv("OPENAI_TEXT_MODEL", "gpt-4o-mini")
 WRITE_LOCK = threading.Lock()
 DICTIONARY_LOCK = threading.Lock()
 DICTIONARY_INDEX: dict[str, dict[str, object]] | None = None
+SESSION_LOCK = threading.Lock()
+ACTIVE_SESSIONS: dict[str, float] = {}
+SHUTDOWN_TIMER: threading.Timer | None = None
+SESSION_HAS_CONNECTED = False
+SESSION_GRACE_SECONDS = 4.0
+SESSION_TIMEOUT_SECONDS = 18.0
+
+
+def register_session(token: str, server: ThreadingHTTPServer) -> None:
+    """Register or refresh a browser tab using the local app."""
+    global SHUTDOWN_TIMER, SESSION_HAS_CONNECTED
+    token = token.strip()
+    if not token:
+        raise ValueError("session token 不能为空")
+    with SESSION_LOCK:
+        ACTIVE_SESSIONS[token] = time.monotonic()
+        SESSION_HAS_CONNECTED = True
+        if SHUTDOWN_TIMER is not None:
+            SHUTDOWN_TIMER.cancel()
+            SHUTDOWN_TIMER = None
+
+
+def schedule_shutdown_if_idle(server: ThreadingHTTPServer) -> None:
+    """Stop the local server after the last browser tab has closed."""
+    global SHUTDOWN_TIMER
+    with SESSION_LOCK:
+        if not SESSION_HAS_CONNECTED or ACTIVE_SESSIONS or SHUTDOWN_TIMER is not None:
+            return
+        SHUTDOWN_TIMER = threading.Timer(
+            SESSION_GRACE_SECONDS,
+            shutdown_if_idle,
+            args=(server,),
+        )
+        SHUTDOWN_TIMER.daemon = True
+        SHUTDOWN_TIMER.start()
+
+
+def close_session(token: str, server: ThreadingHTTPServer) -> None:
+    with SESSION_LOCK:
+        ACTIVE_SESSIONS.pop(token.strip(), None)
+    schedule_shutdown_if_idle(server)
+
+
+def shutdown_if_idle(server: ThreadingHTTPServer) -> None:
+    global SHUTDOWN_TIMER
+    with SESSION_LOCK:
+        SHUTDOWN_TIMER = None
+        if not SESSION_HAS_CONNECTED or ACTIVE_SESSIONS:
+            return
+    print("No browser sessions remain; stopping the English learning app.", flush=True)
+    # shutdown() must run outside the request handler thread.
+    threading.Thread(target=server.shutdown, daemon=True).start()
+
+
+def session_watchdog(server: ThreadingHTTPServer) -> None:
+    """Recover from a browser crash where pagehide cannot send its beacon."""
+    while True:
+        time.sleep(5)
+        now = time.monotonic()
+        with SESSION_LOCK:
+            stale_tokens = [
+                token
+                for token, last_seen in ACTIVE_SESSIONS.items()
+                if now - last_seen > SESSION_TIMEOUT_SECONDS
+            ]
+            for token in stale_tokens:
+                ACTIVE_SESSIONS.pop(token, None)
+        schedule_shutdown_if_idle(server)
 
 
 IRREGULAR_FORMS = {
@@ -777,6 +846,14 @@ class AppHandler(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
         try:
             payload = self.read_json()
+            if path == "/api/session":
+                register_session(str(payload.get("token", "")), self.server)
+                self.send_json({"active": True})
+                return
+            if path == "/api/session-close":
+                close_session(str(payload.get("token", "")), self.server)
+                self.send_json({"closed": True})
+                return
             if path == "/api/lemma":
                 self.send_json({"word": normalize_word(str(payload.get("word", "")))})
                 return
@@ -821,6 +898,8 @@ def main() -> None:
     args = parse_args()
     load_project_env()
     server = ThreadingHTTPServer((args.host, args.port), AppHandler)
+    server.daemon_threads = True
+    threading.Thread(target=session_watchdog, args=(server,), daemon=True).start()
     print(f"English learning app: http://{args.host}:{args.port}", flush=True)
     try:
         server.serve_forever()

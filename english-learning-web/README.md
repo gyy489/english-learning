@@ -23,6 +23,10 @@ uv run --with openai python english-learning-web/server.py
 python3 english-learning-web/server.py
 ```
 
+网页加载后会登记当前浏览器页面；关闭网页时会通知后端。最后一个页面关闭后，后端会等待几秒并自动退出；如果浏览器异常退出，心跳超时后也会自动清理。重新打开 `/Applications/每日英语.app` 会重新启动服务。
+
+为了方便回忆，复习生词释义和正文中文默认显示得很淡并带有轻微模糊；鼠标移到中文解释上时会暂时恢复可读状态。
+
 ## 生成下一天
 
 生成文章会优先使用项目 `.env` 中的 OpenAI API；没有 API Key 时，会自动使用本机已登录的 Codex CLI。生成 MP3 仍需要在项目根目录的 `.env` 中配置：

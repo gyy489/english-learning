@@ -293,9 +293,18 @@ h2 {
   color: var(--green);
 }
 
-.review-meaning {
+.translation-faded {
   color: var(--muted);
   font-size: 0.9rem;
+  opacity: 0.24;
+  filter: blur(1px);
+  transition: opacity 160ms ease, filter 160ms ease;
+}
+
+.translation-faded:hover,
+.translation-faded:focus-visible {
+  opacity: 0.82;
+  filter: blur(0);
 }
 
 .sentence {
@@ -328,8 +337,6 @@ h2 {
 
 .chinese {
   margin-bottom: 0;
-  color: var(--muted);
-  font-size: 0.9rem;
 }
 
 .word-token {
