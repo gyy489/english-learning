@@ -4,6 +4,9 @@
 from __future__ import annotations
 
 import argparse
+import ctypes
+import gzip
+import hashlib
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
@@ -12,9 +15,11 @@ import os
 from pathlib import Path
 import re
 import shutil
+import socket
 import subprocess
 import tempfile
 import threading
+import time
 from urllib.parse import parse_qs, unquote, urlparse
 
 from review_scheduler import (
@@ -49,6 +54,7 @@ DICTIONARY_BUNDLE = (
     / "ecdict_reading.bundle.js"
 )
 ENV_FILE = PROJECT_ROOT / ".env"
+GLOBAL_ENV_FILE = Path.home() / ".config" / "api-keys.env"
 REVIEW_DIR = PROJECT_ROOT / "作文素材" / "单词复习"
 REVIEW_JSON = REVIEW_DIR / "vocabulary.json"
 REVIEW_REPORT = REVIEW_DIR / "review-history.md"
@@ -56,12 +62,20 @@ TEXT_MODEL = os.getenv("OPENAI_TEXT_MODEL", "gpt-4o-mini")
 WRITE_LOCK = threading.RLock()
 DICTIONARY_LOCK = threading.Lock()
 REVIEW_LOCK = threading.Lock()
+AUDIO_CACHE_LOCK = threading.Lock()
 DICTIONARY_INDEX: dict[str, dict[str, object]] | None = None
 SESSION_LOCK = threading.Lock()
-ACTIVE_SESSIONS: set[str] = set()
+ACTIVE_SESSIONS: dict[str, float] = {}
+ACTIVE_OPERATIONS = 0
 SHUTDOWN_TIMER: threading.Timer | None = None
+SESSION_AUDIT_TIMER: threading.Timer | None = None
 SESSION_HAS_CONNECTED = False
 SESSION_GRACE_SECONDS = 4.0
+SESSION_STARTUP_SECONDS = 45.0
+SESSION_AUDIT_SECONDS = 30.0
+SESSION_STALE_SECONDS = 180.0
+AUDIO_CACHE_DIR = PROJECT_ROOT / ".cache" / "english-learning-audio"
+AUDIO_CACHE_BITRATE = "48k"
 
 # ECDICT does not contain every short function word. These direct glosses keep
 # the word-order view useful without asking an API for each sentence.
@@ -101,18 +115,107 @@ def persistent_server_enabled() -> bool:
     }
 
 
+def optimized_audio_path(source_path: Path) -> Path:
+    """Return a compact speech MP3 while preserving the generated original."""
+    ffmpeg = shutil.which("ffmpeg")
+    if not ffmpeg:
+        return source_path
+    source_stat = source_path.stat()
+    relative_name = str(source_path.relative_to(PROJECT_ROOT)).encode("utf-8")
+    cache_key = hashlib.sha256(relative_name).hexdigest()[:12]
+    cached_path = AUDIO_CACHE_DIR / (
+        f"{cache_key}-{source_stat.st_mtime_ns}-{AUDIO_CACHE_BITRATE}.mp3"
+    )
+    if cached_path.exists():
+        return cached_path
+    with AUDIO_CACHE_LOCK:
+        if cached_path.exists():
+            return cached_path
+        AUDIO_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        temp_path = cached_path.with_suffix(".tmp.mp3")
+        result = subprocess.run(
+            [
+                ffmpeg,
+                "-hide_banner",
+                "-loglevel",
+                "error",
+                "-y",
+                "-i",
+                str(source_path),
+                "-vn",
+                "-map_metadata",
+                "-1",
+                "-codec:a",
+                "libmp3lame",
+                "-b:a",
+                AUDIO_CACHE_BITRATE,
+                "-ar",
+                "24000",
+                "-ac",
+                "1",
+                str(temp_path),
+            ],
+            capture_output=True,
+            text=True,
+            timeout=60,
+            check=False,
+        )
+        if result.returncode != 0 or not temp_path.exists():
+            temp_path.unlink(missing_ok=True)
+            print(f"Audio compression skipped: {result.stderr.strip()[-300:]}", flush=True)
+            return source_path
+        temp_path.replace(cached_path)
+    return cached_path
+
+
 def register_session(token: str, server: ThreadingHTTPServer) -> None:
     """Register or refresh a browser tab using the local app."""
-    global SHUTDOWN_TIMER, SESSION_HAS_CONNECTED
+    global SHUTDOWN_TIMER, SESSION_AUDIT_TIMER, SESSION_HAS_CONNECTED
     token = token.strip()
     if not token:
         raise ValueError("session token 不能为空")
     with SESSION_LOCK:
-        ACTIVE_SESSIONS.add(token)
+        ACTIVE_SESSIONS[token] = time.monotonic()
         SESSION_HAS_CONNECTED = True
         if SHUTDOWN_TIMER is not None:
             SHUTDOWN_TIMER.cancel()
             SHUTDOWN_TIMER = None
+        if SESSION_AUDIT_TIMER is None:
+            SESSION_AUDIT_TIMER = threading.Timer(
+                SESSION_AUDIT_SECONDS,
+                audit_sessions,
+                args=(server,),
+            )
+            SESSION_AUDIT_TIMER.daemon = True
+            SESSION_AUDIT_TIMER.start()
+
+
+def audit_sessions(server: ThreadingHTTPServer) -> None:
+    """Expire tabs that vanished without delivering a close event."""
+    global SESSION_AUDIT_TIMER
+    now = time.monotonic()
+    should_stop = False
+    with SESSION_LOCK:
+        SESSION_AUDIT_TIMER = None
+        stale_tokens = [
+            token
+            for token, last_seen in ACTIVE_SESSIONS.items()
+            if now - last_seen > SESSION_STALE_SECONDS
+        ]
+        for token in stale_tokens:
+            ACTIVE_SESSIONS.pop(token, None)
+        if ACTIVE_SESSIONS:
+            SESSION_AUDIT_TIMER = threading.Timer(
+                SESSION_AUDIT_SECONDS,
+                audit_sessions,
+                args=(server,),
+            )
+            SESSION_AUDIT_TIMER.daemon = True
+            SESSION_AUDIT_TIMER.start()
+        elif SESSION_HAS_CONNECTED:
+            should_stop = True
+    if should_stop:
+        schedule_shutdown_if_idle(server)
 
 
 def schedule_shutdown_if_idle(server: ThreadingHTTPServer) -> None:
@@ -121,7 +224,12 @@ def schedule_shutdown_if_idle(server: ThreadingHTTPServer) -> None:
     if persistent_server_enabled():
         return
     with SESSION_LOCK:
-        if not SESSION_HAS_CONNECTED or ACTIVE_SESSIONS or SHUTDOWN_TIMER is not None:
+        if (
+            not SESSION_HAS_CONNECTED
+            or ACTIVE_SESSIONS
+            or ACTIVE_OPERATIONS
+            or SHUTDOWN_TIMER is not None
+        ):
             return
         SHUTDOWN_TIMER = threading.Timer(
             SESSION_GRACE_SECONDS,
@@ -134,7 +242,20 @@ def schedule_shutdown_if_idle(server: ThreadingHTTPServer) -> None:
 
 def close_session(token: str, server: ThreadingHTTPServer) -> None:
     with SESSION_LOCK:
-        ACTIVE_SESSIONS.discard(token.strip())
+        ACTIVE_SESSIONS.pop(token.strip(), None)
+    schedule_shutdown_if_idle(server)
+
+
+def begin_operation() -> None:
+    global ACTIVE_OPERATIONS
+    with SESSION_LOCK:
+        ACTIVE_OPERATIONS += 1
+
+
+def end_operation(server: ThreadingHTTPServer) -> None:
+    global ACTIVE_OPERATIONS
+    with SESSION_LOCK:
+        ACTIVE_OPERATIONS = max(0, ACTIVE_OPERATIONS - 1)
     schedule_shutdown_if_idle(server)
 
 
@@ -142,10 +263,37 @@ def shutdown_if_idle(server: ThreadingHTTPServer) -> None:
     global SHUTDOWN_TIMER
     with SESSION_LOCK:
         SHUTDOWN_TIMER = None
-        if not SESSION_HAS_CONNECTED or ACTIVE_SESSIONS:
+        if not SESSION_HAS_CONNECTED or ACTIVE_SESSIONS or ACTIVE_OPERATIONS:
             return
     print("No browser sessions remain; stopping the English learning app.", flush=True)
     # shutdown() must run outside the request handler thread.
+    threading.Thread(target=server.shutdown, daemon=True).start()
+
+
+def schedule_startup_claim_timeout(server: ThreadingHTTPServer) -> None:
+    """Stop a socket-triggered backend when no browser registers."""
+    global SHUTDOWN_TIMER
+    if persistent_server_enabled():
+        return
+    with SESSION_LOCK:
+        if SHUTDOWN_TIMER is not None:
+            return
+        SHUTDOWN_TIMER = threading.Timer(
+            SESSION_STARTUP_SECONDS,
+            shutdown_if_unclaimed,
+            args=(server,),
+        )
+        SHUTDOWN_TIMER.daemon = True
+        SHUTDOWN_TIMER.start()
+
+
+def shutdown_if_unclaimed(server: ThreadingHTTPServer) -> None:
+    global SHUTDOWN_TIMER
+    with SESSION_LOCK:
+        SHUTDOWN_TIMER = None
+        if SESSION_HAS_CONNECTED or ACTIVE_SESSIONS or ACTIVE_OPERATIONS:
+            return
+    print("No browser claimed the socket-activated app; stopping.", flush=True)
     threading.Thread(target=server.shutdown, daemon=True).start()
 
 
@@ -236,18 +384,25 @@ INVARIANT_BASE_FORMS = {
     "unexpected",
 }
 
-def load_project_env() -> None:
-    if not ENV_FILE.exists():
+def load_env_file(path: Path) -> None:
+    if not path.exists():
         return
-    for raw_line in ENV_FILE.read_text(encoding="utf-8", errors="replace").splitlines():
+    for raw_line in path.read_text(encoding="utf-8", errors="replace").splitlines():
         line = raw_line.strip()
         if not line or line.startswith("#") or "=" not in line:
             continue
+        if line.startswith("export "):
+            line = line.removeprefix("export ").strip()
         key, value = line.split("=", 1)
         key = key.strip()
         value = value.strip().strip('"').strip("'")
         if key and value and key not in os.environ:
             os.environ[key] = value
+
+
+def load_project_env() -> None:
+    load_env_file(GLOBAL_ENV_FILE)
+    load_env_file(ENV_FILE)
 
 
 def article_number(path: Path) -> int | None:
@@ -392,6 +547,7 @@ def parse_article(path: Path) -> dict[str, object]:
             }
         )
 
+    today_words = dedupe_words(clean_today_entries(text))
     audio_path = path.with_suffix(".mp3")
     return {
         "day": article_number(path.parent) or metadata.get("天数", ""),
@@ -399,7 +555,10 @@ def parse_article(path: Path) -> dict[str, object]:
         "metadata": metadata,
         "reviewWords": review_words,
         "sentences": sentences,
-        "todayWords": dedupe_words(clean_today_entries(text)),
+        "todayWords": today_words,
+        "todayWordMeanings": {
+            word: concise_dictionary_meaning(word) for word in today_words
+        },
         "audioAvailable": audio_path.exists(),
         "audioUrl": "/api/audio" if audio_path.exists() else None,
         "markdownPath": str(path.relative_to(PROJECT_ROOT)),
@@ -843,6 +1002,21 @@ def find_codex() -> str | None:
     return None
 
 
+def find_uv() -> str | None:
+    """Find uv when launchd starts the app with a minimal PATH."""
+    configured = os.getenv("UV_BIN", "").strip()
+    candidates = [
+        Path(configured).expanduser() if configured else None,
+        Path(shutil.which("uv")) if shutil.which("uv") else None,
+        Path("/opt/homebrew/bin/uv"),
+        Path("/usr/local/bin/uv"),
+    ]
+    for candidate in candidates:
+        if candidate and candidate.is_file() and os.access(candidate, os.X_OK):
+            return str(candidate)
+    return None
+
+
 def request_generated_markdown(prompt: str) -> tuple[str, str]:
     if os.getenv("OPENAI_API_KEY"):
         try:
@@ -937,7 +1111,7 @@ def generate_next_article() -> dict[str, object]:
     article_path.write_text(markdown, encoding="utf-8")
 
     audio_warning = None
-    uv = shutil.which("uv")
+    uv = find_uv()
     if not os.getenv("OPENAI_API_KEY"):
         audio_warning = "文章已生成；配置 OPENAI_API_KEY 后才能生成 MP3"
     else:
@@ -979,10 +1153,16 @@ class AppHandler(BaseHTTPRequestHandler):
 
     def send_json(self, payload: object, status: int = HTTPStatus.OK) -> None:
         data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+        compressed = len(data) >= 1024 and "gzip" in self.headers.get("Accept-Encoding", "")
+        if compressed:
+            data = gzip.compress(data, compresslevel=6)
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(data)))
         self.send_header("Cache-Control", "no-store")
+        if compressed:
+            self.send_header("Content-Encoding", "gzip")
+            self.send_header("Vary", "Accept-Encoding")
         self.end_headers()
         self.wfile.write(data)
 
@@ -1001,11 +1181,22 @@ class AppHandler(BaseHTTPRequestHandler):
         if not requested.is_file():
             self.send_error(HTTPStatus.NOT_FOUND)
             return
+        file_stat = requested.stat()
+        etag = f'"{file_stat.st_mtime_ns:x}-{file_stat.st_size:x}"'
+        cache_control = "no-cache" if requested.name == "index.html" else "public, max-age=86400"
+        if self.headers.get("If-None-Match") == etag:
+            self.send_response(HTTPStatus.NOT_MODIFIED)
+            self.send_header("Cache-Control", cache_control)
+            self.send_header("ETag", etag)
+            self.end_headers()
+            return
         data = requested.read_bytes()
         content_type = mimetypes.guess_type(requested.name)[0] or "application/octet-stream"
         self.send_response(HTTPStatus.OK)
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(data)))
+        self.send_header("Cache-Control", cache_control)
+        self.send_header("ETag", etag)
         self.end_headers()
         self.wfile.write(data)
 
@@ -1015,18 +1206,32 @@ class AppHandler(BaseHTTPRequestHandler):
         if not audio_path.exists():
             self.send_error(HTTPStatus.NOT_FOUND, "当前文章没有 MP3")
             return
-        size = audio_path.stat().st_size
+        audio_path = optimized_audio_path(audio_path)
+        audio_stat = audio_path.stat()
+        size = audio_stat.st_size
+        etag = f'"{audio_stat.st_mtime_ns:x}-{size:x}"'
         start, end = 0, size - 1
         status = HTTPStatus.OK
         range_header = self.headers.get("Range")
+        if not range_header and self.headers.get("If-None-Match") == etag:
+            self.send_response(HTTPStatus.NOT_MODIFIED)
+            self.send_header("Cache-Control", "private, max-age=3600")
+            self.send_header("ETag", etag)
+            self.end_headers()
+            return
         if range_header:
-            match = re.match(r"bytes=(\d*)-(\d*)", range_header)
-            if match:
-                if match.group(1):
-                    start = int(match.group(1))
+            match = re.fullmatch(r"bytes=(\d*)-(\d*)", range_header.strip())
+            if not match or not any(match.groups()):
+                self.send_error(HTTPStatus.REQUESTED_RANGE_NOT_SATISFIABLE)
+                return
+            if match.group(1):
+                start = int(match.group(1))
                 if match.group(2):
                     end = min(int(match.group(2)), size - 1)
-                status = HTTPStatus.PARTIAL_CONTENT
+            else:
+                suffix_length = int(match.group(2))
+                start = max(size - suffix_length, 0)
+            status = HTTPStatus.PARTIAL_CONTENT
         if start > end or start >= size:
             self.send_error(HTTPStatus.REQUESTED_RANGE_NOT_SATISFIABLE)
             return
@@ -1035,6 +1240,8 @@ class AppHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "audio/mpeg")
         self.send_header("Accept-Ranges", "bytes")
         self.send_header("Content-Length", str(length))
+        self.send_header("Cache-Control", "private, max-age=3600")
+        self.send_header("ETag", etag)
         if status == HTTPStatus.PARTIAL_CONTENT:
             self.send_header("Content-Range", f"bytes {start}-{end}/{size}")
         self.end_headers()
@@ -1114,8 +1321,12 @@ class AppHandler(BaseHTTPRequestHandler):
                 )
                 return
             if path == "/api/generate-next":
-                with WRITE_LOCK:
-                    result = generate_next_article()
+                begin_operation()
+                try:
+                    with WRITE_LOCK:
+                        result = generate_next_article()
+                finally:
+                    end_operation(self.server)
                 self.send_json(result, HTTPStatus.CREATED)
                 return
             self.send_error(HTTPStatus.NOT_FOUND)
@@ -1134,6 +1345,39 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def launchd_socket_server(host: str, port: int) -> ThreadingHTTPServer:
+    """Adopt the listening socket supplied by a macOS launchd Sockets job."""
+    library = ctypes.CDLL(None)
+    activate = library.launch_activate_socket
+    activate.argtypes = [
+        ctypes.c_char_p,
+        ctypes.POINTER(ctypes.POINTER(ctypes.c_int)),
+        ctypes.POINTER(ctypes.c_size_t),
+    ]
+    activate.restype = ctypes.c_int
+    descriptors = ctypes.POINTER(ctypes.c_int)()
+    count = ctypes.c_size_t()
+    result = activate(b"Listeners", ctypes.byref(descriptors), ctypes.byref(count))
+    if result != 0 or count.value != 1:
+        raise RuntimeError(
+            f"launchd socket activation failed: result={result}, sockets={count.value}"
+        )
+    descriptor = descriptors[0]
+    library.free.argtypes = [ctypes.c_void_p]
+    library.free.restype = None
+    library.free(descriptors)
+
+    listener = socket.socket(fileno=descriptor)
+    listener.setblocking(True)
+    server = ThreadingHTTPServer((host, port), AppHandler, bind_and_activate=False)
+    server.socket.close()
+    server.socket = listener
+    server.server_address = listener.getsockname()
+    server.server_name = host
+    server.server_port = port
+    return server
+
+
 def main() -> None:
     args = parse_args()
     load_project_env()
@@ -1141,8 +1385,15 @@ def main() -> None:
         refresh_review_documents()
     except (FileNotFoundError, ValueError, RuntimeError, OSError) as exc:
         print(f"Review history initialization skipped: {exc}", flush=True)
-    server = ThreadingHTTPServer((args.host, args.port), AppHandler)
+    socket_activated = os.getenv("ENGLISH_LEARNING_SOCKET_ACTIVATED") == "1"
+    server = (
+        launchd_socket_server(args.host, args.port)
+        if socket_activated
+        else ThreadingHTTPServer((args.host, args.port), AppHandler)
+    )
     server.daemon_threads = True
+    if socket_activated:
+        schedule_startup_claim_timeout(server)
     print(f"English learning app: http://{args.host}:{args.port}", flush=True)
     try:
         server.serve_forever()

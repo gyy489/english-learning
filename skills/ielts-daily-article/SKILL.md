@@ -5,7 +5,7 @@ description: Generate daily English learning articles from this project, reusing
 
 # IELTS Daily Article
 
-Use this skill inside `/path/to/user` to continue the user's daily English-learning loop.
+Use this skill from the project root to continue the user's daily English-learning loop.
 
 ## Core Goal
 

@@ -16,6 +16,7 @@ import tempfile
 MAX_INPUT_CHARS = 4096
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 ENV_FILE = PROJECT_ROOT / ".env"
+GLOBAL_ENV_FILE = Path.home() / ".config" / "api-keys.env"
 ENV_EXAMPLE_FILE = PROJECT_ROOT / ".env.example"
 API_KEY_NOTICE_NAME = "OPENAI_API_KEY_REQUIRED.md"
 DEFAULT_MODEL = "tts-1"
@@ -40,18 +41,25 @@ DEFAULT_INSTRUCTIONS = "\n".join(
 )
 
 
-def load_project_env() -> None:
-    if not ENV_FILE.exists():
+def load_env_file(path: Path) -> None:
+    if not path.exists():
         return
-    for raw in ENV_FILE.read_text(encoding="utf-8", errors="replace").splitlines():
+    for raw in path.read_text(encoding="utf-8", errors="replace").splitlines():
         line = raw.strip()
         if not line or line.startswith("#") or "=" not in line:
             continue
+        if line.startswith("export "):
+            line = line.removeprefix("export ").strip()
         key, value = line.split("=", 1)
         key = key.strip()
         value = value.strip().strip('"').strip("'")
         if key in {"OPENAI_API_KEY", "OPENAI_TTS_MODEL"} and value and key not in os.environ:
             os.environ[key] = value
+
+
+def load_project_env() -> None:
+    load_env_file(GLOBAL_ENV_FILE)
+    load_env_file(ENV_FILE)
 
 
 def write_env_example() -> None:
@@ -156,6 +164,20 @@ def speech_cli_path() -> Path:
     return codex_home / "skills" / "speech" / "scripts" / "text_to_speech.py"
 
 
+def find_uv() -> str | None:
+    configured = os.getenv("UV_BIN", "").strip()
+    candidates = [
+        Path(configured).expanduser() if configured else None,
+        Path(shutil.which("uv")) if shutil.which("uv") else None,
+        Path("/opt/homebrew/bin/uv"),
+        Path("/usr/local/bin/uv"),
+    ]
+    for candidate in candidates:
+        if candidate and candidate.is_file() and os.access(candidate, os.X_OK):
+            return str(candidate)
+    return None
+
+
 def python_runner(cli_path: Path) -> list[str]:
     if not cli_path.exists():
         raise SystemExit(
@@ -168,7 +190,7 @@ def python_runner(cli_path: Path) -> list[str]:
         __import__("openai")
         return [sys.executable, str(cli_path)]
     except ImportError:
-        uv = shutil.which("uv")
+        uv = find_uv()
         if uv:
             return [uv, "run", "--with", "openai", "python", str(cli_path)]
         return [sys.executable, str(cli_path)]

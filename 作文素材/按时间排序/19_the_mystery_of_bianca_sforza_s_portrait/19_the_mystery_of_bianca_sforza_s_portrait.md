@@ -207,8 +207,6 @@
 
 生单词:
 
-portrait
-
 stir
 
 excitement
@@ -219,13 +217,9 @@ modest
 
 auction
 
-expert
-
 authentic
 
 shadow
-
-drawn
 
 sharp
 
@@ -236,8 +230,6 @@ therefore
 match
 
 area
-
-vellum
 
 period
 
@@ -266,3 +258,35 @@ authorship
 nevertheless
 
 claim
+
+draw
+
+expert
+
+picture
+
+dry
+
+controversial
+
+remain
+
+critic
+
+record
+
+during
+
+sadness
+
+commemorate
+
+reach
+
+scholar
+
+chew
+
+trade
+
+dust

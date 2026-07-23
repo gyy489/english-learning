@@ -1,12 +1,16 @@
 .env
 .DS_Store
 __pycache__/
+.cache/
 *.py[cod]
 *.log
 *.log.*
 
 # 私有服务器拓扑、密码与 AccessKey 笔记，禁止进入公开仓库。
 服务器规则.md
+english-learning-web/REMOTE_ACCESS.md
+deployment/*.plist
+!deployment/*.example.plist
 
 # 本地原始题库和转换测试产物不进入公开仓库。
 雅思真题/

@@ -2,7 +2,7 @@
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta id="themeColor" name="theme-color" content="#f4f3ee">
     <title>每日英语</title>
     <script>
@@ -14,7 +14,7 @@
         document.documentElement.dataset.theme = "light";
       }
     </script>
-    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/styles.css?v=20260722-mobile-6">
   </head>
   <body>
     <main class="app-shell">
@@ -31,11 +31,15 @@
         </div>
 
         <div class="audio-panel" aria-label="音频播放器">
-          <audio id="audio" preload="metadata"></audio>
+          <audio id="audio" preload="auto"></audio>
           <div class="audio-actions">
-            <button id="backButton" class="icon-button" type="button" title="后退 5 秒" aria-label="后退 5 秒">−5</button>
+            <button id="backButton" class="icon-button" type="button" title="单击后退 3 秒，长按连续后退" aria-label="单击后退 3 秒，长按连续后退">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7H5V3M5.4 7A8 8 0 1 1 4 14"/></svg>
+            </button>
             <button id="playButton" class="play-button" type="button" title="播放或暂停" aria-label="播放或暂停">▶</button>
-            <button id="forwardButton" class="icon-button" type="button" title="前进 5 秒" aria-label="前进 5 秒">+5</button>
+            <button id="forwardButton" class="icon-button" type="button" title="单击前进 3 秒，长按连续前进" aria-label="单击前进 3 秒，长按连续前进">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 7h4V3m-.4 4A8 8 0 1 0 20 14"/></svg>
+            </button>
           </div>
           <div class="audio-timeline">
             <span id="currentTime">0:00</span>
@@ -85,10 +89,13 @@
         <div id="reviewPlanWords" class="review-plan-words" aria-label="下一篇目标词"></div>
       </section>
 
-      <section class="content-section review-section" aria-labelledby="reviewHeading">
+      <section id="reviewSection" class="content-section review-section" aria-labelledby="reviewHeading">
         <div class="section-heading">
           <h2 id="reviewHeading">本篇复习单词</h2>
-          <span id="reviewCount" class="count"></span>
+          <div class="review-heading-actions">
+            <span id="reviewCount" class="count"></span>
+            <button id="reviewWordsToggle" class="compact-toggle" type="button" aria-controls="reviewWords" aria-expanded="false" hidden>展开</button>
+          </div>
         </div>
         <div id="reviewWords" class="review-list"></div>
       </section>
@@ -101,10 +108,13 @@
         <div id="articleBody" class="article-body"></div>
       </section>
 
-      <section class="content-section today-section" aria-labelledby="todayHeading">
+      <section id="todaySection" class="content-section today-section" aria-labelledby="todayHeading">
         <div class="section-heading">
           <h2 id="todayHeading">今天的生单词</h2>
-          <span id="saveStatus" class="save-status">已保存</span>
+          <div class="today-heading-actions">
+            <span id="saveStatus" class="save-status">已保存</span>
+            <button id="todayWordsToggle" class="compact-toggle" type="button" aria-controls="todayWordsList" aria-expanded="false" hidden>展开</button>
+          </div>
         </div>
         <div id="todayWordsList" class="review-list"></div>
       </section>
@@ -137,6 +147,6 @@
       </div>
     </aside>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
-    <script src="/static/app.js" defer></script>
+    <script src="/static/app.js?v=20260722-mobile-6" defer></script>
   </body>
 </html>

@@ -24,9 +24,9 @@ uv run --with openai python english-learning-web/server.py
 python3 english-learning-web/server.py
 ```
 
-网页加载后会登记当前浏览器页面。普通本地模式下，最后一个页面正常关闭后，后端会等待几秒并自动退出；设置 `ENGLISH_LEARNING_PERSISTENT=1` 的远程模式不会随页面关闭，用于手机随时访问。页面静置、切到后台或电脑休眠不会触发超时退出。
+安装类似 `deployment/english-learning-server.example.plist` 的 macOS `launchd` 配置后，本地第一次访问 `8787` 时可以自动启动后端。网页每 30 秒发送一次心跳；最后一个页面正常关闭后，后端等待约 4 秒退出。浏览器异常退出时，后端会在 3 分钟心跳失联后退出。正在生成文章或 MP3 时不会被中途关闭。
 
-手机远程访问、HTTPS 登录、private tunnel 端口和重启方法见 `REMOTE_ACCESS.md`。
+远程访问、公网域名、反向代理、隧道端口和服务器拓扑属于本机私有运维资料，不放入公开仓库。
 
 为了方便回忆，复习生词释义和正文中文默认显示得很淡并带有轻微模糊；鼠标移到中文解释上时会暂时恢复可读状态。
 
@@ -42,7 +42,7 @@ python3 english-learning-web/server.py
 
 ## 生成下一天
 
-生成文章会优先使用项目 `.env` 中的 OpenAI API；没有 API Key 时，会自动寻找本机已登录的 Codex CLI，包括从 macOS App 启动时无法继承到 PATH 的 VS Code Codex。生成 MP3 需要本机可用的 `OPENAI_API_KEY`：从“应用程序”启动时会读取 `~/.zshrc` 中的 OpenAI 配置，手动启动时也可以使用项目根目录的 `.env`：
+生成文章会优先使用本机环境中的 OpenAI API；没有 API Key 时，会自动寻找本机已登录的 Codex CLI，包括从 macOS App 启动时无法继承到 PATH 的 VS Code Codex。生成 MP3 需要本机可用的 `OPENAI_API_KEY`：从“应用程序”启动时会读取用户级 `~/.config/api-keys.env`，手动启动时也可以使用项目根目录的 `.env`：
 
 ```text
 OPENAI_API_KEY=你的_API_Key

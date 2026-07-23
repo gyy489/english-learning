@@ -2,7 +2,11 @@ const state = {
   article: null,
   days: [],
   latestDay: null,
+  reviewWordCount: 0,
+  reviewWordsExpanded: false,
   todayWords: [],
+  todayWordMeanings: {},
+  todayWordsExpanded: false,
   todayWordsRenderId: 0,
   dirty: false,
   generating: false,
@@ -28,9 +32,13 @@ const elements = {
   reviewPlanWords: document.querySelector("#reviewPlanWords"),
   reviewCount: document.querySelector("#reviewCount"),
   reviewWords: document.querySelector("#reviewWords"),
+  reviewSection: document.querySelector("#reviewSection"),
+  reviewWordsToggle: document.querySelector("#reviewWordsToggle"),
   sentenceCount: document.querySelector("#sentenceCount"),
   articleBody: document.querySelector("#articleBody"),
   todayWordsList: document.querySelector("#todayWordsList"),
+  todaySection: document.querySelector("#todaySection"),
+  todayWordsToggle: document.querySelector("#todayWordsToggle"),
   saveStatus: document.querySelector("#saveStatus"),
   generateStatus: document.querySelector("#generateStatus"),
   generateButton: document.querySelector("#generateButton"),
@@ -57,21 +65,34 @@ const elements = {
 };
 
 const THEME_STORAGE_KEY = "english-learning-theme";
+const SEEK_SECONDS = 3;
+const IS_LOCAL_ACCESS = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
+const SYNC_INTERVAL_MS = IS_LOCAL_ACCESS ? 3000 : 30000;
+const HEARTBEAT_INTERVAL_MS = 30000;
 const dictionaryCache = new Map();
 const SESSION_TOKEN = globalThis.crypto?.randomUUID?.()
   || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 let sessionRegistered = false;
+let sessionRegistrationInFlight = null;
 
-async function registerSession() {
-  try {
-    await request("/api/session", {
+async function registerSession(force = false) {
+  if (sessionRegistrationInFlight) return sessionRegistrationInFlight;
+  if (sessionRegistered && !force) return;
+  sessionRegistrationInFlight = request("/api/session", {
       method: "POST",
       body: JSON.stringify({ token: SESSION_TOKEN }),
+    })
+    .then(() => {
+      sessionRegistered = true;
+    })
+    .catch(() => {
+      sessionRegistered = false;
+      // The normal page requests will show the useful connection error.
+    })
+    .finally(() => {
+      sessionRegistrationInFlight = null;
     });
-    sessionRegistered = true;
-  } catch {
-    // The normal page requests will show the useful connection error.
-  }
+  return sessionRegistrationInFlight;
 }
 
 function closeSession() {
@@ -324,9 +345,16 @@ function renderTodayWords() {
 
     item.append(wordElement, meaning, removeButton);
     elements.todayWordsList.append(item);
+    const knownMeaning = state.todayWordMeanings[word];
+    if (knownMeaning !== undefined) {
+      meaning.textContent = conciseTranslation(knownMeaning) || "暂无释义";
+      meaning.title = knownMeaning;
+      continue;
+    }
     lookupDictionary(word)
       .then((result) => {
         if (renderId === state.todayWordsRenderId && item.isConnected) {
+          state.todayWordMeanings[word] = result.translation || "";
           meaning.textContent = conciseTranslation(result.translation);
           meaning.title = result.translation || "";
         }
@@ -337,10 +365,42 @@ function renderTodayWords() {
         }
       });
   }
+  updateTodayWordsVisibility();
 }
 
-function setTodayWords(words) {
+function updateTodayWordsVisibility() {
+  const isCompactMobile = window.matchMedia("(max-width: 760px)").matches;
+  const canCollapse = isCompactMobile && state.todayWords.length > 6;
+  elements.todaySection.classList.toggle(
+    "mobile-collapsed",
+    canCollapse && !state.todayWordsExpanded,
+  );
+  elements.todayWordsToggle.hidden = !canCollapse;
+  elements.todayWordsToggle.setAttribute("aria-expanded", String(state.todayWordsExpanded));
+  elements.todayWordsToggle.textContent = state.todayWordsExpanded
+    ? "收起"
+    : `展开 ${state.todayWords.length}`;
+}
+
+function updateReviewWordsVisibility() {
+  const isCompactMobile = window.matchMedia("(max-width: 760px)").matches;
+  const canCollapse = isCompactMobile && state.reviewWordCount > 6;
+  elements.reviewSection.classList.toggle(
+    "mobile-collapsed",
+    canCollapse && !state.reviewWordsExpanded,
+  );
+  elements.reviewWordsToggle.hidden = !canCollapse;
+  elements.reviewWordsToggle.setAttribute("aria-expanded", String(state.reviewWordsExpanded));
+  elements.reviewWordsToggle.textContent = state.reviewWordsExpanded
+    ? "收起"
+    : `展开 ${state.reviewWordCount}`;
+}
+
+function setTodayWords(words, meanings = null) {
   state.todayWords = [...new Set(words.map((word) => String(word).trim().toLowerCase()).filter(Boolean))];
+  if (meanings && typeof meanings === "object") {
+    state.todayWordMeanings = { ...meanings };
+  }
   renderTodayWords();
   refreshSelectedTokens();
 }
@@ -508,20 +568,26 @@ function renderArticle(article) {
   elements.articleTitle.textContent = article.title;
   elements.sourceLabel.textContent = article.metadata["来源真题"] || "";
 
-  elements.reviewCount.textContent = `${article.reviewWords.length} 个`;
+  state.reviewWordCount = article.reviewWords.length;
+  elements.reviewCount.textContent = `${state.reviewWordCount} 个`;
   elements.reviewWords.replaceChildren();
   for (const entry of article.reviewWords) {
     const item = document.createElement("div");
     item.className = "review-item";
     const word = document.createElement("div");
-    word.className = "review-word";
+    word.className = "review-word dictionary-list-word";
     word.textContent = entry.word;
+    word.addEventListener("click", (event) => {
+      event.stopPropagation();
+      scheduleDictionary(entry.word, word);
+    });
     const meaning = document.createElement("div");
     meaning.className = "review-meaning translation-faded";
     meaning.textContent = entry.meaning;
     item.append(word, meaning);
     elements.reviewWords.append(item);
   }
+  updateReviewWordsVisibility();
 
   elements.sentenceCount.textContent = `${article.sentences.length} 句`;
   elements.articleBody.replaceChildren();
@@ -540,8 +606,9 @@ function renderArticle(article) {
     elements.articleBody.append(row);
   }
 
-  setTodayWords(article.todayWords);
+  setTodayWords(article.todayWords, article.todayWordMeanings);
   configureAudio(article);
+  updateMediaMetadata(article);
   updateGenerateButton();
 }
 
@@ -551,13 +618,27 @@ function configureAudio(article) {
   elements.backButton.disabled = !enabled;
   elements.forwardButton.disabled = !enabled;
   elements.progress.disabled = !enabled;
+  elements.currentTime.textContent = "0:00";
+  elements.duration.textContent = enabled ? "--:--" : "0:00";
+  elements.progress.value = "0";
   if (enabled) {
     elements.audio.src = `${article.audioUrl}?day=${article.day}`;
+    elements.audio.preload = "auto";
     elements.audio.volume = Number(elements.volume.value);
+    elements.audio.load();
   } else {
     elements.audio.removeAttribute("src");
     elements.audio.load();
   }
+}
+
+function updateMediaMetadata(article) {
+  if (!("mediaSession" in navigator) || !("MediaMetadata" in window)) return;
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title: article.title,
+    artist: "每日英语",
+    album: `第 ${article.day} 天`,
+  });
 }
 
 async function loadCurrentArticle(day = null) {
@@ -616,6 +697,7 @@ async function loadDayOptions(preferredDay = null) {
     elements.daySelect.append(option);
   }
   elements.daySelect.value = String(preferredDay || state.latestDay);
+  updateGenerateButton();
 }
 
 function updateGenerateButton() {
@@ -642,8 +724,45 @@ async function togglePlayback() {
 }
 
 elements.playButton.addEventListener("click", () => togglePlayback().catch((error) => showToast(error.message)));
-elements.backButton.addEventListener("click", () => seekBy(-5));
-elements.forwardButton.addEventListener("click", () => seekBy(5));
+function attachHoldSeek(button, direction) {
+  let holdTimer = null;
+  let repeatTimer = null;
+  let longPressed = false;
+
+  const stopHolding = () => {
+    window.clearTimeout(holdTimer);
+    window.clearInterval(repeatTimer);
+    holdTimer = null;
+    repeatTimer = null;
+    button.classList.remove("holding");
+  };
+
+  button.addEventListener("pointerdown", (event) => {
+    if (button.disabled || (event.button !== undefined && event.button !== 0)) return;
+    longPressed = false;
+    holdTimer = window.setTimeout(() => {
+      longPressed = true;
+      button.classList.add("holding");
+      seekBy(direction * SEEK_SECONDS);
+      repeatTimer = window.setInterval(() => seekBy(direction * SEEK_SECONDS), 260);
+    }, 450);
+  });
+  button.addEventListener("pointerup", stopHolding);
+  button.addEventListener("pointercancel", stopHolding);
+  button.addEventListener("lostpointercapture", stopHolding);
+  button.addEventListener("contextmenu", (event) => event.preventDefault());
+  button.addEventListener("click", (event) => {
+    if (longPressed) {
+      event.preventDefault();
+      longPressed = false;
+      return;
+    }
+    seekBy(direction * SEEK_SECONDS);
+  });
+}
+
+attachHoldSeek(elements.backButton, -1);
+attachHoldSeek(elements.forwardButton, 1);
 elements.volume.addEventListener("input", () => {
   elements.audio.volume = Number(elements.volume.value);
 });
@@ -654,9 +773,11 @@ elements.progress.addEventListener("input", () => {
 });
 elements.audio.addEventListener("play", () => {
   elements.playButton.textContent = "❚❚";
+  if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing";
 });
 elements.audio.addEventListener("pause", () => {
   elements.playButton.textContent = "▶";
+  if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused";
 });
 elements.audio.addEventListener("loadedmetadata", () => {
   elements.duration.textContent = formatTime(elements.audio.duration);
@@ -668,12 +789,43 @@ elements.audio.addEventListener("timeupdate", () => {
     : 0;
   elements.progress.value = String(percent || 0);
 });
+
+if ("mediaSession" in navigator) {
+  const mediaActions = {
+    play: () => elements.audio.play().catch((error) => showToast(error.message)),
+    pause: () => elements.audio.pause(),
+    seekbackward: (details) => seekBy(-(details?.seekOffset || SEEK_SECONDS)),
+    seekforward: (details) => seekBy(details?.seekOffset || SEEK_SECONDS),
+    seekto: (details) => {
+      if (Number.isFinite(details?.seekTime)) elements.audio.currentTime = details.seekTime;
+    },
+  };
+  for (const [action, handler] of Object.entries(mediaActions)) {
+    try {
+      navigator.mediaSession.setActionHandler(action, handler);
+    } catch {
+      // Older mobile browsers may only support part of the Media Session API.
+    }
+  }
+}
 elements.dictionaryClose.addEventListener("click", closeDictionary);
 document.addEventListener("click", (event) => {
   if (!elements.dictionaryPopover.contains(event.target)) closeDictionary();
 });
 window.addEventListener("scroll", closeDictionary, { passive: true });
 window.addEventListener("resize", closeDictionary);
+window.addEventListener("resize", () => {
+  updateTodayWordsVisibility();
+  updateReviewWordsVisibility();
+});
+elements.reviewWordsToggle.addEventListener("click", () => {
+  state.reviewWordsExpanded = !state.reviewWordsExpanded;
+  updateReviewWordsVisibility();
+});
+elements.todayWordsToggle.addEventListener("click", () => {
+  state.todayWordsExpanded = !state.todayWordsExpanded;
+  updateTodayWordsVisibility();
+});
 elements.daySelect.addEventListener("change", async () => {
   const selectedDay = Number(elements.daySelect.value);
   const previousDay = state.article?.day;
@@ -689,6 +841,8 @@ elements.daySelect.addEventListener("change", async () => {
       }
     }
     elements.audio.pause();
+    state.reviewWordsExpanded = false;
+    state.todayWordsExpanded = false;
     const loaded = await loadCurrentArticle(selectedDay);
     if (!loaded) {
       elements.daySelect.value = String(previousDay);
@@ -717,10 +871,10 @@ document.addEventListener("keydown", (event) => {
     togglePlayback().catch((error) => showToast(error.message));
   } else if (event.key === "ArrowLeft") {
     event.preventDefault();
-    seekBy(-5);
+    seekBy(-SEEK_SECONDS);
   } else if (event.key === "ArrowRight") {
     event.preventDefault();
-    seekBy(5);
+    seekBy(SEEK_SECONDS);
   }
 });
 
@@ -760,10 +914,12 @@ elements.generateButton.addEventListener("click", async () => {
 
 async function initialize() {
   try {
-    await registerSession();
-    await loadDayOptions();
-    await loadCurrentArticle(state.latestDay);
-    await loadReviewPlan();
+    await Promise.all([
+      registerSession(),
+      loadDayOptions(),
+      loadCurrentArticle(),
+      loadReviewPlan(),
+    ]);
   } catch (error) {
     elements.articleTitle.textContent = "无法读取文章";
     showToast(error.message);
@@ -771,8 +927,12 @@ async function initialize() {
 }
 
 initialize();
-window.setInterval(checkExternalChanges, 3000);
-window.addEventListener("pageshow", registerSession);
+window.setInterval(checkExternalChanges, SYNC_INTERVAL_MS);
+window.setInterval(() => registerSession(true), HEARTBEAT_INTERVAL_MS);
+window.addEventListener("pageshow", () => registerSession(true));
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") registerSession(true);
+});
 window.addEventListener("pagehide", (event) => {
   if (!event.persisted) closeSession();
 });

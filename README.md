@@ -38,7 +38,7 @@
 - `作文素材/`：AI 生成的英语短文章、中文解释和生词积累。
 - `作文素材/按时间排序/`：每日练习目录，一天一个文件夹；每个文件夹内放当天 Markdown 文章和对应听力音频。
 - `作文素材/单词复习/`：间隔复习策略、JSON 词库和自动生成的 Markdown 复习历史。
-- `english-learning-web/REMOTE_ACCESS.md`：手机远程访问、private tunnel/reverse proxy 链路和运维说明。
+- 远程访问运维说明、服务器拓扑和本机部署配置属于私有资料，默认不进入公开仓库。
 - `雅思真题/`：雅思真题原始资料和转换后的 AI 可读 Markdown 数据。
 - `雅思真题/Markdown资料/`：由 PDF/DOCX 转换得到的 Markdown 数据层，后续生成学习文章时优先使用这里的资料。
 - `skills/ielts-daily-article/SKILL.md`：项目内的每日文章生成 skill，后续 agent 可按这个文件执行“更新”流程。
@@ -116,7 +116,7 @@ uv run --with openai python scripts/article_to_speech.py "作文素材/按时间
 - `gpt-4o-mini-tts-2025-12-15`：固定版本，适合需要保持声音效果一致的情况。
 - `tts-1-hd`：旧款高质量模型；不支持 `--instructions`。
 
-生成音频需要本机设置 `OPENAI_API_KEY`。脚本会优先读取环境变量；如果没有，也会读取项目根目录的 `.env`。从“应用程序”启动“每日英语”时，启动脚本会读取 `~/.zshrc` 中的 OpenAI 配置，但不会把 key 写入项目或 GitHub。
+生成音频需要本机设置 `OPENAI_API_KEY`。脚本会优先读取环境变量；如果没有，也会读取用户级 `~/.config/api-keys.env` 和项目根目录的 `.env`。从“应用程序”启动“每日英语”时，启动脚本会读取同一个用户级密钥文件，但不会把 key 写入项目或 GitHub。
 
 Web 应用生成文章默认使用 `gpt-4o-mini`，生成音频默认使用 `tts-1`。可以在 `.env` 中分别设置 `OPENAI_TEXT_MODEL` 和 `OPENAI_TTS_MODEL` 覆盖。
 
