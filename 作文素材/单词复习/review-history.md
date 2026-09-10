@@ -4,240 +4,401 @@
 
 ## 当前概览
 
-- 当前天数：第 21 天
-- 词库总数：123
-- 学习中：123
-- 基本熟悉：0
+- 当前天数：第 46 天
+- 词库总数：284
+- 学习中：197
+- 基本熟悉：87
 - 已掌握：0
-- 当前标记生词：0
-- 收件箱：63/120
-- 活跃学习池：60/60
-- 长期维护池：0/120
-- 归档：0
+- 当前标记生词：16
+- 收件箱：120/120
+- 活跃学习池：37/60
+- 长期维护池：87/120
+- 归档：40
 
 ## 复习习惯
 
-- 已完成学习篇数：20
-- 累计复习词次数：152
-- 累计回忆成功率：70%
-- 最近 7 篇回忆成功率：64%
-- 平均每篇标记生词：7.7 个
+- 已完成学习篇数：45
+- 累计复习词次数：516
+- 累计回忆成功率：77%
+- 最近 7 篇回忆成功率：82%
+- 平均每篇标记生词：9.4 个
 
-## 第 22 天生成计划
+## 第 47 天生成计划
 
-- 仍不会、优先重学：无
-- 活跃池到期词：pronunciation、whole、bring、chain、hit、ignore、mechanic、repair、ride、road、smooth、suddenly、wet、wheel、through
-- 长期维护词：无
+- 仍不会、优先重学：authentic、trade、crowd、gather、sale、waste、staff、claim、across
+- 活跃池到期词：worth、frustrate、achievement、dust
+- 长期维护词：paragraph、ignore
 - 从收件箱新激活：无
 - 目标词总数：15/15
-- 顺延当前生词：0 个
-- 顺延到期词：45 个
-- 收件箱等待：63 个
+- 顺延当前生词：7 个
+- 顺延到期词：12 个
+- 收件箱等待：120 个
 - 允许文章额外引入新词：0 个
 
 ## 当前文章学习结果（待生成下一天时确认）
 
-- 记住：dry、reach、tie、chew、sharp、trade、aware、restriction、uncertainty、unpredictably、sound、discovery、forward、improvement、nervous
-- 仍不会：无
-- 新发现：无
-- 旧词再次遗忘：无
+- 记住：uncertainty、pressure、thin、describe、sound、although、rope、glad、auction、authorship
+- 仍不会：authentic、trade、crowd、gather、sale
+- 新发现：apply、lake、furniture、rais、volunteer、avoid、prevent
+- 旧词再次遗忘：waste、staff、claim、across
 
 ## 词库
 
 | 单词 | 中文 | 词池 | 状态 | 首次出现 | 上次复习 | 下次复习 | 成功/复习 | 遗忘 |
 |---|---|---|---|---:|---:|---:|---:|---:|
-| pronunciation | 发音, 读法 | 活跃 | 学习中 | 13 | 14 | 17 | 1/1 | 0 |
-| whole | 全部, 全体, 整体, 完全之体系 | 活跃 | 学习中 | 13 | 14 | 17 | 1/1 | 0 |
-| bring | 带来, 产生, 促使, 提出 | 活跃 | 学习中 | 12 | 15 | 18 | 1/3 | 2 |
-| chain | 链, 枷锁, 束缚 | 活跃 | 学习中 | 14 | 15 | 18 | 1/1 | 0 |
-| hit | 打击, 打, 冲撞, 讽刺 | 活跃 | 学习中 | 14 | 15 | 18 | 1/1 | 0 |
-| ignore | 不理睬, 忽视, 驳回, 忽略 | 活跃 | 学习中 | 14 | 15 | 18 | 1/1 | 0 |
-| mechanic | 机械工, 技工 | 活跃 | 学习中 | 14 | 15 | 18 | 1/1 | 0 |
-| repair | 修理, 补救, 修复 | 活跃 | 学习中 | 14 | 15 | 18 | 1/1 | 0 |
-| ride | 骑马, 乘坐, 乘车, 搭便车 | 活跃 | 学习中 | 14 | 15 | 18 | 1/1 | 0 |
-| road | 路, 道路, 公路, 途径, 方法 | 活跃 | 学习中 | 14 | 15 | 18 | 1/1 | 0 |
-| smooth | 平滑的, 平稳的, 流畅的, 和蔼的, 安祥的, 圆滑的, 调匀的, 无毛的 | 活跃 | 学习中 | 14 | 15 | 18 | 1/1 | 0 |
-| suddenly | 突然, 意外, 忽然, 迅速, 即席作成, 即刻, 急速 | 活跃 | 学习中 | 14 | 15 | 18 | 1/1 | 0 |
-| wet | 湿气, 潮湿, 水分, 雨天 | 活跃 | 学习中 | 14 | 15 | 18 | 1/1 | 0 |
-| wheel | 轮子, 车轮, 轮, 方向盘, 旋转, 机构, 重要人物 | 活跃 | 学习中 | 14 | 15 | 18 | 1/1 | 0 |
-| appear |  | 活跃 | 学习中 | 11 | 12 | 19 | 2/2 | 0 |
-| blank |  | 活跃 | 学习中 | 11 | 12 | 19 | 2/2 | 0 |
-| communicate |  | 活跃 | 学习中 | 11 | 12 | 19 | 2/2 | 0 |
-| disappoint |  | 活跃 | 学习中 | 11 | 12 | 19 | 2/2 | 0 |
-| doubt |  | 活跃 | 学习中 | 11 | 12 | 19 | 2/2 | 0 |
-| endless |  | 活跃 | 学习中 | 11 | 12 | 19 | 2/2 | 0 |
-| force |  | 活跃 | 学习中 | 11 | 12 | 19 | 2/2 | 0 |
-| frustrate |  | 活跃 | 学习中 | 11 | 12 | 19 | 2/2 | 0 |
-| glad | 高兴的；欣慰的 | 活跃 | 学习中 | 15 | 16 | 19 | 1/1 | 0 |
-| gradually |  | 活跃 | 学习中 | 11 | 12 | 19 | 2/2 | 0 |
-| hold | 把握, 把持力, 柄, 控制, 掌握, 监禁 | 活跃 | 学习中 | 15 | 16 | 19 | 1/1 | 0 |
-| quite |  | 活跃 | 学习中 | 11 | 12 | 19 | 2/2 | 0 |
-| reminder |  | 活跃 | 学习中 | 11 | 12 | 19 | 2/2 | 0 |
-| surround |  | 活跃 | 学习中 | 11 | 12 | 19 | 2/2 | 0 |
-| through | 穿越, 从头至尾, 到底, 因为 | 活跃 | 学习中 | 12 | 16 | 19 | 2/4 | 2 |
-| unexpected |  | 活跃 | 学习中 | 11 | 12 | 19 | 2/2 | 0 |
-| across | 越过, 穿过, 与...相交叉, 在...的对面 | 活跃 | 学习中 | 16 | 17 | 20 | 1/1 | 0 |
-| although | 虽然, 尽管 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
-| area | 区域, 面积, 范围, 空地 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
-| auction | 拍卖 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
-| authentic | 可靠的, 可信的, 真正的 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
-| authorship | 原作者, 根源, 原创造者 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
-| behind | 在后地 | 活跃 | 学习中 | 16 | 17 | 20 | 1/1 | 0 |
-| burn | 烧, 烧毁, 烧伤 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
-| ceremony | 典礼, 仪式, 礼节 | 活跃 | 学习中 | 16 | 17 | 20 | 1/1 | 0 |
-| claim | 要求, 要求权, 断言, 权利 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
-| commemorate | 纪念 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
-| common | 通常的, 共同的, 通俗的, 公共的 | 活跃 | 学习中 | 16 | 17 | 20 | 1/1 | 0 |
 | controversial | 争论的, 论争的, 被议论的 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
 | critic | 批评家, 鉴定家 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
-| debate | 辩论, 讨论 | 活跃 | 学习中 | 16 | 17 | 20 | 1/1 | 0 |
 | draw | 拉, 拖, 拔剑 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
-| during | 在...的时候 | 活跃 | 学习中 | 12 | 19 | 20 | 1/2 | 1 |
-| dust | 灰尘, 尘埃, 粉末, 花粉, 土, 骚乱 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
 | excitement | 刺激, 兴奋 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
-| expert | 专家, 行家 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
-| fall | 落下, 瀑布, 采伐量, 下降, 落差, 降低, 堕落, 秋天 | 活跃 | 学习中 | 16 | 17 | 20 | 1/1 | 0 |
 | fingerprint | 指纹 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
-| gently | 温和地, 温柔地, 轻轻地, 逐渐地 | 活跃 | 学习中 | 16 | 17 | 20 | 1/1 | 0 |
-| journey | 旅程, 旅行, 行程 | 活跃 | 学习中 | 16 | 17 | 20 | 1/1 | 0 |
-| leaf | 叶, 树叶, 花瓣, 页 | 活跃 | 学习中 | 16 | 17 | 20 | 1/1 | 0 |
 | match | 比赛, 火柴, 对手 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
 | modest | 谦逊的, 羞怯的, 端庄的, 适度的 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
-| museum | 博物馆 | 活跃 | 学习中 | 16 | 17 | 20 | 1/1 | 0 |
 | nevertheless | 然而, 虽然如此 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
-| ordinary | 平常的, 普通的, 平凡的 | 活跃 | 学习中 | 11 | 17 | 20 | 3/4 | 1 |
 | paint | 油漆, 颜料, 绘画作品, 涂漆 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
 | period | 时期, 节段, 节, 句点, 学时, 周期 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
 | picture | 图画, 照片, 景色, 美丽如画的人(或物), 化身, 生动的描述, 想像, 形象思维 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
-| practise | 实践, 实行, 练习, 实习, 从事(职业) | 活跃 | 学习中 | 16 | 17 | 20 | 1/1 | 0 |
-| prepare | 准备, 筹备, 使在思想上有准备, 制造, 调制 | 活跃 | 学习中 | 16 | 17 | 20 | 1/1 | 0 |
 | prove | 证明, 查验, 检验, 勘探, 显示 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
 | provid |  | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
-| religious | 宗教性的, 虔诚的, 宗教上的, 严谨的 | 活跃 | 学习中 | 16 | 17 | 20 | 1/1 | 0 |
-| remain | 保持, 逗留, 剩余 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
-| remind | 提醒, 使想起 | 活跃 | 学习中 | 16 | 17 | 20 | 1/1 | 0 |
 | reveal | 露出, 显示, 透露, 揭露, 泄露, (神)启示 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
 | sadness | 悲哀, 悲伤 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
 | scholar | 学者, 奖学金获得者, 有文化者, 学习者 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
 | shadow | 阴影, 荫, 影子, 影像, 阴暗, 幽灵, 少许, 隐蔽处, 庇护 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
-| shake | 摇动, 震动 | 活跃 | 学习中 | 16 | 17 | 20 | 1/1 | 0 |
-| slide | 滑, 滑道, 山崩, 雪崩, 幻灯片 | 活跃 | 学习中 | 15 | 17 | 20 | 1/2 | 1 |
 | sum | 总数, 总和, 金额, 概要, 顶点 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
 | therefore | 因此, 所以 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
 | tiny | 很少的, 微小的 | 收件箱 | 学习中 | 19 | — | 20 | 0/0 | 0 |
-| warm | 暖和的, 暖的, 温暖的, 热烈的, 兴奋的, 激烈的, 多情的, 色情的 | 活跃 | 学习中 | 16 | 17 | 20 | 1/1 | 0 |
-| awake | 醒着的 | 活跃 | 学习中 | 16 | 18 | 21 | 1/2 | 1 |
 | brown | 褐色 | 收件箱 | 学习中 | 20 | — | 21 | 0/0 | 0 |
 | edge | 边缘, 尖锐, 刀刃, 优势 | 收件箱 | 学习中 | 20 | — | 21 | 0/0 | 0 |
-| expect | 预期, 盼望, 期待 | 活跃 | 学习中 | 17 | 18 | 21 | 1/1 | 0 |
-| garden | 花园, 果园, 菜园 | 活跃 | 学习中 | 16 | 18 | 21 | 1/2 | 1 |
-| heavy | 重的, 巨大的, 沉重的, 笨重的, 过度的 | 收件箱 | 学习中 | 20 | — | 21 | 0/0 | 0 |
-| modern | 现代人, 有思想的人 | 活跃 | 学习中 | 17 | 18 | 21 | 1/1 | 0 |
 | safe | 保险箱, 冷藏室 | 收件箱 | 学习中 | 20 | — | 21 | 0/0 | 0 |
-| shape | 形状, 形态, 外形, 形式, 身材 | 活跃 | 学习中 | 17 | 18 | 21 | 1/1 | 0 |
-| shelf | 架子, 搁板 | 收件箱 | 学习中 | 20 | — | 21 | 0/0 | 0 |
 | str |  | 收件箱 | 学习中 | 20 | — | 21 | 0/0 | 0 |
 | street | 街道, 马路, 街区 | 收件箱 | 学习中 | 20 | — | 21 | 0/0 | 0 |
-| uneven | 不平坦的, 不均等的, 奇数的 | 活跃 | 学习中 | 17 | 18 | 21 | 1/1 | 0 |
-| warmly | 热情地；温暖地 | 活跃 | 学习中 | 17 | 18 | 21 | 1/1 | 0 |
-| argue | 提出理由, 争论, 辩论 | 活跃 | 学习中 | 16 | 19 | 22 | 1/3 | 2 |
-| bone | 骨头, 骨, 骨制品 | 活跃 | 学习中 | 17 | 19 | 22 | 1/2 | 1 |
-| fence | 围墙, 栅栏, 买卖赃物的人, 剑术 | 收件箱 | 学习中 | 18 | 19 | 22 | 1/1 | 0 |
-| harmful | 有害的, 伤害的 | 活跃 | 学习中 | 16 | 19 | 22 | 1/3 | 2 |
-| round | 圆, 圆形物, 巡回, 循环, 一轮, 一回合, 一局, 范围, 轮唱 | 收件箱 | 学习中 | 17 | 19 | 22 | 1/2 | 1 |
-| soil | 土壤, 土地, 国家, 国土, 温床, 污物, 粪便, 水池 | 收件箱 | 学习中 | 18 | 19 | 22 | 1/1 | 0 |
-| spoon | 匙, 调羹, 匙形工具 | 活跃 | 学习中 | 16 | 19 | 22 | 1/3 | 2 |
-| branch | 树枝, 支店, 支流, 分部 | 收件箱 | 学习中 | 18 | 20 | 23 | 1/2 | 1 |
-| record | 记录, 履历, 档案, 审判记录, 最高纪录, 唱片 | 收件箱 | 学习中 | 11 | 20 | 23 | 3/4 | 1 |
-| stir | 骚动, 轰动, 搅动, 监狱 | 收件箱 | 学习中 | 17 | 20 | 23 | 1/3 | 2 |
-| weak | 不牢固的, 弱的, 虚弱的, 软弱的, 无力的, 无权力的, (论据等)不充分的 | 收件箱 | 学习中 | 13 | 20 | 23 | 2/3 | 1 |
-| aware | 知道的, 有觉悟的 | 收件箱 | 学习中 | 12 | 21 | 24 | 2/3 | 1 |
-| chew | 咀嚼, 嚼碎 | 收件箱 | 学习中 | 18 | 21 | 24 | 1/3 | 2 |
-| dry | 干的, 无酒的, 枯燥无味的, 干燥的 | 收件箱 | 学习中 | 17 | 21 | 24 | 1/4 | 3 |
-| reach | 伸出, 延伸, 区域, 范围, 流域, 岬 | 收件箱 | 学习中 | 16 | 21 | 24 | 1/5 | 4 |
-| restriction | 限制, 限定, 约束 | 收件箱 | 学习中 | 11 | 21 | 24 | 3/6 | 3 |
-| sharp | 半升音调, 利刃, 骗子 | 收件箱 | 学习中 | 18 | 21 | 24 | 1/3 | 2 |
-| tie | 带子, 线, 鞋带, 领带, 领结, 关系, 束缚, 平局, 不分胜负 | 收件箱 | 学习中 | 17 | 21 | 24 | 1/4 | 3 |
-| trade | 贸易, 商业, 交易, 生意, 职业, 顾客, 信风 | 收件箱 | 学习中 | 16 | 21 | 24 | 1/5 | 4 |
-| contrast | 差别, 对比, 对照物 | 收件箱 | 学习中 | 11 | 20 | 27 | 3/4 | 1 |
-| describe | 描述, 描绘, 画 | 收件箱 | 学习中 | 11 | 20 | 27 | 3/4 | 1 |
-| paragraph | 段落, 短评 | 收件箱 | 学习中 | 12 | 20 | 27 | 2/2 | 0 |
-| discovery | 发现, 被发现的事物 | 收件箱 | 学习中 | 13 | 21 | 28 | 2/2 | 0 |
-| forward | 向前的, 早的, 迅速的, 在前的, 进步的 | 收件箱 | 学习中 | 13 | 21 | 28 | 2/2 | 0 |
-| improvement | 进步, 改善, 利用 | 收件箱 | 学习中 | 13 | 21 | 28 | 2/2 | 0 |
-| nervous | 神经紧张的, 不安的, 神经的 | 收件箱 | 学习中 | 13 | 21 | 28 | 2/2 | 0 |
-| sound | 声音, 语音, 吵闹, 声调, 听力范围, 探条, 海峡 | 收件箱 | 学习中 | 12 | 21 | 28 | 2/3 | 1 |
-| uncertainty | 不确定, 不可靠, 不确定的事物 | 收件箱 | 学习中 | 11 | 21 | 28 | 3/5 | 2 |
-| unpredictably | 无法预言地） | 收件箱 | 学习中 | 11 | 21 | 28 | 3/5 | 2 |
+| bread | 面包, 生计, 食物 | 收件箱 | 学习中 | 21 | — | 22 | 0/0 | 0 |
+| cloth | 布料, 织品, 布 | 收件箱 | 学习中 | 21 | — | 22 | 0/0 | 0 |
+| loaf | 一条面包, 块, 游荡 | 收件箱 | 学习中 | 21 | — | 22 | 0/0 | 0 |
+| weather | 天气, 气象, 处境 | 收件箱 | 学习中 | 21 | — | 22 | 0/0 | 0 |
+| goal | 目标, 终点, 得分, 球门, 守门员 | 收件箱 | 学习中 | 22 | — | 23 | 0/0 | 0 |
+| rang | ring的过去式 | 收件箱 | 学习中 | 22 | — | 23 | 0/0 | 0 |
+| ahead | 领先的, 预先的, 向前的 | 收件箱 | 学习中 | 23 | — | 24 | 0/0 | 0 |
+| nod | 点头, 打盹, 晃动 | 收件箱 | 学习中 | 24 | — | 25 | 0/0 | 0 |
+| pool | 池, 水塘, 石油层, 联营 | 收件箱 | 学习中 | 24 | — | 25 | 0/0 | 0 |
+| angry | 生气的, 愤怒的 | 收件箱 | 学习中 | 25 | — | 26 | 0/0 | 0 |
+| rail | 横杆, 围栏, 栏杆, 铁轨, 扶手, 秧鸡 | 收件箱 | 学习中 | 25 | — | 26 | 0/0 | 0 |
+| ancient | 古代的, 古老的, 年老的, 旧的 | 收件箱 | 学习中 | 26 | — | 27 | 0/0 | 0 |
+| bridge | 桥, 舰桥, 桥梁, 桥牌 | 收件箱 | 学习中 | 26 | — | 27 | 0/0 | 0 |
+| guide | 引导者, 导游, 指南, 路标 | 收件箱 | 学习中 | 26 | — | 27 | 0/0 | 0 |
+| town | 城镇, 市, 镇 | 收件箱 | 学习中 | 26 | — | 27 | 0/0 | 0 |
+| cousin | 堂兄弟姊妹, 表兄弟姊妹 | 收件箱 | 学习中 | 27 | — | 28 | 0/0 | 0 |
+| custom | 习惯, 风俗, 海关, 自定义 | 收件箱 | 学习中 | 27 | — | 28 | 0/0 | 0 |
+| fully | 十分地, 完全地, 充分地 | 收件箱 | 学习中 | 27 | — | 28 | 0/0 | 0 |
+| guest | 客人, 来宾, 旅客 | 收件箱 | 学习中 | 27 | — | 28 | 0/0 | 0 |
+| snack | 小吃, 点心, 快餐 | 收件箱 | 学习中 | 27 | — | 28 | 0/0 | 0 |
+| upset | 弄翻的, 混乱的, 心烦的 | 收件箱 | 学习中 | 27 | — | 28 | 0/0 | 0 |
+| church | 教堂, 礼拜, 教会 | 收件箱 | 学习中 | 28 | — | 29 | 0/0 | 0 |
+| ground | 土地, 战场, 场地, 地面, 范围 | 收件箱 | 学习中 | 28 | — | 29 | 0/0 | 0 |
+| hole | 孔, 洞, 穴, 漏洞 | 收件箱 | 学习中 | 28 | — | 29 | 0/0 | 0 |
+| wooden | 木制的, 呆笨的, 木然的 | 收件箱 | 学习中 | 28 | — | 29 | 0/0 | 0 |
+| amount | 总数, 总额 | 收件箱 | 学习中 | 29 | — | 30 | 0/0 | 0 |
+| arrang |  | 收件箱 | 学习中 | 29 | — | 30 | 0/0 | 0 |
+| attract | 吸引, 诱惑 | 收件箱 | 学习中 | 29 | — | 30 | 0/0 | 0 |
+| customer | 消费者 | 收件箱 | 学习中 | 29 | — | 30 | 0/0 | 0 |
+| neat | 整洁的, 巧妙的, 匀称的, 简洁的 | 收件箱 | 学习中 | 29 | — | 30 | 0/0 | 0 |
+| organiz |  | 收件箱 | 学习中 | 29 | — | 30 | 0/0 | 0 |
+| solve | 解决, 付给, 溶解 | 收件箱 | 学习中 | 29 | — | 30 | 0/0 | 0 |
+| stall | 厩, 停车处, 牧师职位, 货摊, 托辞, 拖延 | 收件箱 | 学习中 | 29 | — | 30 | 0/0 | 0 |
+| borrow | 借, 借入, 借用 | 收件箱 | 学习中 | 30 | — | 31 | 0/0 | 0 |
+| complain | 抱怨, 抗议, 控诉 | 收件箱 | 学习中 | 30 | — | 31 | 0/0 | 0 |
+| cooperation | 合作, 协力, 配合 | 收件箱 | 学习中 | 30 | — | 31 | 0/0 | 0 |
+| crate |  | 收件箱 | 学习中 | 30 | — | 31 | 0/0 | 0 |
+| entrance | 入口, 进入点, 入场, 入学, 进入, 开始(阶段), 就任 | 收件箱 | 学习中 | 30 | — | 31 | 0/0 | 0 |
+| firm | 公司, 商号 | 收件箱 | 学习中 | 30 | — | 31 | 0/0 | 0 |
+| knot | 结, 群, 难题 | 收件箱 | 学习中 | 30 | — | 31 | 0/0 | 0 |
+| solv |  | 收件箱 | 学习中 | 30 | — | 31 | 0/0 | 0 |
+| ability | 能力, 才干 | 收件箱 | 学习中 | 31 | — | 32 | 0/0 | 0 |
+| corner | 角落, 转角, 窘境 | 收件箱 | 学习中 | 31 | — | 32 | 0/0 | 0 |
+| drop | 滴, 微量, 落下, 空投 | 收件箱 | 学习中 | 31 | — | 32 | 0/0 | 0 |
+| encourag |  | 收件箱 | 学习中 | 31 | — | 32 | 0/0 | 0 |
+| heater | 加热器, 灯丝, 加热工 | 收件箱 | 学习中 | 31 | — | 32 | 0/0 | 0 |
+| steady | 稳定的, 不动摇的, 沉着的, 稳固的, 坚定的, 经常的 | 收件箱 | 学习中 | 31 | — | 32 | 0/0 | 0 |
+| towel | 手巾, 毛巾 | 收件箱 | 学习中 | 31 | — | 32 | 0/0 | 0 |
+| hidden | 隐藏的 | 收件箱 | 学习中 | 32 | — | 33 | 0/0 | 0 |
+| accomplishment | 成就, 完成 | 收件箱 | 学习中 | 33 | — | 34 | 0/0 | 0 |
+| almost | 几乎, 差不多 | 收件箱 | 学习中 | 33 | — | 34 | 0/0 | 0 |
+| bloom | 花, 开花, 青春, 钢块 | 收件箱 | 学习中 | 33 | — | 34 | 0/0 | 0 |
+| concern | 关心, 忧虑 | 收件箱 | 学习中 | 33 | — | 34 | 0/0 | 0 |
+| content | 内容, 满足, 意义, 要旨 | 收件箱 | 学习中 | 33 | — | 34 | 0/0 | 0 |
+| effort | 努力, 成就 | 收件箱 | 学习中 | 33 | — | 34 | 0/0 | 0 |
+| filter | 滤波器, 过滤器, 滤光器, 过滤嘴, 去尘器 | 收件箱 | 学习中 | 33 | — | 34 | 0/0 | 0 |
+| rest | 休息, 睡眠, 安息, 稍息, 静止, 支架, 休息处, 其余者, 剩余部分 | 收件箱 | 学习中 | 33 | — | 34 | 0/0 | 0 |
+| among | 在...之中 | 收件箱 | 学习中 | 34 | — | 35 | 0/0 | 0 |
+| anticipation | 预期, 预料 | 收件箱 | 学习中 | 34 | — | 35 | 0/0 | 0 |
+| aspect | 外观, 方面, 面貌, 方向 | 收件箱 | 学习中 | 34 | — | 35 | 0/0 | 0 |
+| caught | catch的过去式和过去分词 | 收件箱 | 学习中 | 34 | — | 35 | 0/0 | 0 |
+| chore | 零工, 家务 | 收件箱 | 学习中 | 34 | — | 35 | 0/0 | 0 |
+| garage | 车库, 汽车修理厂, 机库 | 收件箱 | 学习中 | 34 | — | 35 | 0/0 | 0 |
+| individually | 以个人身分, 各个地, 独特地 | 收件箱 | 学习中 | 34 | — | 35 | 0/0 | 0 |
+| keen | 锋利的, 敏锐的, 强烈的, 敏捷的, 热心的, 渴望的 | 收件箱 | 学习中 | 34 | — | 35 | 0/0 | 0 |
+| sell | 卖, 背叛, 销售, 出卖 | 收件箱 | 学习中 | 34 | — | 35 | 0/0 | 0 |
+| embrace | 拥抱 | 收件箱 | 学习中 | 35 | — | 36 | 0/0 | 0 |
+| leisure | 空闲, 闲暇, 悠闲 | 收件箱 | 学习中 | 35 | — | 36 | 0/0 | 0 |
+| novel | 小说, 长篇故事 | 收件箱 | 学习中 | 35 | — | 36 | 0/0 | 0 |
+| frustration | 挫折, 顿挫 | 收件箱 | 学习中 | 36 | — | 37 | 0/0 | 0 |
+| promis |  | 收件箱 | 学习中 | 36 | — | 37 | 0/0 | 0 |
+| raindrop |  | 收件箱 | 学习中 | 36 | — | 37 | 0/0 | 0 |
+| throughout | 到处, 贯穿全部地, 自始至终 | 收件箱 | 学习中 | 36 | — | 37 | 0/0 | 0 |
+| awareness | 意识, 认识 | 收件箱 | 学习中 | 37 | — | 38 | 0/0 | 0 |
+| cover | 盖子, 封面, 藉口 | 收件箱 | 学习中 | 37 | — | 38 | 0/0 | 0 |
+| explor |  | 收件箱 | 学习中 | 37 | — | 38 | 0/0 | 0 |
+| pour | 流出, 倾泻, 骤雨 | 收件箱 | 学习中 | 37 | — | 38 | 0/0 | 0 |
+| seek | 寻求, 寻找, 探索, 追求, 搜索, 请求 | 收件箱 | 学习中 | 37 | — | 38 | 0/0 | 0 |
+| shelter | 庇护所, 避难所, 庇护, 隐蔽处, 掩蔽 | 收件箱 | 学习中 | 37 | — | 38 | 0/0 | 0 |
+| soak | 浸, 湿透, 大雨 | 收件箱 | 学习中 | 37 | — | 38 | 0/0 | 0 |
+| spend | 花费, 浪费, 度过, 消耗, 消磨 | 收件箱 | 学习中 | 37 | — | 38 | 0/0 | 0 |
+| vibrant | 振动的, 战栗的, 响亮的, 活跃的 | 收件箱 | 学习中 | 37 | — | 38 | 0/0 | 0 |
+| pond | 池塘 | 收件箱 | 学习中 | 38 | — | 39 | 0/0 | 0 |
+| rejuvenat |  | 收件箱 | 学习中 | 38 | — | 39 | 0/0 | 0 |
+| reply | 答复, 回答, 答辩 | 收件箱 | 学习中 | 38 | — | 39 | 0/0 | 0 |
+| scenery | 风景, 景色, 舞台布景 | 收件箱 | 学习中 | 38 | — | 39 | 0/0 | 0 |
+| stuck | stick的过去式和过去分词 | 收件箱 | 学习中 | 38 | — | 39 | 0/0 | 0 |
+| sudden | 突然, 忽然 | 收件箱 | 学习中 | 38 | — | 39 | 0/0 | 0 |
+| complex | 综合体, 情结, 络合物 | 收件箱 | 学习中 | 39 | — | 40 | 0/0 | 0 |
+| couch | 长沙发, 睡椅, 卧榻 | 收件箱 | 学习中 | 39 | — | 40 | 0/0 | 0 |
+| herb | 药草, 香草 | 收件箱 | 学习中 | 39 | — | 40 | 0/0 | 0 |
+| plate | 碟, 盘子, 盆中物, 金属板, 图版, 金银餐具, 印版, 金属牌(照) | 收件箱 | 学习中 | 39 | — | 40 | 0/0 | 0 |
+| recipe | 食谱, 处方, 秘诀 | 收件箱 | 学习中 | 39 | — | 40 | 0/0 | 0 |
+| reward | 报酬, 酬谢, 赏金 | 收件箱 | 学习中 | 39 | — | 40 | 0/0 | 0 |
+| weight | 重, 重量, 体重, 砝码, 重大, 影响, 力量 | 收件箱 | 学习中 | 39 | — | 40 | 0/0 | 0 |
+| definitely | 明确无疑地, 清楚地 | 归档 | 学习中 | 40 | — | 41 | 0/0 | 0 |
+| tail | 尾部, 后部, 辫子, 随员, 特务, 燕尾服, 踪迹, 限定继承(权) | 归档 | 学习中 | 40 | — | 41 | 0/0 | 0 |
+| wag | 摇摆, 摇动, 饶舌 | 归档 | 学习中 | 40 | — | 41 | 0/0 | 0 |
+| climb | 攀登, 上升, 爬 | 归档 | 学习中 | 41 | — | 42 | 0/0 | 0 |
+| counter | 计算器, 计算者, 柜台, 筹码 | 归档 | 学习中 | 41 | — | 42 | 0/0 | 0 |
+| fair | 展览会, 市集, 美好的事物 | 归档 | 学习中 | 41 | — | 42 | 0/0 | 0 |
+| fee | 费用, 小费, 封地, 所有权 | 归档 | 学习中 | 41 | — | 42 | 0/0 | 0 |
+| hill | 小山, 丘陵, 小土堆 | 归档 | 学习中 | 41 | — | 42 | 0/0 | 0 |
+| law | 法律, 法则, 定律, 法律的制约, 法学, 司法界, 诉讼 | 归档 | 学习中 | 41 | — | 42 | 0/0 | 0 |
+| register | 寄存器, 记录, 登记簿, 注册 | 归档 | 学习中 | 41 | — | 42 | 0/0 | 0 |
+| advice | 忠告, 劝告, 意见, 报道, 通知 | 归档 | 学习中 | 42 | — | 43 | 0/0 | 0 |
+| floor | 地板, 楼层, 底部, 底价 | 归档 | 学习中 | 42 | — | 43 | 0/0 | 0 |
+| kind | 种类, 性质, 方式 | 归档 | 学习中 | 42 | — | 43 | 0/0 | 0 |
+| rarely | 很少地, 罕有地 | 归档 | 学习中 | 42 | — | 43 | 0/0 | 0 |
+| reserve | 储备品, 贮量, 后备军, 自然保护区, 保留, 拘谨, 节制, 储备金 | 归档 | 学习中 | 42 | — | 43 | 0/0 | 0 |
+| shut | 关闭 | 归档 | 学习中 | 42 | — | 43 | 0/0 | 0 |
+| below | 在下面 | 归档 | 学习中 | 43 | — | 44 | 0/0 | 0 |
+| damag |  | 归档 | 学习中 | 43 | — | 44 | 0/0 | 0 |
+| mystery | 秘密, 神秘, 奥秘 | 归档 | 学习中 | 43 | — | 44 | 0/0 | 0 |
+| ship | 船, 舰 | 归档 | 学习中 | 43 | — | 44 | 0/0 | 0 |
+| board | 木板, 甲板, 膳食, 会议桌 | 归档 | 学习中 | 44 | — | 45 | 0/0 | 0 |
+| essay | 随笔, 短文, 评论, 企图 | 归档 | 学习中 | 44 | — | 45 | 0/0 | 0 |
+| fear | 恐怖, 害怕, 担心 | 归档 | 学习中 | 44 | — | 45 | 0/0 | 0 |
+| paragraph | 段落, 短评 | 维护 | 基本熟悉 | 12 | 31 | 45 | 3/3 | 0 |
+| pin | 大头针, 针, 别针, 栓, 销子, 图钉, 插头, 管脚, 品(液量单位) | 归档 | 学习中 | 44 | — | 45 | 0/0 | 0 |
+| proud | 骄傲的, 自大的, 自豪的, 辉煌的, 壮丽的 | 归档 | 学习中 | 44 | — | 45 | 0/0 | 0 |
+| trouble | 烦恼, 麻烦, 困难, 动乱, 故障 | 归档 | 学习中 | 44 | — | 45 | 0/0 | 0 |
+| wide | 宽的, 广阔的, 普遍的, 宽阔的, 广泛的, 一般的 | 归档 | 学习中 | 44 | — | 45 | 0/0 | 0 |
+| yard | 码, 庭院, 工场 | 归档 | 学习中 | 44 | — | 45 | 0/0 | 0 |
+| bottom | 底部 | 归档 | 学习中 | 45 | — | 46 | 0/0 | 0 |
+| drew | draw的过去式 | 归档 | 学习中 | 45 | — | 46 | 0/0 | 0 |
+| fact | 事实, 真实性, 真相, 细节, 论据 | 归档 | 学习中 | 45 | — | 46 | 0/0 | 0 |
+| ignore | 不理睬, 忽视, 驳回, 忽略 | 维护 | 基本熟悉 | 14 | 32 | 46 | 3/3 | 0 |
+| label | 标签, 称号, 商标, 标志 | 归档 | 学习中 | 45 | — | 46 | 0/0 | 0 |
+| mechanic | 机械工, 技工 | 维护 | 基本熟悉 | 14 | 32 | 46 | 3/3 | 0 |
+| nervous | 神经紧张的, 不安的, 神经的 | 维护 | 基本熟悉 | 13 | 32 | 46 | 3/3 | 0 |
+| pronunciation | 发音, 读法 | 维护 | 基本熟悉 | 13 | 32 | 46 | 3/3 | 0 |
+| repair | 修理, 补救, 修复 | 维护 | 基本熟悉 | 14 | 32 | 46 | 3/3 | 0 |
+| topic | 主题, 论题, 话题 | 归档 | 学习中 | 45 | — | 46 | 0/0 | 0 |
+| whole | 全部, 全体, 整体, 完全之体系 | 维护 | 基本熟悉 | 13 | 32 | 46 | 3/3 | 0 |
+| achievement | 完成, 成就, 功业 | 活跃 | 学习中 | 33 | 44 | 47 | 2/4 | 2 |
+| across | 越过, 穿过, 与...相交叉, 在...的对面 | 活跃 | 学习中 | 16 | 46 | 47 | 4/6 | 2 |
+| apply | 涂, 应用 | 归档 | 学习中 | 46 | — | 47 | 0/0 | 0 |
+| authentic | 可靠的, 可信的, 真正的 | 活跃 | 学习中 | 19 | 46 | 47 | 0/4 | 4 |
+| avoid | 避免, 防止, 撤消 | 归档 | 学习中 | 46 | — | 47 | 0/0 | 0 |
+| bench | 长椅子 | 活跃 | 学习中 | 23 | 40 | 47 | 2/3 | 1 |
+| claim | 要求, 要求权, 断言, 权利 | 活跃 | 学习中 | 19 | 46 | 47 | 1/3 | 2 |
+| commemorate | 纪念 | 活跃 | 学习中 | 19 | 44 | 47 | 1/1 | 0 |
+| count | 计算, 视为 | 活跃 | 学习中 | 21 | 44 | 47 | 1/2 | 1 |
+| crowd | 群众, 一伙人 | 活跃 | 学习中 | 30 | 46 | 47 | 1/4 | 3 |
+| dust | 灰尘, 尘埃, 粉末, 花粉, 土, 骚乱 | 活跃 | 学习中 | 19 | 44 | 47 | 1/3 | 2 |
+| expert | 专家, 行家 | 活跃 | 学习中 | 19 | 44 | 47 | 1/2 | 1 |
+| frustrate | 使沮丧 | 活跃 | 学习中 | 11 | 40 | 47 | 6/9 | 3 |
+| furniture | 家具, 帆具 | 归档 | 学习中 | 46 | — | 47 | 0/0 | 0 |
+| gather | 集合, 聚集 | 活跃 | 学习中 | 34 | 46 | 47 | 2/5 | 3 |
+| lake | 湖, 池, 色淀 | 归档 | 学习中 | 46 | — | 47 | 0/0 | 0 |
+| ordinary | 平常的, 普通的, 平凡的 | 维护 | 基本熟悉 | 11 | 33 | 47 | 5/6 | 1 |
+| prevent | 预防, 防止, 阻止, 妨碍 | 归档 | 学习中 | 46 | — | 47 | 0/0 | 0 |
+| rais |  | 归档 | 学习中 | 46 | — | 47 | 0/0 | 0 |
+| remain | 保持, 逗留, 剩余 | 活跃 | 学习中 | 19 | 44 | 47 | 1/2 | 1 |
+| sale | 出售, 卖, 拍卖, 销售额, 廉价出售 | 活跃 | 学习中 | 29 | 46 | 47 | 2/4 | 2 |
+| smooth | 平滑的, 平稳的, 流畅的, 和蔼的, 安祥的, 圆滑的, 调匀的, 无毛的 | 维护 | 基本熟悉 | 14 | 33 | 47 | 3/3 | 0 |
+| staff | 全体人员, 工作班子, 棍棒, 杆, 拐杖, 支柱, 权杖 | 活跃 | 学习中 | 37 | 46 | 47 | 0/1 | 1 |
+| trade | 贸易, 商业, 交易, 生意, 职业, 顾客, 信风 | 活跃 | 学习中 | 16 | 46 | 47 | 4/12 | 8 |
+| volunteer | 志愿者 | 归档 | 学习中 | 46 | — | 47 | 0/0 | 0 |
+| waste | 浪费, 废物, 损耗, 消耗, 荒地, 垃圾, 地面风化物 | 活跃 | 学习中 | 29 | 46 | 47 | 2/6 | 4 |
+| worth | 价值, 财产 | 活跃 | 学习中 | 32 | 40 | 47 | 2/6 | 4 |
+| aware | 知道的, 有觉悟的 | 活跃 | 学习中 | 12 | 41 | 48 | 5/7 | 2 |
+| behind | 在后地 | 维护 | 基本熟悉 | 16 | 34 | 48 | 3/3 | 0 |
+| burn | 烧, 烧毁, 烧伤 | 活跃 | 学习中 | 19 | 45 | 48 | 3/7 | 4 |
+| ceremony | 典礼, 仪式, 礼节 | 维护 | 基本熟悉 | 16 | 34 | 48 | 3/3 | 0 |
+| common | 通常的, 共同的, 通俗的, 公共的 | 维护 | 基本熟悉 | 16 | 34 | 48 | 3/3 | 0 |
+| explore | 探险, 探测, 探究 | 活跃 | 学习中 | 32 | 41 | 48 | 2/3 | 1 |
+| fall | 落下, 瀑布, 采伐量, 下降, 落差, 降低, 堕落, 秋天 | 维护 | 基本熟悉 | 16 | 34 | 48 | 3/3 | 0 |
+| gently | 温和地, 温柔地, 轻轻地, 逐渐地 | 维护 | 基本熟悉 | 16 | 34 | 48 | 3/3 | 0 |
+| hang | 悬挂, 诀窍, 意义 | 活跃 | 学习中 | 30 | 41 | 48 | 2/3 | 1 |
+| hold | 把握, 把持力, 柄, 控制, 掌握, 监禁 | 维护 | 基本熟悉 | 15 | 34 | 48 | 3/3 | 0 |
+| task | 工作, 任务, 作业, 困难的工作 | 活跃 | 学习中 | 31 | 45 | 48 | 1/2 | 1 |
+| awake | 醒着的 | 维护 | 基本熟悉 | 16 | 35 | 49 | 3/4 | 1 |
+| expect | 预期, 盼望, 期待 | 维护 | 基本熟悉 | 17 | 35 | 49 | 3/3 | 0 |
+| leaf | 叶, 树叶, 花瓣, 页 | 维护 | 基本熟悉 | 16 | 35 | 49 | 3/3 | 0 |
+| modern | 现代人, 有思想的人 | 维护 | 基本熟悉 | 17 | 35 | 49 | 3/3 | 0 |
+| museum | 博物馆 | 维护 | 基本熟悉 | 16 | 35 | 49 | 3/3 | 0 |
+| practise | 实践, 实行, 练习, 实习, 从事(职业) | 维护 | 基本熟悉 | 16 | 35 | 49 | 3/3 | 0 |
+| prepare | 准备, 筹备, 使在思想上有准备, 制造, 调制 | 维护 | 基本熟悉 | 16 | 35 | 49 | 3/3 | 0 |
+| pressure | 压, 榨, 按, 强制, 压力, 压迫, 压强 | 活跃 | 学习中 | 31 | 46 | 49 | 1/2 | 1 |
+| remind | 提醒, 使想起 | 维护 | 基本熟悉 | 16 | 35 | 49 | 3/3 | 0 |
+| shake | 摇动, 震动 | 维护 | 基本熟悉 | 16 | 35 | 49 | 3/3 | 0 |
+| thin | 薄的, 细的, 瘦的, 稀疏的, 稀薄的, 淡的, 弱的, 空洞的 | 活跃 | 学习中 | 43 | 46 | 49 | 1/2 | 1 |
+| uncertainty | 不确定, 不可靠, 不确定的事物 | 活跃 | 学习中 | 11 | 46 | 49 | 5/8 | 3 |
+| bone | 骨头, 骨, 骨制品 | 维护 | 基本熟悉 | 17 | 36 | 50 | 3/4 | 1 |
+| branch | 树枝, 支店, 支流, 分部 | 维护 | 基本熟悉 | 18 | 36 | 50 | 3/4 | 1 |
+| pot | 盆, 罐, 壶, 坩埚, 奖杯 | 活跃 | 学习中 | 27 | 43 | 50 | 2/3 | 1 |
+| round | 圆, 圆形物, 巡回, 循环, 一轮, 一回合, 一局, 范围, 轮唱 | 维护 | 基本熟悉 | 17 | 36 | 50 | 3/4 | 1 |
+| shape | 形状, 形态, 外形, 形式, 身材 | 维护 | 基本熟悉 | 17 | 36 | 50 | 3/3 | 0 |
+| soil | 土壤, 土地, 国家, 国土, 温床, 污物, 粪便, 水池 | 维护 | 基本熟悉 | 18 | 36 | 50 | 3/3 | 0 |
+| unpredictably | 无法预言地） | 维护 | 基本熟悉 | 11 | 36 | 50 | 5/8 | 3 |
+| warm | 暖和的, 暖的, 温暖的, 热烈的, 兴奋的, 激烈的, 多情的, 色情的 | 维护 | 基本熟悉 | 16 | 36 | 50 | 3/3 | 0 |
+| warmly | 热情地；温暖地 | 维护 | 基本熟悉 | 17 | 36 | 50 | 3/3 | 0 |
+| area | 区域, 面积, 范围, 空地 | 活跃 | 学习中 | 19 | 44 | 51 | 2/3 | 1 |
+| bring | 带来, 产生, 促使, 提出 | 维护 | 基本熟悉 | 12 | 37 | 51 | 4/7 | 3 |
+| chew | 咀嚼, 嚼碎 | 维护 | 基本熟悉 | 18 | 37 | 51 | 3/8 | 5 |
+| forward | 向前的, 早的, 迅速的, 在前的, 进步的 | 维护 | 基本熟悉 | 13 | 37 | 51 | 4/6 | 2 |
+| gate | 门, 牌楼, 大门, 通道, 闸 | 维护 | 基本熟悉 | 21 | 37 | 51 | 3/5 | 2 |
+| improvement | 进步, 改善, 利用 | 维护 | 基本熟悉 | 13 | 37 | 51 | 4/5 | 1 |
+| through | 穿越, 从头至尾, 到底, 因为 | 维护 | 基本熟悉 | 12 | 37 | 51 | 5/8 | 3 |
+| weak | 不牢固的, 弱的, 虚弱的, 软弱的, 无力的, 无权力的, (论据等)不充分的 | 维护 | 基本熟悉 | 13 | 37 | 51 | 4/5 | 1 |
+| chain | 链, 枷锁, 束缚 | 维护 | 基本熟悉 | 14 | 38 | 52 | 4/5 | 1 |
+| disappoint | 使失望 | 维护 | 基本熟悉 | 11 | 38 | 52 | 5/6 | 1 |
+| doubt | 怀疑 | 维护 | 基本熟悉 | 11 | 38 | 52 | 5/6 | 1 |
+| dry | 干的, 无酒的, 枯燥无味的, 干燥的 | 维护 | 基本熟悉 | 17 | 38 | 52 | 4/8 | 4 |
+| empty | 空的, 空虚的, 空腹的, 空洞的 | 活跃 | 学习中 | 30 | 45 | 52 | 2/5 | 3 |
+| engag | engage 的不完整拼写；参与 | 活跃 | 学习中 | 35 | 45 | 52 | 2/3 | 1 |
+| engage | 参与；使参与 | 活跃 | 学习中 | 41 | 45 | 52 | 2/3 | 1 |
+| front | 前面, 开头, 前线, 阵线, 态度 | 活跃 | 学习中 | 24 | 45 | 52 | 2/3 | 1 |
+| hit | 打击, 打, 冲撞, 讽刺 | 维护 | 基本熟悉 | 14 | 38 | 52 | 4/5 | 1 |
+| messy | 散乱的, 污秽的, 麻烦的 | 活跃 | 学习中 | 30 | 45 | 52 | 2/3 | 1 |
+| reach | 伸出, 延伸, 区域, 范围, 流域, 岬 | 维护 | 基本熟悉 | 16 | 38 | 52 | 4/11 | 7 |
+| road | 路, 道路, 公路, 途径, 方法 | 维护 | 基本熟悉 | 14 | 38 | 52 | 5/7 | 2 |
+| shelf | 架子, 搁板 | 活跃 | 学习中 | 20 | 45 | 52 | 2/3 | 1 |
+| wet | 湿气, 潮湿, 水分, 雨天 | 维护 | 基本熟悉 | 14 | 38 | 52 | 4/7 | 3 |
+| although | 虽然, 尽管 | 活跃 | 学习中 | 19 | 46 | 53 | 2/2 | 0 |
+| auction | 拍卖 | 活跃 | 学习中 | 19 | 46 | 53 | 2/3 | 1 |
+| authorship | 原作者, 根源, 原创造者 | 活跃 | 学习中 | 19 | 46 | 53 | 2/2 | 0 |
+| debate | 辩论, 讨论 | 维护 | 基本熟悉 | 16 | 39 | 53 | 4/5 | 1 |
+| during | 在...的时候 | 维护 | 基本熟悉 | 12 | 39 | 53 | 4/5 | 1 |
+| force | 力量；强迫 | 维护 | 基本熟悉 | 11 | 39 | 53 | 5/6 | 1 |
+| heavy | 重的, 巨大的, 沉重的, 笨重的, 过度的 | 维护 | 基本熟悉 | 20 | 39 | 53 | 3/5 | 2 |
+| journey | 旅程, 旅行, 行程 | 维护 | 基本熟悉 | 16 | 39 | 53 | 4/5 | 1 |
+| ride | 骑马, 乘坐, 乘车, 搭便车 | 维护 | 基本熟悉 | 14 | 39 | 53 | 4/5 | 1 |
+| slide | 滑, 滑道, 山崩, 雪崩, 幻灯片 | 维护 | 基本熟悉 | 15 | 39 | 53 | 4/6 | 2 |
+| wheel | 轮子, 车轮, 轮, 方向盘, 旋转, 机构, 重要人物 | 维护 | 基本熟悉 | 14 | 39 | 53 | 4/5 | 1 |
+| argue | 提出理由, 争论, 辩论 | 维护 | 基本熟悉 | 16 | 40 | 54 | 4/7 | 3 |
+| garden | 花园, 果园, 菜园 | 维护 | 基本熟悉 | 16 | 40 | 54 | 4/6 | 2 |
+| harmful | 有害的, 伤害的 | 维护 | 基本熟悉 | 16 | 40 | 54 | 4/7 | 3 |
+| spoon | 匙, 调羹, 匙形工具 | 维护 | 基本熟悉 | 16 | 40 | 54 | 4/7 | 3 |
+| stir | 骚动, 轰动, 搅动, 监狱 | 维护 | 基本熟悉 | 17 | 40 | 54 | 4/7 | 3 |
+| fence | 围墙, 栅栏, 买卖赃物的人, 剑术 | 维护 | 基本熟悉 | 18 | 41 | 55 | 4/5 | 1 |
+| record | 记录, 履历, 档案, 审判记录, 最高纪录, 唱片 | 维护 | 基本熟悉 | 11 | 41 | 55 | 6/8 | 2 |
+| religious | 宗教性的, 虔诚的, 宗教上的, 严谨的 | 维护 | 基本熟悉 | 16 | 41 | 55 | 4/5 | 1 |
+| restriction | 限制, 限定, 约束 | 维护 | 基本熟悉 | 11 | 41 | 55 | 6/11 | 5 |
+| sharp | 半升音调, 利刃, 骗子 | 维护 | 基本熟悉 | 18 | 41 | 55 | 4/8 | 4 |
+| suddenly | 突然, 意外, 忽然, 迅速, 即席作成, 即刻, 急速 | 维护 | 基本熟悉 | 14 | 41 | 55 | 5/7 | 2 |
+| tie | 带子, 线, 鞋带, 领带, 领结, 关系, 束缚, 平局, 不分胜负 | 维护 | 基本熟悉 | 17 | 41 | 55 | 4/9 | 5 |
+| uneven | 不平坦的, 不均等的, 奇数的 | 维护 | 基本熟悉 | 17 | 41 | 55 | 4/5 | 1 |
+| seller | 销售者 | 维护 | 基本熟悉 | 21 | 42 | 56 | 3/4 | 1 |
+| roof | 屋顶, 室顶 | 维护 | 基本熟悉 | 21 | 43 | 57 | 3/5 | 2 |
+| discovery | 发现, 被发现的事物 | 维护 | 基本熟悉 | 13 | 44 | 58 | 5/6 | 1 |
+| step | 步骤, 步, 步幅, 脚步声, 踏级, 步伐, 短距离, 步态, 手段, 等级 | 维护 | 基本熟悉 | 21 | 44 | 58 | 3/4 | 1 |
+| gradually | 逐渐地 | 维护 | 基本熟悉 | 11 | 45 | 59 | 6/8 | 2 |
+| instead | 作为替代, 反而 | 维护 | 基本熟悉 | 27 | 45 | 59 | 4/6 | 2 |
+| glad | 高兴的；欣慰的 | 维护 | 基本熟悉 | 15 | 46 | 60 | 5/6 | 1 |
+| rope | 绳, 索, 粗绳, 绞索, 决窍 | 维护 | 基本熟悉 | 26 | 46 | 60 | 4/6 | 2 |
+| appear | 出现 | 维护 | 基本熟悉 | 11 | 37 | 67 | 4/4 | 0 |
+| blank | 空白的 | 维护 | 基本熟悉 | 11 | 38 | 68 | 4/4 | 0 |
+| communicate | 交流；沟通 | 维护 | 基本熟悉 | 11 | 38 | 68 | 4/4 | 0 |
+| endless | 无尽的 | 维护 | 基本熟悉 | 11 | 39 | 69 | 4/4 | 0 |
+| quite | 相当 | 维护 | 基本熟悉 | 11 | 39 | 69 | 4/4 | 0 |
+| reminder | 提醒；提醒物 | 维护 | 基本熟悉 | 11 | 40 | 70 | 4/4 | 0 |
+| surround | 围绕；包围 | 维护 | 基本熟悉 | 11 | 40 | 70 | 4/4 | 0 |
+| unexpected | 意外的 | 维护 | 基本熟悉 | 11 | 41 | 71 | 4/4 | 0 |
+| contrast | 差别, 对比, 对照物 | 维护 | 基本熟悉 | 11 | 45 | 75 | 5/6 | 1 |
+| describe | 描述, 描绘, 画 | 维护 | 基本熟悉 | 11 | 46 | 76 | 5/6 | 1 |
+| sound | 声音, 语音, 吵闹, 声调, 听力范围, 探条, 海峡 | 维护 | 基本熟悉 | 12 | 46 | 76 | 4/5 | 1 |
 
 ## 最近复习历史
 
-### 第 20 天
+### 第 45 天
 
-- 记住：stir、branch、weak、record、contrast、describe、paragraph
-- 仍不会：dry、reach、tie、chew、sharp、trade、aware、restriction
-- 新词：safe、shelf、brown、street、edge、str、heavy
-- 安排到下一篇：dry、reach、tie、chew、sharp、trade、aware、restriction、uncertainty、unpredictably、sound、discovery、forward、improvement、nervous
+- 记住：burn、claim、task、contrast、empty、gradually、instead、engag、engage、front、messy、shelf
+- 仍不会：authentic、uncertainty、trade
+- 新词：topic、drew、fact、bottom、label
+- 安排到下一篇：authentic、uncertainty、trade、pressure、thin、describe、sound、although、rope、crowd、gather、glad、sale、auction、authorship
 
-### 第 19 天
+### 第 44 天
 
-- 记住：spoon、fence、bone、harmful、argue、soil、round
-- 仍不会：stir、dry、branch、reach、tie、chew、sharp、trade
-- 新词：excitement、sum、modest、auction、authentic、shadow、therefore、match、area、period、burn、tiny、reveal、fingerprint、paint、provid、although、prove、authorship、nevertheless、claim、draw、expert、picture、controversial、remain、critic、sadness、commemorate、scholar、dust
-- 安排到下一篇：stir、dry、branch、reach、tie、chew、sharp、trade、weak、record、contrast、describe、aware、paragraph、restriction
+- 记住：dust、achievement、remain、expert、count、discovery、step、area、commemorate
+- 仍不会：burn、authentic、claim
+- 新词：board、pin、wide、yard、trouble、essay、proud、fear
+- 安排到下一篇：burn、authentic、claim、task、uncertainty、contrast、trade、empty、gradually、instead、engag、engage、front、messy、shelf
 
-### 第 18 天
+### 第 43 天
 
-- 记住：expect、uneven、warmly、garden、shape、modern、awake
-- 仍不会：round、reach、bone、tie、dry、harmful、spoon、stir、argue、trade
-- 新词：branch、fence、chew、sharp、soil
-- 安排到下一篇：stir、spoon、dry、branch、reach、tie、fence、chew、bone、harmful、sharp、trade、argue、soil、round
+- 记住：crowd、gather、auction、waste、roof、pot、authorship
+- 仍不会：dust、burn、achievement、authentic
+- 新词：ship、thin、damag、below、mystery
+- 安排到下一篇：dust、burn、achievement、authentic、remain、expert、count、discovery、step、area、claim、commemorate
 
-### 第 17 天
+### 第 42 天
 
-- 记住：warm、ordinary、common、remind、journey、ceremony、behind、museum、leaf、debate、fall、religious、gently、practise、prepare、across、slide、shake
-- 仍不会：trade、reach、awake、harmful、garden、argue、spoon
-- 新词：expect、uneven、round、warmly、bone、tie、dry、shape、modern、stir
-- 安排到下一篇：expect、uneven、round、reach、warmly、bone、tie、dry、garden、shape、harmful、modern、awake、spoon、stir、argue、trade
+- 记住：empty、engage、front、messy、shelf、seller、engag、although
+- 仍不会：crowd、gather、auction
+- 新词：advice、shut、rarely、kind、reserve、floor
+- 安排到下一篇：crowd、gather、auction、dust、waste、roof、burn、achievement、pot、authentic、authorship
 
-### 第 16 天
+### 第 41 天
 
-- 记住：glad、hold、through
-- 仍不会：slide
-- 新词：warm、common、trade、remind、reach、awake、journey、ceremony、behind、museum、leaf、debate、fall、religious、gently、practise、prepare、harmful、across、garden、argue、spoon、shake
-- 安排到下一篇：warm、ordinary、common、trade、remind、reach、awake、journey、ceremony、behind、museum、leaf、debate、fall、religious、gently、practise、prepare、harmful、across、garden、argue、spoon、slide、shake
+- 记住：area、unexpected、record、suddenly、aware、fence、religious、uneven、explore、hang、restriction、tie、sharp
+- 仍不会：empty、engage
+- 新词：register、climb、hill、engage、counter、fee、law、fair
+- 安排到下一篇：empty、engage、front、messy、shelf、crowd、seller、gather、engag、although、auction
 
-### 第 15 天
+### 第 40 天
 
-- 记住：ride、wheel、hit、wet、smooth、ignore、suddenly、bring、chain、mechanic、repair、road
-- 仍不会：through
-- 新词：slide、glad、hold
-- 安排到下一篇：slide、glad、hold、through
+- 记住：waste、pot、burn、achievement、reminder、surround、bench、worth、argue、harmful、spoon、stir、frustrate、garden
+- 仍不会：empty
+- 新词：definitely、wag、tail
+- 安排到下一篇：empty、area、engage、unexpected、record、suddenly、aware、fence、religious、uneven、explore、hang、restriction、tie、sharp
 
-### 第 14 天
+### 第 39 天
 
-- 记住：nervous、restriction、uncertainty、sound、forward、pronunciation、discovery、unpredictably、weak、whole、improvement
-- 仍不会：bring
-- 新词：ride、wheel、hit、wet、smooth、ignore、suddenly、chain、mechanic、repair、road
-- 安排到下一篇：ride、wheel、hit、wet、through、smooth、ignore、suddenly、bring、chain、mechanic、repair、road
+- 记住：endless、quite、force、ride、wheel、glad、sale、heavy、slide、rope、across、debate、during、journey
+- 仍不会：waste
+- 新词：recipe、complex、herb、couch、reward、plate、weight
+- 安排到下一篇：waste、pot、burn、empty、achievement、reminder、surround、bench、worth、argue、harmful、spoon、stir、frustrate、garden
 
-### 第 13 天
+### 第 38 天
 
-- 记住：during、contrast、aware、paragraph、through、describe
-- 仍不会：restriction、uncertainty、sound、bring、unpredictably
-- 新词：nervous、forward、pronunciation、discovery、weak、whole、improvement
-- 安排到下一篇：nervous、restriction、uncertainty、sound、forward、pronunciation、discovery、bring、unpredictably、weak、whole、improvement
+- 记住：gather、blank、communicate、road、gradually、chain、hit、reach、trade、dry、wet、instead、disappoint、doubt
+- 仍不会：waste
+- 新词：pond、reply、scenery、sudden、stuck、rejuvenat
+- 安排到下一篇：waste、endless、quite、force、ride、wheel、glad、sale、heavy、slide、rope、across、debate、during、journey
 
-### 第 12 天
+### 第 37 天
 
-- 记住：frustrate、unexpected、endless、force、reminder、disappoint、gradually、appear、ordinary、surround、communicate、quite、record、blank、doubt
-- 仍不会：restriction、uncertainty、contrast、unpredictably、describe
-- 新词：during、aware、paragraph、sound、through、bring
-- 安排到下一篇：restriction、during、contrast、aware、paragraph、uncertainty、sound、through、bring、describe、unpredictably
-
-### 第 11 天
-
-- 记住：restriction、frustrate、unexpected、endless、uncertainty、force、reminder、contrast、disappoint、gradually、appear、unpredictably、ordinary、surround、communicate、describe、quite、record、blank、doubt
+- 记住：worth、frustrate、aware、hang、explore、appear、improvement、weak、discovery、step、chew、bring、through、forward、gate
 - 仍不会：无
-- 新词：无
-- 安排到下一篇：restriction、frustrate、unexpected、endless、uncertainty、force、reminder、contrast、disappoint、gradually、appear、unpredictably、ordinary、surround、communicate、describe、quite、record、blank、doubt
+- 新词：spend、vibrant、seek、cover、soak、pour、shelter、staff、explor、awareness
+- 安排到下一篇：gather、waste、blank、communicate、road、gradually、chain、hit、reach、trade、dry、wet、instead、disappoint、doubt
+
+### 第 36 天
+
+- 记住：rope、bench、burn、shape、warm、roof、bone、branch、round、soil、warmly、unpredictably
+- 仍不会：worth、frustrate、aware
+- 新词：throughout、raindrop、frustration、promis
+- 安排到下一篇：worth、frustrate、aware、hang、explore、appear、improvement、weak、discovery、step、chew、bring、through、forward、gate

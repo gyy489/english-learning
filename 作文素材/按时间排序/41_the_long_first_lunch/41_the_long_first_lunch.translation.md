@@ -1,0 +1,131 @@
+# 第 41 天中译英：第一天办手续的小午饭
+
+## 中文题目
+
+请根据中文小故事，用提示词完成一段英文翻译练习。
+
+汤姆后来回想起开学第一天，最先记住的不是课堂，而是排队和找路。他在校门口遇到一个同样迷路的新生安娜，两人都饿着肚子，背着沉重的包，却还得先找到报到处。入口旁的围栏上挂着一张旧地图，上面标着食堂、图书馆、宗教中心和几栋教学楼；办公室其实在校园另一片区域的后面。
+
+他们担心走错路会浪费整个上午，于是沿着一段高低不平的台阶往山上走。大厅里起初几乎没有人在办公桌前，他们差点以为找错了地方，后来才发现真正的队伍藏在另一扇门后，而且人数比想象中多得多。安娜忽然想起自己还没吃早饭，汤姆便留在队里，让她去食堂买点东西；为了避免记错，她把汤姆想要的食物和饮料认真记了下来。
+
+安娜想顺路看看校园，经过宗教中心和安静的花园后才到食堂。门口却有一条意外规定：没有新生证件的人不能从正门进入，只能绕到侧门。里面人声嘈杂，她试着和柜台后的工作人员沟通，但对方忙得几乎顾不上回答。等她终于排到前面，面包架已经快空了，汤姆想要的奶酪面包也没有了，她只好买了米饭、苹果和果汁带回去。
+
+两人继续排队时，系着蓝色领带的工作人员登记了安娜的地址和课程，又告诉他们这还不是最后一步：卡片还要送去法学院盖章，之后再回来缴费。汤姆笑着说，大学生活给了他们一个很直接的教训：事情本身不难，只是每一个小步骤都和下一个小步骤连在一起。后来他们坐在围栏附近的树下分着午饭，决定准时一点去下一栋楼。
+
+## 建议使用词
+
+`empty`、`area`、`engag`、`unexpected`、`record`、`suddenly`、`aware`、`fence`、`religious`、`uneven`、`explore`、`hang`、`restriction`、`tie`、`sharp`
+
+## 当前英文草稿
+
+### 第 1 段
+
+#### 中文
+
+汤姆后来回想起开学第一天，最先记住的不是课堂，而是排队和找路。他在校门口遇到一个同样迷路的新生安娜，两人都饿着肚子，背着沉重的包，却还得先找到报到处。入口旁的围栏上挂着一张旧地图，上面标着食堂、图书馆、宗教中心和几栋教学楼；办公室其实在校园另一片区域的后面。
+
+#### 英文草稿
+
+```text
+tom later recalled the first day in university , the most reminders thing is not course, but this are queue and search area. he find another student named Anna, they were hangery and carry the heavy backpack, in this situation, they had to find the register. there have  a  old map stay beside the fence  near the entrance, they show the food hall, library, religious center and several teaching building. and there have a  place behinde the office.
+```
+
+#### 订正
+
+```text
+Tom later recalled his first day at university. What he remembered first was not the classes, but standing in line and finding his way. At the school gate, he met another lost new student named Anna. They were both hungry and carrying heavy bags, but they still had to find the check-in office first. An old map was hanging on the fence by the entrance. It showed the food hall, the library, the religious center, and several teaching buildings. The office was actually at the back of another area of the campus.
+```
+
+### 第 2 段
+
+#### 中文
+
+他们担心走错路会浪费整个上午，于是沿着一段高低不平的台阶往山上走。大厅里起初几乎没有人在办公桌前，他们差点以为找错了地方，后来才发现真正的队伍藏在另一扇门后，而且人数比想象中多得多。安娜忽然想起自己还没吃早饭，汤姆便留在队里，让她去食堂买点东西；为了避免记错，她把汤姆想要的食物和饮料认真记了下来。
+
+#### 英文草稿
+
+```text
+they aware waste whole morning if they chooesd wrong path, so they head go up followed the steps. at first , there have no student at the desk,Anna thought they find a wrong area, but after 1 minute, they saw the real queue  behind  another gate, and so many people that they unexpected. Anna suddenly remind that she did not had breakfast, so tom stay in front of the queue, let Anna go to food hall, she was so carefully recorde what he want for avoid wrong.
+```
+
+#### 订正
+
+```text
+They were aware that taking the wrong path could waste the whole morning, so they went up the hill along a set of uneven steps. At first, there was almost no one at the desks in the hall, and they almost thought they were in the wrong place. A little later, they found that the real line was hidden behind another door, and there were far more people than they had expected. Anna suddenly remembered that she had not eaten breakfast, so Tom stayed in line and let her go to the food hall to buy something. To avoid mistakes, she carefully recorded the food and drink Tom wanted.
+```
+
+### 第 3 段
+
+#### 中文
+
+安娜想顺路看看校园，经过宗教中心和安静的花园后才到食堂。门口却有一条意外规定：没有新生证件的人不能从正门进入，只能绕到侧门。里面人声嘈杂，她试着和柜台后的工作人员沟通，但对方忙得几乎顾不上回答。等她终于排到前面，面包架已经快空了，汤姆想要的奶酪面包也没有了，她只好买了米饭、苹果和果汁带回去。
+
+#### 英文草稿
+
+```text
+Anna wanted to take a look the campus on her way, she through the religious center and the quiet garden and arrived food hall. here have a restriction unexpected: the students can't enter by the main gate, but side door. the hall full in noise of people, she tried to engage with the counters, but she was too busy to not have answer. when she arrive the end of the line, the self of bread had empty, here has no bread with cheese, so she bought rise , apple and juse go back.
+```
+
+#### 订正
+
+```text
+Anna wanted to explore the campus on the way. She passed the religious center and a quiet garden before she reached the food hall. At the door, however, there was an unexpected restriction: students without a new-student card could not enter through the main door and had to go around to the side door. Inside, the hall was loud and full of people. She tried to talk to the worker behind the counter, but the worker was too busy to give much of an answer. By the time she reached the front of the line, the bread shelf was almost empty, and the cheese bread Tom wanted was gone. So she bought rice, an apple, and juice and took them back.
+```
+
+### 第 4 段
+
+#### 中文
+
+两人继续排队时，系着蓝色领带的工作人员登记了安娜的地址和课程，又告诉他们这还不是最后一步：卡片还要送去法学院盖章，之后再回来缴费。汤姆笑着说，大学生活给了他们一个很直接的教训：事情本身不难，只是每一个小步骤都和下一个小步骤连在一起。后来他们坐在围栏附近的树下分着午饭，决定准时一点去下一栋楼。
+
+#### 英文草稿
+
+```text
+when the two of them continued to queue, the worker with a blue tie notice the adrisse and course, he told them it is not final step, the card have to signe in the law school, and go back for fee. tom laugh and said : the university give us a heavy lesson : the thing is not difficult , but one small step tie another small steps. after , they share the lunche side the fence under the tree, and decide go to the next building at one clock
+```
+
+#### 订正
+
+```text
+While the two of them continued to stand in line, a worker with a blue tie recorded Anna’s address and courses. He also told them this was not the final step: the card still had to be taken to the law school to be signed, and then they had to come back to pay the fee. Tom laughed and said that university life had given them a very direct lesson: the thing itself was not hard, but every small step was tied to the next one. Later, they sat under a tree near the fence, shared lunch, and decided to reach the next building on time.
+```
+
+
+## 提交与订正记录
+
+### 第 1 次：自然表达 | 2026-08-11T19:52:11.238945+00:00
+
+#### 学习者提交
+
+```text
+tom later recalled the first day in university , the most reminders thing is not course, but this are queue and search area. he find another student named Anna, they were hangery and carry the heavy backpack, in this situation, they had to find the register. there have  a  old map stay beside the fence  near the entrance, they show the food hall, library, religious center and several teaching building. and there have a  place behinde the office.
+
+they aware waste whole morning if they chooesd wrong path, so they head go up followed the steps. at first , there have no student at the desk,Anna thought they find a wrong area, but after 1 minute, they saw the real queue  behind  another gate, and so many people that they unexpected. Anna suddenly remind that she did not had breakfast, so tom stay in front of the queue, let Anna go to food hall, she was so carefully recorde what he want for avoid wrong.
+
+Anna wanted to take a look the campus on her way, she through the religious center and the quiet garden and arrived food hall. here have a restriction unexpected: the students can't enter by the main gate, but side door. the hall full in noise of people, she tried to engage with the counters, but she was too busy to not have answer. when she arrive the end of the line, the self of bread had empty, here has no bread with cheese, so she bought rise , apple and juse go back.
+
+when the two of them continued to queue, the worker with a blue tie notice the adrisse and course, he told them it is not final step, the card have to signe in the law school, and go back for fee. tom laugh and said : the university give us a heavy lesson : the thing is not difficult , but one small step tie another small steps. after , they share the lunche side the fence under the tree, and decide go to the next building at one clock
+```
+
+#### 网页订正
+
+```text
+Tom later recalled his first day at university. What he remembered first was not the classes, but standing in line and finding his way. At the school gate, he met another lost new student named Anna. They were both hungry and carrying heavy bags, but they still had to find the check-in office first. An old map was hanging on the fence by the entrance. It showed the food hall, the library, the religious center, and several teaching buildings. The office was actually at the back of another area of the campus.
+
+They were aware that taking the wrong path could waste the whole morning, so they went up the hill along a set of uneven steps. At first, there was almost no one at the desks in the hall, and they almost thought they were in the wrong place. A little later, they found that the real line was hidden behind another door, and there were far more people than they had expected. Anna suddenly remembered that she had not eaten breakfast, so Tom stayed in line and let her go to the food hall to buy something. To avoid mistakes, she carefully recorded the food and drink Tom wanted.
+
+Anna wanted to explore the campus on the way. She passed the religious center and a quiet garden before she reached the food hall. At the door, however, there was an unexpected restriction: students without a new-student card could not enter through the main door and had to go around to the side door. Inside, the hall was loud and full of people. She tried to talk to the worker behind the counter, but the worker was too busy to give much of an answer. By the time she reached the front of the line, the bread shelf was almost empty, and the cheese bread Tom wanted was gone. So she bought rice, an apple, and juice and took them back.
+
+While the two of them continued to stand in line, a worker with a blue tie recorded Anna’s address and courses. He also told them this was not the final step: the card still had to be taken to the law school to be signed, and then they had to come back to pay the fee. Tom laughed and said that university life had given them a very direct lesson: the thing itself was not hard, but every small step was tied to the next one. Later, they sat under a tree near the fence, shared lunch, and decided to reach the next building on time.
+```
+
+#### 反馈
+
+- 整体内容覆盖较完整，但原文中很多句子受中文语序影响较重，需要用英文常见结构重组。
+- “there have”应改为“there is/there are”或直接换成更自然的主语结构。
+- 表示排队时，用“stand in line / stay in line / reach the front of the line”更自然。
+- 注意动词时态统一，回忆过去的故事主要使用一般过去时。
+- 已覆盖开学第一天排队、找路、地图、食堂、办公室位置等主要信息。
+- 已覆盖安娜去食堂、遇到进入规定、食物卖空和买回午饭的情节。
+- 已覆盖最后登记、还需去法学院处理卡片、回来缴费以及两人的总结。
+- 可尝试使用：engage：本题中用 talk to 更自然，不必强行使用 engage。、sharp：本题没有明显需要使用 sharp 的内容。

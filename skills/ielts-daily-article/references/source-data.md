@@ -30,7 +30,7 @@ Current summary:
 
 ## Selection Policy
 
-For the user's current IELTS 6.0 goal:
+For the user's current IELTS 6.5 goal:
 
 - Prefer P1 for easier daily input and fluency.
 - Use P2 for steady growth and useful academic vocabulary.

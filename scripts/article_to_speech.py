@@ -19,24 +19,25 @@ ENV_FILE = PROJECT_ROOT / ".env"
 GLOBAL_ENV_FILE = Path.home() / ".config" / "api-keys.env"
 ENV_EXAMPLE_FILE = PROJECT_ROOT / ".env.example"
 API_KEY_NOTICE_NAME = "OPENAI_API_KEY_REQUIRED.md"
-DEFAULT_MODEL = "tts-1"
+DEFAULT_MODEL = "gpt-4o-mini-tts-2025-12-15"
 SUPPORTED_MODELS = (
     "gpt-4o-mini-tts",
     "gpt-4o-mini-tts-2025-12-15",
     "tts-1",
     "tts-1-hd",
 )
-# cedar 属于较新的 TTS 模型声音；默认模型 tts-1 使用 nova 等兼容声音。
-DEFAULT_VOICE = "nova"
+# The default model supports delivery instructions, so accent guidance is applied.
+DEFAULT_VOICE = "cedar"
 DEFAULT_FORMAT = "mp3"
-DEFAULT_SPEED = 0.92
+DEFAULT_SPEED = 0.84
 DEFAULT_INSTRUCTIONS = "\n".join(
     [
         "Voice Affect: Natural, calm, and human-like.",
-        "Tone: Clear standard English for listening practice.",
-        "Pacing: Steady and slightly slow.",
+        "Tone: Clear British English for IELTS listening practice.",
+        "Pacing: Slow, steady, and deliberate for an English learner to follow comfortably.",
+        "Accent: Use a modern standard British accent; avoid an exaggerated theatrical style.",
         "Pronunciation: Enunciate each word clearly, especially ending sounds.",
-        "Pauses: Use short natural pauses between sentences.",
+        "Pauses: Use clear, slightly longer pauses between sentences, without breaking natural phrasing.",
     ]
 )
 

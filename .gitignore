@@ -14,6 +14,7 @@ deployment/*.plist
 
 # 本地原始题库和转换测试产物不进入公开仓库。
 雅思真题/
+作文素材/UGA英语课/
 临时skill测试/
 artifacts/
 默写/

@@ -10,6 +10,15 @@ const state = {
   todayWordsRenderId: 0,
   dirty: false,
   generating: false,
+  learningView: "reading",
+  writingPractice: null,
+  writingLoadedDay: null,
+  writingCreating: false,
+  writingSubmitting: false,
+  writingDraftSyncTimer: null,
+  writingDraftSaving: false,
+  writingDraftLastSyncedText: "",
+  writingDraftRequestId: 0,
   toastTimer: null,
   dictionaryClickTimer: null,
   dictionaryRequestId: 0,
@@ -17,6 +26,7 @@ const state = {
 };
 
 const elements = {
+  appShell: document.querySelector(".app-shell"),
   daySelect: document.querySelector("#daySelect"),
   articleTitle: document.querySelector("#articleTitle"),
   sourceLabel: document.querySelector("#sourceLabel"),
@@ -41,7 +51,33 @@ const elements = {
   todayWordsToggle: document.querySelector("#todayWordsToggle"),
   saveStatus: document.querySelector("#saveStatus"),
   generateStatus: document.querySelector("#generateStatus"),
+  generateInstruction: document.querySelector("#generateInstruction"),
   generateButton: document.querySelector("#generateButton"),
+  completeReadingButton: document.querySelector("#completeReadingButton"),
+  readingTab: document.querySelector("#readingTab"),
+  writingTab: document.querySelector("#writingTab"),
+  readingView: document.querySelector("#readingView"),
+  writingView: document.querySelector("#writingView"),
+  writingDayLabel: document.querySelector("#writingDayLabel"),
+  writingAvailability: document.querySelector("#writingAvailability"),
+  writingCreateButton: document.querySelector("#writingCreateButton"),
+  writingContent: document.querySelector("#writingContent"),
+  writingFocusCard: document.querySelector("#writingFocusCard"),
+  writingFocusTitle: document.querySelector("#writingFocusTitle"),
+  writingFocusExplanation: document.querySelector("#writingFocusExplanation"),
+  writingFocusMethod: document.querySelector("#writingFocusMethod"),
+  writingTitle: document.querySelector("#writingTitle"),
+  writingInstructions: document.querySelector("#writingInstructions"),
+  writingTargetWords: document.querySelector("#writingTargetWords"),
+  writingExercise: document.querySelector("#writingExercise"),
+  writingWordCount: document.querySelector("#writingWordCount"),
+  writingSyncStatus: document.querySelector("#writingSyncStatus"),
+  correctionLevel: document.querySelector("#correctionLevel"),
+  writingSubmitButton: document.querySelector("#writingSubmitButton"),
+  writingStatus: document.querySelector("#writingStatus"),
+  writingAttemptsSection: document.querySelector("#writingAttemptsSection"),
+  writingAttemptCount: document.querySelector("#writingAttemptCount"),
+  writingAttempts: document.querySelector("#writingAttempts"),
   themeButton: document.querySelector("#themeButton"),
   themeIcon: document.querySelector("#themeIcon"),
   themeColor: document.querySelector("#themeColor"),
@@ -65,6 +101,8 @@ const elements = {
 };
 
 const THEME_STORAGE_KEY = "english-learning-theme";
+const WRITING_DRAFT_KEY_PREFIX = "english-learning-writing-draft-";
+const WRITING_DRAFT_SYNC_DELAY_MS = 700;
 const SEEK_SECONDS = 3;
 const IS_LOCAL_ACCESS = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
 const SYNC_INTERVAL_MS = IS_LOCAL_ACCESS ? 3000 : 30000;
@@ -146,6 +184,316 @@ async function request(url, options = {}) {
   return payload;
 }
 
+function writingDraftKey(day) {
+  return `${WRITING_DRAFT_KEY_PREFIX}${day}`;
+}
+
+function writingDraftValues() {
+  return [...elements.writingExercise.querySelectorAll(".writing-input")].map((input) => input.value);
+}
+
+function writingDraftText(values = writingDraftValues()) {
+  return values.map((value) => value.trim()).filter(Boolean).join("\n\n");
+}
+
+function writingDraftSignature(values = writingDraftValues()) {
+  return JSON.stringify(values);
+}
+
+function updateWritingWordCount() {
+  const count = (writingDraftText().match(/[A-Za-z]+(?:['’][A-Za-z]+)?/g) || []).length;
+  elements.writingWordCount.textContent = `${count} 词`;
+}
+
+function saveWritingDraft() {
+  const day = state.article?.day;
+  if (!day) return;
+  try {
+    localStorage.setItem(writingDraftKey(day), JSON.stringify(writingDraftValues()));
+  } catch {
+    // Draft persistence is a convenience; typing must still work without storage.
+  }
+}
+
+function loadWritingDraft(day, paragraphCount) {
+  try {
+    const saved = localStorage.getItem(writingDraftKey(day));
+    if (!saved) return Array(paragraphCount).fill("");
+    const parsed = JSON.parse(saved);
+    if (Array.isArray(parsed)) {
+      return (parsed.map((value) => String(value))
+        .slice(0, paragraphCount)
+        .concat(Array(paragraphCount).fill("")))
+        .slice(0, paragraphCount);
+    }
+  } catch {
+    // Legacy single-box drafts are restored by splitting blank-line paragraphs.
+  }
+  const legacy = localStorage.getItem(writingDraftKey(day)) || "";
+  const parts = legacy ? legacy.split(/\n\s*\n/) : [];
+  return (parts.slice(0, paragraphCount).concat(Array(paragraphCount).fill(""))).slice(0, paragraphCount);
+}
+
+function setWritingSyncStatus(message, stateName = "") {
+  elements.writingSyncStatus.textContent = message;
+  elements.writingSyncStatus.className = `writing-sync-status${stateName ? ` ${stateName}` : ""}`;
+}
+
+function queueWritingDraftSync() {
+  window.clearTimeout(state.writingDraftSyncTimer);
+  if (!state.writingPractice?.available) return;
+  setWritingSyncStatus("正在同步到 VS Code...");
+  state.writingDraftSyncTimer = window.setTimeout(() => {
+    syncWritingDraft();
+  }, WRITING_DRAFT_SYNC_DELAY_MS);
+}
+
+async function syncWritingDraft({ immediate = false } = {}) {
+  window.clearTimeout(state.writingDraftSyncTimer);
+  state.writingDraftSyncTimer = null;
+  const day = state.article?.day;
+  const paragraphs = writingDraftValues();
+  const text = writingDraftText(paragraphs);
+  const signature = writingDraftSignature(paragraphs);
+  if (!day || !state.writingPractice?.available) return true;
+  if (!immediate && signature === state.writingDraftLastSyncedText) {
+    setWritingSyncStatus("已同步到 VS Code", "saved");
+    return true;
+  }
+  const requestId = ++state.writingDraftRequestId;
+  state.writingDraftSaving = true;
+  setWritingSyncStatus("正在同步到 VS Code...");
+  try {
+    await request("/api/writing-draft", {
+      method: "POST",
+      body: JSON.stringify({ day, text, paragraphs }),
+    });
+    if (requestId === state.writingDraftRequestId && state.article?.day === day) {
+      state.writingDraftLastSyncedText = signature;
+      setWritingSyncStatus("已同步到 VS Code", "saved");
+    }
+    return true;
+  } catch (error) {
+    if (requestId === state.writingDraftRequestId && state.article?.day === day) {
+      setWritingSyncStatus("本地草稿尚未同步", "error");
+    }
+    return false;
+  } finally {
+    if (requestId === state.writingDraftRequestId) state.writingDraftSaving = false;
+  }
+}
+
+function setLearningView(view) {
+  const nextView = view === "writing" ? "writing" : "reading";
+  state.learningView = nextView;
+  const writing = nextView === "writing";
+  elements.readingView.hidden = writing;
+  elements.writingView.hidden = !writing;
+  elements.readingTab.classList.toggle("active", !writing);
+  elements.writingTab.classList.toggle("active", writing);
+  elements.readingTab.setAttribute("aria-selected", String(!writing));
+  elements.writingTab.setAttribute("aria-selected", String(writing));
+  elements.appShell.dataset.learningView = nextView;
+}
+
+function renderWritingAttempts(attempts) {
+  const records = Array.isArray(attempts) ? [...attempts].reverse() : [];
+  elements.writingAttempts.replaceChildren();
+  elements.writingAttemptsSection.hidden = !records.length;
+  elements.writingAttemptCount.textContent = records.length ? `${records.length} 次` : "";
+  for (const record of records) {
+    const item = document.createElement("article");
+    item.className = "writing-attempt";
+    const meta = document.createElement("div");
+    meta.className = "writing-attempt-meta";
+    const label = document.createElement("span");
+    label.textContent = `第 ${record.id || "?"} 次 · ${record.levelLabel || "修正"}`;
+    const date = document.createElement("span");
+    const rawDate = record.submittedAt ? new Date(record.submittedAt) : null;
+    date.textContent = rawDate && !Number.isNaN(rawDate.valueOf())
+      ? rawDate.toLocaleString("zh-CN", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" })
+      : "";
+    meta.append(label, date);
+    item.append(meta);
+
+    const addTextBlock = (heading, content, extraClass = "") => {
+      if (!content) return;
+      const title = document.createElement("h3");
+      title.textContent = heading;
+      const body = document.createElement("p");
+      body.className = `writing-text${extraClass ? ` ${extraClass}` : ""}`;
+      body.textContent = content;
+      item.append(title, body);
+    };
+    addTextBlock("你的提交", record.originalText);
+    addTextBlock("修正版", record.correctedText, "writing-correction");
+
+    const feedback = Array.isArray(record.feedback) ? record.feedback : [];
+    const coverage = Array.isArray(record.coverage) ? record.coverage : [];
+    const suggestions = Array.isArray(record.suggestions) ? record.suggestions : [];
+    if (feedback.length || coverage.length || suggestions.length) {
+      const title = document.createElement("h3");
+      title.textContent = "反馈";
+      const list = document.createElement("ul");
+      list.className = "writing-feedback";
+      for (const message of [...feedback, ...coverage]) {
+        const line = document.createElement("li");
+        line.textContent = message;
+        list.append(line);
+      }
+      if (suggestions.length) {
+        const line = document.createElement("li");
+        line.textContent = `可尝试使用：${suggestions.join("、")}`;
+        list.append(line);
+      }
+      item.append(title, list);
+    }
+    elements.writingAttempts.append(item);
+  }
+}
+
+function renderWritingExercise(paragraphs, drafts) {
+  elements.writingExercise.replaceChildren();
+  paragraphs.forEach((paragraph, index) => {
+    const item = document.createElement("article");
+    item.className = "writing-paragraph-exercise";
+
+    const heading = document.createElement("h3");
+    heading.textContent = `第 ${index + 1} 段`;
+    const prompt = document.createElement("p");
+    prompt.className = "writing-paragraph-prompt";
+    prompt.textContent = paragraph;
+
+    const input = document.createElement("textarea");
+    input.className = "writing-input";
+    input.rows = Math.max(5, Math.min(12, Math.ceil(paragraph.length / 70)));
+    input.maxLength = 12000;
+    input.placeholder = "在这里写这一段的英文翻译";
+    input.value = drafts[index] || "";
+    input.setAttribute("aria-label", `第 ${index + 1} 段英文翻译`);
+    input.addEventListener("input", () => {
+      updateWritingWordCount();
+      saveWritingDraft();
+      queueWritingDraftSync();
+    });
+    input.addEventListener("blur", () => {
+      syncWritingDraft({ immediate: true });
+    });
+
+    item.append(heading, prompt, input);
+    elements.writingExercise.append(item);
+  });
+}
+
+// Updates only the "订正" block inside each existing paragraph article,
+// without touching the draft textareas (which would lose focus/typing).
+function renderWritingParagraphCorrections(corrections) {
+  const items = elements.writingExercise.querySelectorAll(".writing-paragraph-exercise");
+  items.forEach((item, index) => {
+    const correction = corrections[index];
+    let block = item.querySelector(".writing-paragraph-correction");
+    if (!correction) {
+      if (block) block.remove();
+      return;
+    }
+    if (!block) {
+      block = document.createElement("div");
+      block.className = "writing-paragraph-correction";
+      const label = document.createElement("h4");
+      label.textContent = "订正";
+      const text = document.createElement("p");
+      text.className = "writing-text writing-correction";
+      block.append(label, text);
+      item.append(block);
+    }
+    block.querySelector("p").textContent = correction;
+  });
+}
+
+function renderWritingPractice(payload) {
+  state.writingPractice = payload;
+  const day = state.article?.day;
+  elements.writingDayLabel.textContent = day ? `第 ${day} 天` : "";
+  const available = Boolean(payload?.available);
+  const completed = Boolean(payload?.readingCompleted);
+  elements.completeReadingButton.disabled = !available || state.generating;
+  elements.completeReadingButton.textContent = completed ? "进入中译英" : "完成阅读，进入中译英";
+  elements.writingCreateButton.hidden = available || !payload?.canCreate;
+  elements.writingCreateButton.disabled = state.writingCreating;
+
+  if (!available) {
+    elements.writingAvailability.textContent = payload?.message || "当前日期没有中译英练习。";
+    elements.writingContent.hidden = true;
+    elements.writingFocusCard.hidden = true;
+    elements.writingAttemptsSection.hidden = true;
+    return;
+  }
+  elements.writingAvailability.textContent = completed
+    ? "根据当天阅读改写的中文题目；可重复提交并选择不同的修正程度。"
+    : "本篇中译英已准备好；可直接开始输入，也可先回到阅读页完成学习。";
+  elements.writingContent.hidden = false;
+  const writingFocus = payload.writingFocus;
+  const hasWritingFocus = Boolean(writingFocus?.focusTitle);
+  elements.writingFocusCard.hidden = !hasWritingFocus;
+  elements.writingFocusTitle.textContent = hasWritingFocus ? writingFocus.focusTitle : "";
+  elements.writingFocusExplanation.textContent = hasWritingFocus
+    ? writingFocus.focusExplanation || ""
+    : "";
+  elements.writingFocusMethod.textContent = hasWritingFocus
+    ? `今天的练习方法：${writingFocus.practiceInstruction || "围绕这一项反复练习。"}`
+    : "";
+  elements.writingTitle.textContent = payload.title || "中文题目";
+  elements.writingInstructions.textContent = payload.instructions || "";
+  elements.writingTargetWords.replaceChildren();
+  for (const word of Array.isArray(payload.suggestedWords) ? payload.suggestedWords : []) {
+    const chip = document.createElement("span");
+    chip.className = "review-plan-word";
+    chip.textContent = word;
+    elements.writingTargetWords.append(chip);
+  }
+  const paragraphs = Array.isArray(payload.paragraphs) ? payload.paragraphs.map(String) : [];
+  if (state.writingLoadedDay !== day) {
+    const storedDrafts = Array.isArray(payload.draftParagraphs)
+      ? payload.draftParagraphs.map((value) => String(value))
+      : String(payload.draftText || "").split(/\n\s*\n/);
+    const serverDrafts = (storedDrafts.slice(0, paragraphs.length)
+      .concat(Array(paragraphs.length).fill("")))
+      .slice(0, paragraphs.length);
+    const localDrafts = loadWritingDraft(day, paragraphs.length);
+    const drafts = serverDrafts.some(Boolean) ? serverDrafts : localDrafts;
+    renderWritingExercise(paragraphs, drafts);
+    state.writingLoadedDay = day;
+    state.writingDraftLastSyncedText = writingDraftSignature(serverDrafts);
+    if (localDrafts.some(Boolean) && !serverDrafts.some(Boolean)) queueWritingDraftSync();
+  }
+  const correctionParagraphs = Array.isArray(payload.latestCorrectionParagraphs)
+    ? payload.latestCorrectionParagraphs.map((value) => String(value))
+    : [];
+  renderWritingParagraphCorrections(correctionParagraphs);
+  elements.writingExercise.querySelectorAll(".writing-input").forEach((input) => {
+    input.disabled = state.writingSubmitting;
+  });
+  elements.correctionLevel.disabled = state.writingSubmitting;
+  elements.writingSubmitButton.disabled = state.writingSubmitting;
+  updateWritingWordCount();
+  if (!state.writingDraftSaving && state.writingDraftLastSyncedText === writingDraftSignature()) {
+    setWritingSyncStatus("已同步到 VS Code", "saved");
+  }
+  renderWritingAttempts(payload.attempts);
+}
+
+async function loadWritingPractice() {
+  const day = state.article?.day;
+  if (!day) return;
+  try {
+    const payload = await request(`/api/writing-practice?day=${encodeURIComponent(day)}`);
+    if (state.article?.day === day) renderWritingPractice(payload);
+  } catch (error) {
+    if (state.article?.day !== day) return;
+    renderWritingPractice({ day, available: false, message: `无法读取中译英练习：${error.message}` });
+  }
+}
+
 function renderReviewPlan(payload) {
   const summary = payload?.summary || {};
   const habits = payload?.habits || {};
@@ -175,8 +523,8 @@ function renderReviewPlan(payload) {
   if (deferred) deferredParts.push(`${deferred} 个到期旧词`);
   const deferredText = deferredParts.length ? `，另有 ${deferredParts.join("、")}顺延` : "";
   const sourceText = generationMode.usesSource
-    ? "低负荷：会使用雅思原文"
-    : "高负荷：不使用雅思原文，只围绕单词生成";
+    ? "会使用超给的听力转写作为情节参考"
+    : "当前没有可用的听力情节来源";
   const planText = targetWords.length
     ? `下一篇固定不超过 15 个：重学/本篇词 ${recentWords.length} 个，到期词 ${dueWords.length} 个，收件箱新激活 ${admittedWords.length} 个${deferredText}。`
     : "下一篇当前没有必须复习的目标词；系统最多只会激活 2 个新词。";
@@ -562,6 +910,7 @@ function createHardTranslatedSentence(entry) {
 
 function renderArticle(article) {
   closeDictionary();
+  if (state.article?.day !== article.day) state.writingLoadedDay = null;
   state.article = article;
   state.dirty = false;
   elements.daySelect.value = String(article.day);
@@ -610,6 +959,7 @@ function renderArticle(article) {
   configureAudio(article);
   updateMediaMetadata(article);
   updateGenerateButton();
+  loadWritingPractice();
 }
 
 function configureAudio(article) {
@@ -704,6 +1054,10 @@ function updateGenerateButton() {
   const isLatestDay = state.article?.day === state.latestDay;
   elements.generateButton.disabled = state.generating || !isLatestDay;
   elements.generateButton.title = isLatestDay ? "" : `请先切换到第 ${state.latestDay} 天`;
+  elements.generateInstruction.disabled = state.generating;
+  if (state.writingPractice) {
+    elements.completeReadingButton.disabled = !state.writingPractice.available || state.generating;
+  }
 }
 
 function seekBy(seconds) {
@@ -818,6 +1172,93 @@ window.addEventListener("resize", () => {
   updateTodayWordsVisibility();
   updateReviewWordsVisibility();
 });
+elements.readingTab.addEventListener("click", () => setLearningView("reading"));
+elements.writingTab.addEventListener("click", async () => {
+  setLearningView("writing");
+  await loadWritingPractice();
+});
+elements.completeReadingButton.addEventListener("click", async () => {
+  const day = state.article?.day;
+  if (!day || elements.completeReadingButton.disabled) return;
+  if (!(await saveTodayWords())) return;
+  elements.completeReadingButton.disabled = true;
+  elements.writingStatus.textContent = "";
+  try {
+    const practice = await request("/api/complete-reading", {
+      method: "POST",
+      body: JSON.stringify({ day }),
+    });
+    renderWritingPractice(practice);
+    setLearningView("writing");
+    showToast("阅读已完成，开始中译英练习");
+  } catch (error) {
+    showToast(error.message);
+    await loadWritingPractice();
+  }
+});
+elements.writingCreateButton.addEventListener("click", async () => {
+  const day = state.article?.day;
+  if (!day || state.writingCreating) return;
+  state.writingCreating = true;
+  elements.writingCreateButton.disabled = true;
+  elements.writingAvailability.textContent = "正在根据本篇阅读创建中译英题目...";
+  try {
+    const practice = await request("/api/create-writing-practice", {
+      method: "POST",
+      body: JSON.stringify({ day }),
+    });
+    renderWritingPractice(practice);
+    showToast("中译英题目已创建");
+  } catch (error) {
+    renderWritingPractice({
+      day,
+      available: false,
+      canCreate: true,
+      message: conciseError(error, "中译英题目创建失败，请重试"),
+    });
+  } finally {
+    state.writingCreating = false;
+    if (state.writingPractice) renderWritingPractice(state.writingPractice);
+  }
+});
+elements.writingSubmitButton.addEventListener("click", async () => {
+  const day = state.article?.day;
+  const text = writingDraftText();
+  if (!day || state.writingSubmitting) return;
+  if (!text) {
+    showToast("请先输入英文内容");
+    elements.writingExercise.querySelector(".writing-input")?.focus();
+    return;
+  }
+  state.writingSubmitting = true;
+  elements.writingStatus.textContent = "正在检查表达和高频词...";
+  elements.writingStatus.className = "generate-status";
+  await syncWritingDraft({ immediate: true });
+  renderWritingPractice(state.writingPractice);
+  try {
+    const result = await request("/api/writing-submit", {
+      method: "POST",
+      body: JSON.stringify({
+        day,
+        text,
+        level: elements.correctionLevel.value,
+      }),
+    });
+    state.writingPractice = result.practice;
+    state.writingDraftLastSyncedText = writingDraftSignature();
+    renderWritingPractice(result.practice);
+    elements.writingStatus.textContent = "修正版已保存，可继续修改后再次提交。";
+    saveWritingDraft();
+    showToast("已生成修正版");
+  } catch (error) {
+    elements.writingStatus.textContent = conciseError(error, "中译英修正失败，请重试");
+    elements.writingStatus.className = "generate-status error";
+    showToast(elements.writingStatus.textContent);
+  } finally {
+    state.writingSubmitting = false;
+    if (state.writingPractice) renderWritingPractice(state.writingPractice);
+  }
+});
 elements.reviewWordsToggle.addEventListener("click", () => {
   state.reviewWordsExpanded = !state.reviewWordsExpanded;
   updateReviewWordsVisibility();
@@ -841,6 +1282,7 @@ elements.daySelect.addEventListener("change", async () => {
       }
     }
     elements.audio.pause();
+    setLearningView("reading");
     state.reviewWordsExpanded = false;
     state.todayWordsExpanded = false;
     const loaded = await loadCurrentArticle(selectedDay);
@@ -881,6 +1323,7 @@ document.addEventListener("keydown", (event) => {
 elements.generateButton.addEventListener("click", async () => {
   if (state.article?.day !== state.latestDay) return;
   if (!(await saveTodayWords())) return;
+  const extraInstruction = elements.generateInstruction.value.trim();
   state.generating = true;
   updateGenerateButton();
   elements.generateStatus.textContent = "正在生成文章和音频，这可能需要几分钟...";
@@ -888,15 +1331,24 @@ elements.generateButton.addEventListener("click", async () => {
   try {
     const result = await request("/api/generate-next", {
       method: "POST",
-      body: JSON.stringify({}),
+      body: JSON.stringify({ extraInstruction }),
     });
     const audioStatus = result.warning
       ? conciseError({ message: result.warning }, "音频未生成")
       : `第 ${result.day} 天文章已生成，音频未生成`;
-    elements.generateStatus.textContent = result.audioGenerated
-      ? `第 ${result.day} 天已生成`
-      : audioStatus;
-    showToast(`${result.mode}：第 ${result.day} 天已生成`);
+    const baseStatus = result.audioGenerated ? `第 ${result.day} 天已生成` : audioStatus;
+    elements.generateStatus.textContent = result.generatorNotice
+      ? `${baseStatus}\n${result.generatorNotice}`
+      : baseStatus;
+    elements.generateStatus.className = result.generatorNotice
+      ? "generate-status warning"
+      : "generate-status";
+    showToast(
+      result.generatorNotice
+        ? `${result.mode}：第 ${result.day} 天已生成 · ${result.generatorNotice}`
+        : `${result.mode}：第 ${result.day} 天已生成`
+    );
+    elements.generateInstruction.value = "";
     await loadDayOptions(result.day);
     await loadCurrentArticle(result.day);
     if (result.reviewPlan) renderReviewPlan(result.reviewPlan);

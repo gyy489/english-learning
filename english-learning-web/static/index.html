@@ -14,7 +14,7 @@
         document.documentElement.dataset.theme = "light";
       }
     </script>
-    <link rel="stylesheet" href="/static/styles.css?v=20260722-mobile-6">
+    <link rel="stylesheet" href="/static/styles.css?v=20260814-hide-translations-1">
   </head>
   <body>
     <main class="app-shell">
@@ -53,6 +53,12 @@
         </div>
       </header>
 
+      <nav class="learning-tabs" aria-label="学习方式">
+        <button id="readingTab" class="learning-tab active" type="button" role="tab" aria-selected="true" aria-controls="readingView">阅读与听力</button>
+        <button id="writingTab" class="learning-tab" type="button" role="tab" aria-selected="false" aria-controls="writingView">写作与口语</button>
+      </nav>
+
+      <div id="readingView" class="learning-view">
       <section class="content-section review-plan-section" aria-labelledby="reviewPlanHeading">
         <div class="section-heading">
           <h2 id="reviewPlanHeading">长期复习计划</h2>
@@ -121,8 +127,69 @@
 
       <footer class="page-footer">
         <p id="generateStatus" class="generate-status" role="status"></p>
+        <button id="completeReadingButton" class="complete-reading-button" type="button" disabled>完成阅读，进入中译英</button>
+        <textarea
+          id="generateInstruction"
+          class="generate-instruction"
+          rows="2"
+          maxlength="300"
+          placeholder="可选：输入这篇文章的额外要求，例如指定话题或场景；留空则按默认方式生成"
+          aria-label="下一篇文章的额外要求"
+        ></textarea>
         <button id="generateButton" class="generate-button" type="button">生成下一天的内容</button>
       </footer>
+      </div>
+
+      <section id="writingView" class="learning-view writing-view" hidden aria-labelledby="writingHeading">
+        <div class="content-section writing-intro">
+          <div class="section-heading">
+            <h2 id="writingHeading">中译英练习</h2>
+            <span id="writingDayLabel" class="count"></span>
+          </div>
+          <p id="writingAvailability" class="writing-availability">正在读取当天练习...</p>
+          <button id="writingCreateButton" class="complete-reading-button" type="button" hidden>基于本篇创建中译英</button>
+        </div>
+
+        <div id="writingContent" hidden>
+          <section id="writingFocusCard" class="content-section writing-focus-card" hidden aria-labelledby="writingFocusTitle">
+            <p class="writing-focus-kicker">本次只解决一个问题</p>
+            <h2 id="writingFocusTitle"></h2>
+            <p id="writingFocusExplanation"></p>
+            <p id="writingFocusMethod" class="writing-focus-method"></p>
+          </section>
+          <section class="content-section writing-prompt-section">
+            <div class="section-heading">
+              <h2 id="writingTitle">中文题目</h2>
+            </div>
+            <p id="writingInstructions" class="writing-instructions"></p>
+            <div id="writingTargetWords" class="review-plan-words" aria-label="建议使用的词汇"></div>
+            <div class="section-heading">
+              <h2 id="writingEditorHeading">逐段翻译</h2>
+              <span id="writingWordCount" class="count">0 词</span>
+            </div>
+            <div id="writingExercise" class="writing-exercise" lang="zh-CN"></div>
+            <p id="writingSyncStatus" class="writing-sync-status" role="status"></p>
+            <div class="writing-submit-row">
+              <label class="correction-level-label" for="correctionLevel">修正程度</label>
+              <select id="correctionLevel" class="correction-level" aria-label="修正程度">
+                <option value="basic">基础纠错</option>
+                <option value="natural" selected>自然表达</option>
+                <option value="advanced">结构提升</option>
+              </select>
+              <button id="writingSubmitButton" class="generate-button writing-submit-button" type="button">提交并修正</button>
+            </div>
+            <p id="writingStatus" class="generate-status" role="status"></p>
+          </section>
+
+          <section id="writingAttemptsSection" class="content-section writing-attempts-section" aria-labelledby="writingAttemptsHeading" hidden>
+            <div class="section-heading">
+              <h2 id="writingAttemptsHeading">提交记录</h2>
+              <span id="writingAttemptCount" class="count"></span>
+            </div>
+            <div id="writingAttempts" class="writing-attempts"></div>
+          </section>
+        </div>
+      </section>
     </main>
 
     <aside id="dictionaryPopover" class="dictionary-popover" hidden aria-live="polite">
@@ -147,6 +214,6 @@
       </div>
     </aside>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
-    <script src="/static/app.js?v=20260722-mobile-6" defer></script>
+    <script src="/static/app.js?v=20260814-writing-focus-1" defer></script>
   </body>
 </html>

@@ -172,6 +172,42 @@ h1 {
   margin-bottom: 0;
 }
 
+.learning-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.learning-tab {
+  min-height: 48px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.learning-tab:hover,
+.learning-tab:focus-visible {
+  color: var(--green);
+  outline: none;
+}
+
+.learning-tab.active {
+  border-bottom-color: var(--green);
+  color: var(--green);
+}
+
+.learning-view[hidden] {
+  display: none;
+}
+
+.app-shell[data-learning-view="writing"] .audio-panel {
+  visibility: hidden;
+}
+
 .audio-panel {
   min-width: 0;
 }
@@ -377,23 +413,7 @@ h2 {
 }
 
 .translation-faded {
-  color: var(--muted);
-  font-size: 0.9rem;
-  opacity: 0.24;
-  filter: blur(1px);
-  transition: opacity 160ms ease, filter 160ms ease;
-}
-
-.translation-faded:hover,
-.translation-faded:focus-visible {
-  opacity: 0.82;
-  filter: blur(0);
-}
-
-.sentence:hover .word-gloss.translation-faded,
-.sentence:focus-within .word-gloss.translation-faded {
-  opacity: 0.82;
-  filter: blur(0);
+  display: none;
 }
 
 .word-pair {
@@ -587,6 +607,233 @@ h2 {
   color: var(--danger);
 }
 
+.generate-status.warning {
+  color: var(--amber);
+}
+
+.complete-reading-button {
+  display: block;
+  margin: 0 auto 14px;
+  border: 1px solid var(--green);
+  border-radius: var(--radius);
+  padding: 8px 15px;
+  background: transparent;
+  color: var(--green);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.complete-reading-button:hover,
+.complete-reading-button:focus-visible {
+  background: var(--green-soft);
+  outline: none;
+}
+
+.complete-reading-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.writing-view {
+  min-height: 58vh;
+}
+
+.writing-intro {
+  background: var(--review-surface);
+}
+
+.writing-availability,
+.writing-instructions {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.writing-prompt-section {
+  background: var(--surface);
+}
+
+.writing-focus-card {
+  border: 1px solid var(--green);
+  background: var(--green-soft);
+}
+
+.writing-focus-card h2,
+.writing-focus-card p {
+  margin-top: 0;
+}
+
+.writing-focus-card p:last-child {
+  margin-bottom: 0;
+}
+
+.writing-focus-kicker {
+  margin-bottom: 8px;
+  color: var(--green);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.writing-focus-method {
+  color: var(--muted);
+}
+
+.writing-instructions {
+  margin-bottom: 14px;
+}
+
+.writing-exercise {
+  margin-top: 14px;
+}
+
+.writing-paragraph-exercise {
+  padding: 22px 0;
+  border-top: 1px solid var(--line);
+}
+
+.writing-paragraph-exercise:first-child {
+  padding-top: 4px;
+  border-top: 0;
+}
+
+.writing-paragraph-exercise h3 {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.writing-paragraph-prompt {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  line-height: 1.85;
+}
+
+.writing-input {
+  display: block;
+  width: 100%;
+  min-height: 150px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px;
+  background: var(--surface);
+  color: var(--english);
+  line-height: 1.75;
+  resize: vertical;
+}
+
+.writing-paragraph-correction {
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.writing-paragraph-correction h4 {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.writing-sync-status {
+  min-height: 1.25rem;
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.writing-sync-status.saved {
+  color: var(--green);
+}
+
+.writing-sync-status.error {
+  color: var(--danger);
+}
+
+.writing-input:focus-visible,
+.correction-level:focus-visible {
+  border-color: var(--green);
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+.writing-submit-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.correction-level-label {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.correction-level {
+  min-width: 122px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 8px 28px 8px 9px;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.writing-submit-button {
+  min-height: 42px;
+  padding: 8px 18px;
+}
+
+.writing-attempts-section {
+  background: var(--surface);
+}
+
+.writing-attempt {
+  padding: 22px 0;
+  border-top: 1px solid var(--line);
+}
+
+.writing-attempt:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.writing-attempt-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.writing-attempt h3 {
+  margin: 16px 0 6px;
+  font-size: 0.9rem;
+}
+
+.writing-text {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.75;
+}
+
+.writing-correction {
+  color: var(--english);
+  font-weight: 600;
+}
+
+.writing-feedback {
+  margin: 10px 0 0;
+  padding-left: 20px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .today-word-item {
   position: relative;
   padding-right: 30px;
@@ -624,6 +871,34 @@ h2 {
 .generate-status {
   min-height: 1.5em;
   margin-bottom: 10px;
+  white-space: pre-line;
+}
+
+.generate-instruction {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto 14px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  resize: vertical;
+}
+
+.generate-instruction::placeholder {
+  color: var(--muted);
+}
+
+.generate-instruction:focus-visible {
+  outline: 2px solid var(--word-hover);
+  outline-offset: 1px;
+}
+
+.generate-instruction:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .generate-button {
@@ -858,6 +1133,24 @@ h2 {
     padding: 24px 10px 34px;
   }
 
+  .learning-tab {
+    min-height: 44px;
+    font-size: 0.9rem;
+  }
+
+  .app-shell[data-learning-view="writing"] .audio-panel {
+    display: none;
+  }
+
+  .writing-submit-row {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .writing-input {
+    min-height: 160px;
+  }
+
   .toast {
     right: 12px;
     bottom: calc(126px + env(safe-area-inset-bottom));
@@ -878,6 +1171,11 @@ h2 {
 
   .generate-button {
     width: 100%;
+  }
+
+  .writing-submit-button {
+    width: auto;
+    flex: 1;
   }
 
   .dictionary-popover {

@@ -1,6 +1,6 @@
 # 每日英语 Web 应用
 
-这个本地应用直接读写项目中的 `作文素材/按时间排序/`，不创建额外的数据格式。
+这个本地应用直接读写项目中的 `作文素材/按时间排序/`。每日中译英会额外保存同目录的 Markdown 工作稿，便于在 VS Code 中继续学习。
 
 页面支持浅色和暗色主题，首次打开时跟随系统设置，手动切换后会记住选择。
 标题上方可以选择任意已有天数；正文、MP3 和生词区域会一起切换。
@@ -26,6 +26,13 @@ python3 english-learning-web/server.py
 
 安装类似 `deployment/english-learning-server.example.plist` 的 macOS `launchd` 配置后，本地第一次访问 `8787` 时可以自动启动后端。网页每 30 秒发送一次心跳；最后一个页面正常关闭后，后端等待约 4 秒退出。浏览器异常退出时，后端会在 3 分钟心跳失联后退出。正在生成文章或 MP3 时不会被中途关闭。
 
+`launchd` 的 socket activation 要求它直接派生的进程就是 Python 本身，所以启动脚本（`scripts/start_socket_web.sh`）不能像手动启动那样套一层 `uv run`。如果需要 Codex CLI 不可用时的 OpenAI API 自动回退，请预先创建一个专用虚拟环境并装好 `openai`，脚本会自动优先使用它：
+
+```bash
+uv venv "$HOME/Library/Application Support/EnglishLearning/venv" --python /opt/homebrew/bin/python3
+uv pip install --python "$HOME/Library/Application Support/EnglishLearning/venv/bin/python3" openai
+```
+
 远程访问、公网域名、反向代理、隧道端口和服务器拓扑属于本机私有运维资料，不放入公开仓库。
 
 为了方便回忆，复习生词释义和正文中文默认显示得很淡并带有轻微模糊；鼠标移到中文解释上时会暂时恢复可读状态。
@@ -42,6 +49,8 @@ python3 english-learning-web/server.py
 
 ## 生成下一天
 
+“生成下一天的内容”按钮上方有一个可选的额外要求输入框，最多 300 字。留空时按默认方式生成；填写后，模型会在不违反目标复习词、格式和当前负荷模式的前提下尽量满足这个要求（例如指定话题或场景）。生成成功后输入框会自动清空。
+
 生成文章会优先使用本机环境中的 OpenAI API；没有 API Key 时，会自动寻找本机已登录的 Codex CLI，包括从 macOS App 启动时无法继承到 PATH 的 VS Code Codex。生成 MP3 需要本机可用的 `OPENAI_API_KEY`：从“应用程序”启动时会读取用户级 `~/.config/api-keys.env`，手动启动时也可以使用项目根目录的 `.env`：
 
 ```text
@@ -52,16 +61,32 @@ OPENAI_API_KEY=你的_API_Key
 
 ```text
 OPENAI_TEXT_MODEL=gpt-4o-mini
-OPENAI_TTS_MODEL=tts-1
+OPENAI_TTS_MODEL=gpt-4o-mini-tts-2025-12-15
 ```
 
-`gpt-4o-mini` 用于文章和中文解释；`tts-1` 用于生成听力 MP3。两项都可以在 `.env` 中覆盖。
+`gpt-4o-mini` 用于文章和中文解释；`gpt-4o-mini-tts-2025-12-15` 用于生成英式口音 IELTS 听力 MP3。两项都可以在 `.env` 中覆盖。
 
 生成规则：
 
-- 只有目标词不超过 7 个、本篇标记生词不超过 5 个、没有到期顺延、收件箱等待不超过 15 个时，才读取雅思原文并生成约 36-40 句。
-- 任一负荷条件超限：不读取雅思原文，直接围绕目标单词生成约 25-30 句的简单文章。
-- 纯单词模式只使用常见基础词和连接词，不主动加入生僻名词、专业术语或复杂形容词。
-- 即使在低负荷题库模式中，额外新目标词也严格受系统给出的 0-2 个额度限制。
+- 每天从 `雅思真题/用于雅思学习skills数据/超给的资料/listening/cambridge-ielts-1/` 的 16 个听力 Section 中稳定随机选择一个，最近 12 天尽量不重复；不再读取原来的阅读题库。
+- 所有负荷模式都会参考听力情节。负荷高时暂停加入新目标词，但仍保留人物目标、信息差、转折和结果，避免退化为普通生活流水账。
+- 正文目标约 55-65 句，50-70 句均可接受；故事自然结束即可，必要时可拆成两篇短文。
+- 每篇都经过独立的写作者和审稿者两次 AI 处理，再由本地英语前 5000 高频词表验证。前一天复习词和已学词可以保留，其余候选偏词必须改成更常见的表达。
+- 额外新目标词仍严格遵守复习系统的 0-2 个额度；高负荷时为 0。
+
+## 中译英练习
+
+新生成的每日文章会同时生成一份相似但不逐句对应的中文题目。写作页按中文段落逐段显示，每段下方都有对应英文输入框；可在顶部切换到“写作与口语”栏目，输入英文并反复提交。
+
+修正提供三个强度：基础纠错、自然表达、结构提升。网页输入框会在停止输入约一秒后自动同步到当天目录的 `<文章名>.translation.md`；因此 VS Code 的 Copilot 和 Codex 都能直接读取当前英文草稿、中文题目及历次订正记录。每次提交都会保存原文、修正版、建议词使用情况和中文反馈；修正版同样要通过高频词检查。较早文章可在写作页按需创建一份练习。
+
+## 高频词验证
+
+项目内词表为 `english-learning-web/data/common-english-5000.json`，由 `wordfreq` 生成，前 3000 词可视为核心层、3001-5000 为扩展层。重新生成词表或单独验证文章时可运行：
+
+```bash
+uv run --with wordfreq python scripts/build_common_words.py
+python3 scripts/verify_common_vocabulary.py "作文素材/按时间排序/<day>/<article>.md" --allow "当天复习词"
+```
 
 生成的 Markdown 和 MP3 仍保存在新的每日文件夹中，因此可以继续在 VS Code 中直接使用。

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import ctypes
+from datetime import UTC, datetime
 import gzip
 import hashlib
 from http import HTTPStatus
@@ -22,6 +23,7 @@ import threading
 import time
 from urllib.parse import parse_qs, unquote, urlparse
 
+from common_vocabulary import report_words, vocabulary_report
 from review_scheduler import (
     build_review_state,
     dashboard_payload,
@@ -35,13 +37,13 @@ PROJECT_ROOT = Path(
 ).expanduser().resolve()
 STATIC_DIR = APP_DIR / "static"
 ARTICLES_DIR = PROJECT_ROOT / "作文素材" / "按时间排序"
-SOURCE_INDEX = (
+LISTENING_SOURCE_DIR = (
     PROJECT_ROOT
     / "雅思真题"
-    / "Markdown资料"
-    / "7月阅读"
-    / "ReadingPractice"
-    / "readingpractice-index.json"
+    / "用于雅思学习skills数据"
+    / "超给的资料"
+    / "listening"
+    / "cambridge-ielts-1"
 )
 TTS_SCRIPT = PROJECT_ROOT / "scripts" / "article_to_speech.py"
 DICTIONARY_BUNDLE = (
@@ -58,10 +60,23 @@ GLOBAL_ENV_FILE = Path.home() / ".config" / "api-keys.env"
 REVIEW_DIR = PROJECT_ROOT / "作文素材" / "单词复习"
 REVIEW_JSON = REVIEW_DIR / "vocabulary.json"
 REVIEW_REPORT = REVIEW_DIR / "review-history.md"
-TEXT_MODEL = os.getenv("OPENAI_TEXT_MODEL", "gpt-4o-mini")
+TEXT_MODEL = os.getenv("OPENAI_TEXT_MODEL", "gpt-5.5")
+MAX_GENERATION_ATTEMPTS = 5
+MAX_EXTRA_INSTRUCTION_LENGTH = 300
+LISTENING_SOURCE_HISTORY_WINDOW = 12
+MIN_ARTICLE_SENTENCES = 50
+MAX_ARTICLE_SENTENCES = 70
+MAX_WRITING_INPUT_LENGTH = 12_000
+WRITING_LEVELS = {
+    "basic": "基础纠错",
+    "natural": "自然表达",
+    "advanced": "结构提升",
+}
+
 WRITE_LOCK = threading.RLock()
 DICTIONARY_LOCK = threading.Lock()
 REVIEW_LOCK = threading.Lock()
+WRITING_LOCK = threading.Lock()
 AUDIO_CACHE_LOCK = threading.Lock()
 DICTIONARY_INDEX: dict[str, dict[str, object]] | None = None
 SESSION_LOCK = threading.Lock()
@@ -473,6 +488,102 @@ def section_between(text: str, start: str, end: str) -> str:
     return section
 
 
+SECTION_WORDS = {"one": 1, "two": 2, "three": 3, "four": 4}
+SECTION_MARKER = re.compile(r"\bSection\s+(?P<number>[1-4]|one|two|three|four)\b", re.IGNORECASE)
+
+
+def _section_number(raw_number: str) -> int:
+    value = raw_number.strip().lower()
+    return int(value) if value.isdigit() else SECTION_WORDS[value]
+
+
+def listening_sections_from_file(path: Path) -> list[dict[str, object]]:
+    """Split a Cambridge test transcript into its four usable listening units."""
+    raw_markdown = path.read_text(encoding="utf-8", errors="replace")
+    transcript = raw_markdown.split("## 转录文本", 1)[1] if "## 转录文本" in raw_markdown else ""
+    if not transcript:
+        return []
+    starts: dict[int, int] = {}
+    for match in SECTION_MARKER.finditer(transcript):
+        number = _section_number(match.group("number"))
+        following = transcript[match.end() : match.end() + 260].lower()
+        is_content_start = any(
+            phrase in following
+            for phrase in (
+                "you will hear",
+                "in this section",
+                "you are going to hear",
+                "two students",
+                "a talk given",
+                "a conversation between",
+            )
+        )
+        if is_content_start and number not in starts:
+            starts[number] = match.start()
+    ordered = sorted(starts.items())
+    sections: list[dict[str, object]] = []
+    test_match = re.search(r"Listening Test\s+(\d+)", raw_markdown, re.IGNORECASE)
+    test_number = int(test_match.group(1)) if test_match else 0
+    for index, (number, start) in enumerate(ordered):
+        end = ordered[index + 1][1] if index + 1 < len(ordered) else len(transcript)
+        text = transcript[start:end].strip()
+        if len(text) < 180:
+            continue
+        identifier = f"cambridge-ielts-1-test{test_number}-section{number}"
+        sections.append(
+            {
+                "id": identifier,
+                "title": f"Cambridge IELTS 1 Listening Test {test_number} / Section {number}",
+                "test": test_number,
+                "section": number,
+                "markdownPath": str(path.relative_to(PROJECT_ROOT)),
+                "text": text,
+            }
+        )
+    return sections
+
+
+def listening_source_units() -> list[dict[str, object]]:
+    if not LISTENING_SOURCE_DIR.exists():
+        raise FileNotFoundError(f"听力转写目录不存在：{LISTENING_SOURCE_DIR}")
+    units: list[dict[str, object]] = []
+    for path in sorted(LISTENING_SOURCE_DIR.glob("test*.md")):
+        units.extend(listening_sections_from_file(path))
+    if not units:
+        raise RuntimeError("没有从超给的听力转写中识别出可用的 Section")
+    return units
+
+
+def recent_listening_source_ids(limit: int = LISTENING_SOURCE_HISTORY_WINDOW) -> list[str]:
+    identifiers: list[str] = []
+    for _, article_path in article_files()[-limit:]:
+        text = article_path.read_text(encoding="utf-8", errors="replace")
+        match = re.search(r"^- 听力片段：(.+)$", text, re.MULTILINE)
+        if not match:
+            continue
+        identifiers.extend(
+            identifier.strip()
+            for identifier in match.group(1).split(";")
+            if identifier.strip()
+        )
+    return identifiers
+
+
+def choose_listening_source(next_day: int) -> dict[str, object]:
+    """Pick a stable random listening unit while avoiding recent repetition."""
+    units = listening_source_units()
+    recent = set(recent_listening_source_ids())
+    candidates = [unit for unit in units if str(unit["id"]) not in recent]
+    if not candidates:
+        # The initial pool contains only 16 sections. Once it is exhausted,
+        # reset the cycle while still avoiding the last few days when possible.
+        recent_tail = set(recent_listening_source_ids(4))
+        candidates = [unit for unit in units if str(unit["id"]) not in recent_tail] or units
+    candidates.sort(key=lambda unit: str(unit["id"]))
+    digest = hashlib.sha256(f"listening-source:{next_day}".encode("utf-8")).hexdigest()
+    return candidates[int(digest, 16) % len(candidates)]
+
+
 def clean_today_entries(text: str) -> list[str]:
     marker = "生单词:"
     if marker not in text:
@@ -796,28 +907,6 @@ def save_today_words(path: Path, words: list[object]) -> list[str]:
     return cleaned
 
 
-def choose_source() -> dict[str, object]:
-    entries = json.loads(SOURCE_INDEX.read_text(encoding="utf-8"))
-    used_sources: set[str] = set()
-    for _, path in article_files():
-        match = re.search(r"^- 来源文件：(.+)$", path.read_text(encoding="utf-8"), re.MULTILINE)
-        if match:
-            used_sources.add(match.group(1).strip())
-
-    candidates = [
-        item
-        for item in entries
-        if item.get("status") == "ok"
-        and item.get("part") in {"P1", "P2"}
-        and item.get("markdown_path") not in used_sources
-        and (PROJECT_ROOT / str(item.get("markdown_path", ""))).exists()
-    ]
-    candidates.sort(key=lambda item: (item.get("part") != "P1", int(str(item.get("number", 9999)))))
-    if not candidates:
-        raise RuntimeError("没有找到未使用的 P1/P2 阅读材料")
-    return candidates[0]
-
-
 def generation_mode(
     target_count: int,
     recent_count: int,
@@ -826,31 +915,33 @@ def generation_mode(
     current_marked_count: int = 0,
     inbox_waiting_count: int = 0,
 ) -> dict[str, object]:
-    source_allowed = (
-        target_count <= 7
-        and recent_count <= 5
-        and current_marked_count <= 5
-        and deferred_due_count == 0
-        and inbox_waiting_count <= 15
+    high_load = (
+        target_count >= 8
+        or recent_count >= 6
+        or current_marked_count >= 6
+        or deferred_due_count > 0
+        or inbox_waiting_count > 15
     )
-    if not source_allowed:
+    if high_load:
         if deferred_due_count > 0:
-            name = "积压清理（纯单词）"
+            name = "积压清理（听力情节复习）"
         elif target_count >= 8 or current_marked_count >= 6:
-            name = "高负荷纯单词复习"
+            name = "高负荷听力情节复习"
         else:
-            name = "收件箱减压（纯单词）"
+            name = "收件箱减压（听力情节复习）"
         return {
             "name": name,
-            "sentenceCount": "约 25-30",
-            "minimumSentences": 25,
+            "sentenceCount": "约 55-65",
+            "minimumSentences": MIN_ARTICLE_SENTENCES,
+            "maximumSentences": MAX_ARTICLE_SENTENCES,
             "newWords": "0",
-            "usesSource": False,
+            "usesSource": True,
         }
     return {
-        "name": "低负荷雅思题库扩展",
-        "sentenceCount": "约 36-40",
-        "minimumSentences": 36,
+        "name": "听力情节扩展",
+        "sentenceCount": "约 55-65",
+        "minimumSentences": MIN_ARTICLE_SENTENCES,
+        "maximumSentences": MAX_ARTICLE_SENTENCES,
         "newWords": f"最多 {max(0, new_word_allowance)}",
         "usesSource": True,
     }
@@ -888,20 +979,31 @@ def slugify_title(title: str, day: int) -> str:
 
 
 def validate_generated_article(text: str, expected_day: int, mode: dict[str, object]) -> None:
-    required = ["# ", f"- 天数：第 {expected_day} 天", "## 复习生词", "## 正文", "生单词:"]
+    required = [
+        "# ",
+        f"- 天数：第 {expected_day} 天",
+        "- 来源真题：",
+        "- 来源文件：",
+        "- 听力片段：",
+        "## 复习生词",
+        "## 正文",
+        "生单词:",
+    ]
     missing = [item for item in required if item not in text]
     if missing:
         raise RuntimeError(f"模型输出缺少必要格式：{', '.join(missing)}")
+    title_match = re.search(r"^#\s+(.+)$", text, re.MULTILINE)
+    if title_match and title_match.group(1).strip().lower() in {"english title", "daily review"}:
+        raise RuntimeError("模型忘记把标题换成具体标题，仍是模板占位符")
     count = len(re.findall(r"^\d+\.\s+", section_between(text, "## 正文", "生单词:"), re.MULTILINE))
     minimum = int(mode["minimumSentences"])
     if count < minimum:
         raise RuntimeError(f"模型只生成了 {count} 句，低于当前模式要求的 {minimum} 句")
+    maximum = int(mode.get("maximumSentences", MAX_ARTICLE_SENTENCES))
+    if count > maximum:
+        raise RuntimeError(f"模型生成了 {count} 句，超过当前模式建议上限 {maximum} 句")
     if text.rsplit("生单词:", 1)[1].strip():
         raise RuntimeError("模型错误地填写了末尾“生单词:”区域")
-    if not mode["usesSource"]:
-        for field in ("来源真题", "来源文件"):
-            if f"- {field}：无（纯生词复习）" not in text:
-                raise RuntimeError(f"纯复习模式的“{field}”必须标记为无")
 
 
 def build_generation_prompt(
@@ -910,31 +1012,31 @@ def build_generation_prompt(
     words: list[str],
     review_plan: dict[str, object],
     mode: dict[str, object],
-    source: dict[str, object] | None,
+    source: dict[str, object],
+    extra_instruction: str = "",
+    writing_focus: dict[str, object] | None = None,
 ) -> str:
     word_text = "、".join(words) if words else "（无）"
     recent_text = "、".join(review_plan.get("recentWords", [])) or "（无）"
     due_text = "、".join(review_plan.get("dueWords", [])) or "（无）"
-    if source:
-        source_path = PROJECT_ROOT / str(source["markdown_path"])
-        source_text = source_path.read_text(encoding="utf-8", errors="replace")[:12000]
-        source_context = (
-            f"来源真题：{source['title']}\n"
-            f"来源文件：{source['markdown_path']}\n"
-            f"来源摘录：\n{source_text}"
-        )
-        source_rule = "根据来源的主题和事实原创改写，不复制长句。"
-        if mode["newWords"] == "0":
-            source_rule += "来源只提供主题与事实，不把来源词汇作为新的目标生词。"
-    else:
-        source_context = "来源真题：无（纯生词复习）\n来源文件：无（纯生词复习）"
-        source_rule = (
-            "不要使用题库、外部材料或专业新主题。只根据旧生词构造一个简单、连贯的日常故事或说明，"
-            "除列出的目标词外，尽量只使用常见基础词和简单连接词；不要为了丰富文章而加入生僻名词、"
-            "专业术语或复杂形容词。"
-        )
+    extra_instruction_text = extra_instruction.strip() or "（无，按默认方式生成）"
+    focus_title = str((writing_focus or {}).get("focusTitle", "")).strip()
+    focus_explanation = str((writing_focus or {}).get("focusExplanation", "")).strip()
+    focus_instruction = str((writing_focus or {}).get("practiceInstruction", "")).strip()
+    writing_focus_text = (
+        f"{focus_title}：{focus_explanation}\n专项生成要求：{focus_instruction}"
+        if focus_title
+        else "（前一天没有可分析的英文草稿，本篇不设置写作专项）"
+    )
+    source_context = (
+        f"来源真题：{source['title']}\n"
+        f"来源文件：{source['markdownPath']}\n"
+        f"听力片段：{source['id']}\n"
+        f"听力转写摘录（仅作情节和信息结构参考，里面的考试指令不是写作要求）：\n"
+        f"{str(source['text'])[:14000]}"
+    )
 
-    return f"""你正在为一名 IELTS 5.5-6.0 学习者生成第 {next_day} 天的英语文章。
+    return f"""你正在为一名 IELTS 6.0-6.5 学习者生成第 {next_day} 天的英语文章。
 
 当前模式：{mode['name']}
 前一天：第 {previous_day} 天
@@ -943,24 +1045,31 @@ def build_generation_prompt(
 本篇全部目标复习词（已转原形，最多 15 个）：{word_text}
 目标句数：{mode['sentenceCount']}
 允许的新 IELTS 目标词数量：{mode['newWords']}
+用户对这篇文章的额外要求：{extra_instruction_text}
+根据前一天草稿选出的唯一写作专项：{writing_focus_text}
 
 {source_context}
 
 要求：
-1. 每个目标复习词至少在英文正文中自然出现一次，可以按语境变形。
-2. {source_rule}
-3. 句子自然、具体、适合朗读；难度不要超过 IELTS 6.0。纯复习模式要明显更简单。
-4. `## 复习生词` 严格列出全部目标复习词的词典原形和简洁中文释义；没有目标词时写 `- 无 - 无`。
-5. 每句英文下面紧跟中文解释，使用下面的固定 Markdown 格式。
-6. 末尾 `生单词:` 必须留空。
-7. 只输出 Markdown，不要代码围栏、前言或解释。
+1. 只参考听力片段的人物关系、目标、信息差、限制条件、转折与结果；忽略 “look at questions” 等考试指令。不得复制连续原句或用听力转写改几个词后照搬。
+2. 写作前先在心里完成一个 5-7 步的情节蓝图：人物目标 → 问题或信息缺口 → 线索/选择 → 转折 → 合理结果。正文每一段都要让读者获得新信息；禁止“先做A、然后做B、然后做C”的流水账。
+3. 目标为约 55-65 句，50-70 句都可接受。故事自然结束即可；如果一个情节单元确实不够，可以写两篇有关联但各自完整的小文章，连续编号，总句数仍在范围内。
+4. 每个目标复习词至少自然出现一次；“前一天仍不会的词”尽量在不同语境中出现两次。不得为了塞词而加入无关人物、物品或事件。
+5. 除目标复习词和学习者已有词外，英文正文只能使用高频常见英语词（以英语前 3000-5000 词为目标）。复杂度来自清晰的因果、转折、对话和句式，而不是罕见名词、专业术语、文学化形容词或一次性场景道具。避免 resilience、meticulous、remarkable 这类词。
+6. 句子自然、具体、适合朗读；难度不要超过 IELTS 6.5。当前负荷高时不新增目标词，但仍然使用听力情节作为故事骨架。
+7. `## 复习生词` 严格列出全部目标复习词的词典原形和简洁中文释义；没有目标词时写 `- 无 - 无`。
+8. 每句英文下面紧跟中文解释，使用下面的固定 Markdown 格式。
+9. 末尾 `生单词:` 必须留空。只输出 Markdown，不要代码围栏、前言或解释。
+10. 如果存在“唯一写作专项”，正文要反复提供该结构的正确、自然示范，尤其让单数与复数、时态或相关句型形成可观察的对比；只强化这一项，不要同时加入第二个语法专项。
+11. 如果“用户对这篇文章的额外要求”不是“（无，按默认方式生成）”，在不违反以上规则的前提下尽量满足；冲突时以本提示中的复习、词汇和格式规则为准。
 
 固定格式：
 # English Title
 
 - 天数：第 {next_day} 天
-- 来源真题：<题目；纯复习模式写“无（纯生词复习）”>
-- 来源文件：<相对路径；纯复习模式写“无（纯生词复习）”>
+- 来源真题：{source['title']}
+- 来源文件：{source['markdownPath']}
+- 听力片段：{source['id']}
 - 复习内容：D{previous_day} 当前生词 + 到期旧词 + <当前模式>
 
 ## 复习生词
@@ -1017,26 +1126,10 @@ def find_uv() -> str | None:
     return None
 
 
-def request_generated_markdown(prompt: str) -> tuple[str, str]:
-    if os.getenv("OPENAI_API_KEY"):
-        try:
-            from openai import OpenAI
-        except ImportError:
-            pass
-        else:
-            model = os.getenv("OPENAI_TEXT_MODEL", TEXT_MODEL)
-            response = OpenAI().responses.create(
-                model=model,
-                input=prompt,
-                max_output_tokens=8_000,
-            )
-            return response.output_text, model
-
+def run_codex(prompt: str) -> str:
     codex = find_codex()
     if not codex:
-        raise RuntimeError(
-            "没有可用的文章生成方式：请配置 OPENAI_API_KEY，或安装并登录 Codex CLI。"
-        )
+        raise RuntimeError("未找到可用的 Codex CLI")
     with tempfile.TemporaryDirectory(prefix="english-learning-") as temp_dir:
         output_path = Path(temp_dir) / "article.md"
         codex_env = os.environ.copy()
@@ -1067,13 +1160,701 @@ def request_generated_markdown(prompt: str) -> tuple[str, str]:
         if result.returncode != 0 or not output_path.exists():
             details = (result.stderr or result.stdout).strip().splitlines()
             message = details[-1] if details else "Codex CLI 没有返回文章"
-            raise RuntimeError(f"Codex CLI 生成失败：{message}")
-        return output_path.read_text(encoding="utf-8"), "Codex CLI"
+            raise RuntimeError(message)
+        return output_path.read_text(encoding="utf-8")
 
 
-def generate_next_article() -> dict[str, object]:
+def run_openai_api(prompt: str, max_output_tokens: int = 8_000) -> tuple[str, str]:
+    if not os.getenv("OPENAI_API_KEY"):
+        raise RuntimeError("未配置 OPENAI_API_KEY，无法调用 API 生成文章")
+    try:
+        from openai import OpenAI
+    except ImportError as exc:
+        raise RuntimeError("未安装 openai 库，无法调用 API 生成文章") from exc
+    model = os.getenv("OPENAI_TEXT_MODEL", TEXT_MODEL)
+    response = OpenAI().responses.create(
+        model=model,
+        input=prompt,
+        max_output_tokens=max_output_tokens,
+    )
+    return response.output_text, model
+
+
+def request_generated_text(
+    prompt: str, *, max_output_tokens: int = 8_000
+) -> tuple[str, str, bool]:
+    """Generate text with independent writer/reviewer prompts.
+
+    Codex CLI is the primary generator. If Codex is missing, not logged in,
+    or out of quota, automatically fall back to the OpenAI API (when
+    OPENAI_API_KEY is configured). Returns (text, generator_label, used_codex).
+    """
+    if find_codex():
+        try:
+            return run_codex(prompt), "Codex CLI", True
+        except RuntimeError as codex_error:
+            if not os.getenv("OPENAI_API_KEY"):
+                raise RuntimeError(f"Codex CLI 生成失败：{codex_error}") from codex_error
+            text, model = run_openai_api(prompt, max_output_tokens)
+            return text, f"{model}（Codex 不可用，已自动改用 API：{codex_error}）", False
+
+    if os.getenv("OPENAI_API_KEY"):
+        text, model = run_openai_api(prompt, max_output_tokens)
+        return text, f"{model}（未检测到 Codex CLI，已自动改用 API）", False
+
+    raise RuntimeError(
+        "没有可用的文章生成方式：请配置 OPENAI_API_KEY，或安装并登录 Codex CLI。"
+    )
+
+
+def request_generated_markdown(prompt: str) -> tuple[str, str, bool]:
+    return request_generated_text(prompt, max_output_tokens=8_000)
+
+
+def article_vocabulary_report(
+    markdown: str, target_words: list[str], known_words: list[str]
+) -> dict[str, object]:
+    return vocabulary_report(
+        section_between(markdown, "## 正文", "生单词:"),
+        allowed_words=target_words,
+        known_words=known_words,
+    )
+
+
+def build_article_critic_prompt(
+    markdown: str,
+    target_words: list[str],
+    known_words: list[str],
+    vocabulary_check: dict[str, object],
+) -> str:
+    target_text = "、".join(target_words) if target_words else "（无）"
+    known_text = "、".join(known_words) or "（无）"
+    flagged_text = "、".join(report_words(vocabulary_check)) or "（无）"
+    return f"""你是第二位独立审稿人。第一位写作者已经完成一篇 IELTS 学习文章；你要怀疑地检查它并输出修订后的完整 Markdown。
+
+目标复习词（必须保留）：{target_text}
+学习者已学过、允许保留的词：{known_text}
+程序按英语前5000高频词检查出的候选偏词：{flagged_text}
+
+请完成以下审稿工作：
+1. 把候选偏词改成更常见的表达；目标词和已学词除外。不得加入新的偏词、专业词、罕见姓名或为了装饰场景而出现一次的道具词。
+2. 检查故事是否有清晰因果和信息推进。删改流水账、重复动作、无结果的旁支和前后矛盾。
+3. 保持文章自然、适合朗读，不能把正常英语改成幼稚的逐词替换。
+4. 保持全部 Markdown 结构、每个英文句子后的中文解释、听力来源元数据、目标词覆盖、句子编号和总句数。末尾 `生单词:` 必须为空。
+5. 只输出修订后的完整 Markdown，不要审稿说明、代码围栏或前言。
+
+待审文章：
+{markdown}
+"""
+
+
+def extract_article_english(markdown: str) -> str:
+    body = section_between(markdown, "## 正文", "生单词:")
+    return "\n".join(
+        match.group(1).strip()
+        for match in re.finditer(r"^\s*\d+\.\s+(.+?)\s*$", body, re.MULTILINE)
+    )
+
+
+def parse_model_json(text: str) -> dict[str, object]:
+    cleaned = text.strip()
+    cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\s*```$", "", cleaned)
+    start = cleaned.find("{")
+    end = cleaned.rfind("}")
+    if start < 0 or end < start:
+        raise RuntimeError("模型没有返回 JSON 对象")
+    try:
+        payload = json.loads(cleaned[start : end + 1])
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("模型返回的 JSON 格式错误") from exc
+    if not isinstance(payload, dict):
+        raise RuntimeError("模型返回的 JSON 不是对象")
+    return payload
+
+
+def diagnose_previous_writing(
+    previous_day: int, article_path: Path
+) -> dict[str, object] | None:
+    """Choose exactly one learning focus from the previous day's draft."""
+    practice = read_writing_practice(article_path)
+    if practice is None:
+        return None
+    attempts = practice.get("attempts", [])
+    latest_attempt = (
+        attempts[-1]
+        if isinstance(attempts, list) and attempts and isinstance(attempts[-1], dict)
+        else None
+    )
+    draft = str((latest_attempt or {}).get("originalText", "")).strip()
+    if not draft:
+        draft = str(practice.get("draftText", "")).strip()
+    if not draft:
+        draft = "\n\n".join(
+            part.strip() for part in draft_paragraphs_for_practice(practice) if part.strip()
+        )
+    if not draft:
+        return None
+
+    previous_feedback = "\n".join(
+        f"- {item}" for item in _clean_feedback_list((latest_attempt or {}).get("feedback"), 4)
+    ) or "（没有已有反馈，请直接分析草稿）"
+    prompt = f"""你是英语写作诊断教练。分析第 {previous_day} 天的学习者英文草稿，找出 2-4 个最严重、最反复、最影响理解或 IELTS 分数的问题，但下一天只能训练其中一个。
+
+选择规则：
+1. 只选择一个范围清楚、可通过一篇中译英反复练习的问题，例如“一般过去时”“主谓一致”“although 后不再接 but”。
+2. 优先选择反复出现的基础问题；不要选择“整体语法较差”“表达不自然”这种过宽标签。
+3. focusExplanation 用简短中文说明草稿中出现了什么错误。
+4. practiceInstruction 明确告诉下一篇阅读和中译英应怎样反复呈现正确结构。
+5. majorIssues 可以列出多个诊断结果，但 focusTitle 必须只有一个问题，不能用“和、以及、/”合并两个问题。
+
+只返回合法 JSON：
+{{
+  "majorIssues": ["问题一", "问题二"],
+  "focusTitle": "下一天只训练的一个问题",
+  "focusExplanation": "为什么优先解决它",
+  "practiceInstruction": "下一篇内容如何训练它"
+}}
+
+已有反馈：
+{previous_feedback}
+
+学习者草稿：
+{draft}
+"""
+    generated, _generator, _used_codex = request_generated_text(
+        prompt, max_output_tokens=1_200
+    )
+    diagnosis = parse_model_json(generated)
+    major_issues = _clean_feedback_list(diagnosis.get("majorIssues"), 4)
+    focus_title = str(diagnosis.get("focusTitle", "")).strip()
+    focus_explanation = str(diagnosis.get("focusExplanation", "")).strip()
+    practice_instruction = str(diagnosis.get("practiceInstruction", "")).strip()
+    if not major_issues or not focus_title or not focus_explanation or not practice_instruction:
+        raise RuntimeError("前一天写作诊断缺少主要问题或唯一训练重点")
+    return {
+        "sourceDay": previous_day,
+        "majorIssues": major_issues,
+        "focusTitle": focus_title,
+        "focusExplanation": focus_explanation,
+        "practiceInstruction": practice_instruction,
+    }
+
+
+def writing_practice_path(article_path: Path) -> Path:
+    return article_path.with_name(f"{article_path.stem}.writing.json")
+
+
+def writing_workspace_path(article_path: Path) -> Path:
+    """Human-readable counterpart of the writing JSON, kept in the article folder."""
+    return article_path.with_name(f"{article_path.stem}.translation.md")
+
+
+def write_json(path: Path, payload: dict[str, object]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f"{path.name}.tmp")
+    temporary.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    temporary.replace(path)
+
+
+def markdown_code_block(value: object, empty_message: str = "") -> str:
+    text = str(value or "").strip()
+    if not text:
+        return empty_message
+    longest_backticks = max((len(run) for run in re.findall(r"`+", text)), default=0)
+    fence = "`" * max(3, longest_backticks + 1)
+    return f"{fence}text\n{text}\n{fence}"
+
+
+def draft_paragraphs_for_practice(practice: dict[str, object]) -> list[str]:
+    """Return one editable English draft per Chinese paragraph, including legacy drafts."""
+    prompt_paragraphs = practice.get("paragraphs", [])
+    paragraph_count = len(prompt_paragraphs) if isinstance(prompt_paragraphs, list) else 0
+    stored = practice.get("draftParagraphs")
+    if isinstance(stored, list):
+        drafts = [str(item) for item in stored]
+    else:
+        legacy_text = str(practice.get("draftText", "")).strip()
+        drafts = re.split(r"\n\s*\n", legacy_text) if legacy_text else []
+    if paragraph_count:
+        return (drafts[:paragraph_count] + [""] * paragraph_count)[:paragraph_count]
+    return drafts
+
+
+def corrected_paragraphs_for_attempt(
+    attempt: dict[str, object] | None, paragraph_count: int
+) -> list[str] | None:
+    """Split the latest attempt's correctedText back into per-paragraph pieces.
+
+    Returns None when there is no attempt yet, or the correction did not
+    preserve the same paragraph count, so callers can fall back instead of
+    misaligning a paragraph's correction with the wrong Chinese prompt.
+    """
+    if not attempt or not paragraph_count:
+        return None
+    corrected = str(attempt.get("correctedText", "")).strip()
+    if not corrected:
+        return None
+    pieces = [part.strip() for part in re.split(r"\n\s*\n", corrected) if part.strip()]
+    if len(pieces) != paragraph_count:
+        return None
+    return pieces
+
+
+def writing_workspace_markdown(practice: dict[str, object]) -> str:
+    """Render the learner's current work in a Markdown file for VS Code assistants."""
+    day = practice.get("day", "")
+    title = str(practice.get("title", "中译英练习")).strip() or "中译英练习"
+    paragraphs = [str(item).strip() for item in practice.get("paragraphs", []) if str(item).strip()]
+    suggested_words = [str(item).strip() for item in practice.get("suggestedWords", []) if str(item).strip()]
+    attempts = practice.get("attempts", [])
+    if not isinstance(attempts, list):
+        attempts = []
+    latest_attempt = attempts[-1] if attempts and isinstance(attempts[-1], dict) else None
+    corrected_paragraphs = corrected_paragraphs_for_attempt(latest_attempt, len(paragraphs))
+    lines = [
+        f"# 第 {day} 天中译英：{title}",
+        "",
+    ]
+    writing_focus = practice.get("writingFocus")
+    if isinstance(writing_focus, dict) and str(writing_focus.get("focusTitle", "")).strip():
+        lines.extend(
+            [
+                "## 本次只解决一个问题",
+                "",
+                f"**{str(writing_focus.get('focusTitle', '')).strip()}**",
+                "",
+                str(writing_focus.get("focusExplanation", "")).strip(),
+                "",
+                f"练习方法：{str(writing_focus.get('practiceInstruction', '')).strip()}",
+                "",
+            ]
+        )
+    lines.extend([
+        "## 中文题目",
+        "",
+        str(practice.get("instructions", "")).strip(),
+        "",
+    ])
+    for paragraph in paragraphs:
+        lines.extend([paragraph, ""])
+    lines.extend(["## 建议使用词", ""])
+    lines.append("、".join(f"`{word}`" for word in suggested_words) or "（无）")
+    lines.extend(["", "## 当前英文草稿", ""])
+    drafts = draft_paragraphs_for_practice(practice)
+    if paragraphs:
+        for index, (paragraph, draft) in enumerate(zip(paragraphs, drafts), start=1):
+            lines.extend([f"### 第 {index} 段", "", "#### 中文", "", paragraph, ""])
+            lines.extend(["#### 英文草稿", "", markdown_code_block(draft, "（尚未输入；网页输入后会自动同步。）"), ""])
+            if corrected_paragraphs:
+                lines.extend(["#### 订正", "", markdown_code_block(corrected_paragraphs[index - 1]), ""])
+    else:
+        lines.append(markdown_code_block(practice.get("draftText"), "（尚未输入；网页输入后会自动同步。）"))
+    lines.extend(["", "## 提交与订正记录", ""])
+
+    if not attempts:
+        lines.append("（尚未提交。）")
+    else:
+        for record in attempts:
+            if not isinstance(record, dict):
+                continue
+            attempt_id = record.get("id", "")
+            level = str(record.get("levelLabel", "")).strip()
+            submitted_at = str(record.get("submittedAt", "")).strip()
+            metadata = " | ".join(part for part in (level, submitted_at) if part)
+            lines.extend([f"### 第 {attempt_id} 次{f'：{metadata}' if metadata else ''}", ""])
+            lines.extend(["#### 学习者提交", "", markdown_code_block(record.get("originalText")), ""])
+            lines.extend(["#### 网页订正", "", markdown_code_block(record.get("correctedText")), ""])
+            feedback = _clean_feedback_list(record.get("feedback"), 4)
+            coverage = _clean_feedback_list(record.get("coverage"), 3)
+            suggestions = [str(item).strip() for item in record.get("suggestions", []) if str(item).strip()]
+            if feedback or coverage or suggestions:
+                lines.extend(["#### 反馈", ""])
+                lines.extend(f"- {item}" for item in [*feedback, *coverage])
+                if suggestions:
+                    lines.append(f"- 可尝试使用：{'、'.join(suggestions)}")
+                lines.append("")
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def write_writing_workspace(article_path: Path, practice: dict[str, object]) -> None:
+    path = writing_workspace_path(article_path)
+    temporary = path.with_name(f"{path.name}.tmp")
+    temporary.write_text(writing_workspace_markdown(practice), encoding="utf-8")
+    temporary.replace(path)
+
+
+def build_writing_practice_prompt(
+    day: int,
+    article_path: Path,
+    markdown: str,
+    target_words: list[str],
+    writing_focus: dict[str, object] | None = None,
+) -> str:
+    target_text = "、".join(target_words) if target_words else "（无）"
+    focus_text = (
+        f"{writing_focus.get('focusTitle')}：{writing_focus.get('practiceInstruction')}"
+        if writing_focus
+        else "（无专项）"
+    )
+    return f"""根据下面第 {day} 天的英文阅读，制作一题给英语学习者的中译英练习。
+
+目标复习词：{target_text}
+本次唯一写作专项：{focus_text}
+
+规则：
+1. 中文题必须保留相似的因果骨架和主要信息，但绝对不能逐句翻译原阅读。
+2. 改变叙述顺序、人物视角或部分具体细节；用 2-4 个中文段落组织为一个小故事或说明。
+3. 中文题应自然引导学习者使用目标复习词的原有含义，但不要直接在正文中给英文答案。
+4. 不要给参考英文答案、评分或任何英文句子。
+5. 如果有写作专项，中文题必须安排多处自然语境，让学习者反复使用该专项；不要额外设计第二个语法难点。
+6. 只返回下列 JSON，不要代码围栏：
+{{
+  "title": "中文练习标题",
+  "instructions": "一句简短中文说明",
+  "paragraphs": ["中文段落一", "中文段落二"],
+  "suggestedWords": ["目标词"]
+}}
+
+阅读英文正文：
+{extract_article_english(markdown)}
+
+文章路径：{article_path.relative_to(PROJECT_ROOT)}
+"""
+
+
+def generate_writing_practice(
+    day: int,
+    article_path: Path,
+    markdown: str,
+    target_words: list[str],
+    writing_focus: dict[str, object] | None = None,
+) -> tuple[dict[str, object], str, bool]:
+    prompt = build_writing_practice_prompt(
+        day, article_path, markdown, target_words, writing_focus
+    )
+    last_error: RuntimeError | None = None
+    for _ in range(MAX_GENERATION_ATTEMPTS):
+        generated, generator, used_codex = request_generated_text(
+            prompt, max_output_tokens=2_500
+        )
+        try:
+            practice = parse_model_json(generated)
+            title = str(practice.get("title", "")).strip()
+            instructions = str(practice.get("instructions", "")).strip()
+            paragraphs = practice.get("paragraphs", [])
+            if not title or not instructions or not isinstance(paragraphs, list):
+                raise RuntimeError("中译英题目缺少标题、说明或段落")
+            cleaned_paragraphs = [str(item).strip() for item in paragraphs if str(item).strip()]
+            if not 2 <= len(cleaned_paragraphs) <= 4:
+                raise RuntimeError("中译英题目必须包含 2-4 个中文段落")
+            return (
+                {
+                    "version": 1,
+                    "day": day,
+                    "articlePath": str(article_path.relative_to(PROJECT_ROOT)),
+                    "createdAt": datetime.now(UTC).isoformat(),
+                    "readingCompletedAt": None,
+                    "title": title,
+                    "instructions": instructions,
+                    "paragraphs": cleaned_paragraphs,
+                    "suggestedWords": dedupe_words(
+                        list(practice.get("suggestedWords", [])) or target_words
+                    ),
+                    "writingFocus": writing_focus,
+                    "attempts": [],
+                },
+                generator,
+                used_codex,
+            )
+        except RuntimeError as exc:
+            last_error = exc
+            prompt += f"\n\n上次返回无效，原因：{exc}。请严格只返回要求的 JSON。"
+    assert last_error is not None
+    raise last_error
+
+
+def read_writing_practice(article_path: Path) -> dict[str, object] | None:
+    path = writing_practice_path(article_path)
+    if not path.exists():
+        return None
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise RuntimeError("中译英练习数据格式错误")
+    return payload
+
+
+def public_writing_practice(practice: dict[str, object] | None, day: int) -> dict[str, object]:
+    if practice is None:
+        return {
+            "day": day,
+            "available": False,
+            "canCreate": True,
+            "message": "中译英练习会从新生成的每日文章开始提供。",
+        }
+    article_reference = Path(str(practice.get("articlePath", "")))
+    workspace_reference = article_reference.with_name(
+        f"{article_reference.stem}.translation.md"
+    )
+    paragraphs = list(practice.get("paragraphs", []))
+    attempts = practice.get("attempts", [])
+    latest_attempt = (
+        attempts[-1] if isinstance(attempts, list) and attempts and isinstance(attempts[-1], dict) else None
+    )
+    return {
+        "day": day,
+        "available": True,
+        "readingCompleted": bool(practice.get("readingCompletedAt")),
+        "title": str(practice.get("title", "")),
+        "instructions": str(practice.get("instructions", "")),
+        "writingFocus": practice.get("writingFocus"),
+        "paragraphs": paragraphs,
+        "suggestedWords": list(practice.get("suggestedWords", [])),
+        "draftText": str(practice.get("draftText", "")),
+        "draftParagraphs": draft_paragraphs_for_practice(practice),
+        "draftUpdatedAt": str(practice.get("draftUpdatedAt", "")),
+        "workspacePath": str(workspace_reference),
+        "attempts": list(practice.get("attempts", [])),
+        # Latest correction split back into one entry per Chinese paragraph, so
+        # the reading page can show it right next to that paragraph's draft
+        # instead of only inside the submission history at the bottom.
+        "latestCorrectionParagraphs": corrected_paragraphs_for_attempt(latest_attempt, len(paragraphs)) or [],
+    }
+
+
+def get_writing_practice(day: object | None = None) -> dict[str, object]:
+    article_day, article_path = article_for_day(day)
+    with WRITING_LOCK:
+        practice = read_writing_practice(article_path)
+        if practice is not None and not writing_workspace_path(article_path).exists():
+            write_writing_workspace(article_path, practice)
+        return public_writing_practice(practice, article_day)
+
+
+def article_target_words(article_path: Path) -> list[str]:
+    text = article_path.read_text(encoding="utf-8", errors="replace")
+    review_words: list[str] = []
+    for line in section_between(text, "## 复习生词", "## 正文").splitlines():
+        match = re.match(r"^\s*-\s+(.+?)(?:\s+-\s+.+)?$", line)
+        if match:
+            review_words.append(match.group(1))
+    return dedupe_words(review_words + clean_today_entries(text))
+
+
+def create_writing_practice(day: object | None = None) -> dict[str, object]:
+    """Backfill one exercise for a historical article on explicit user action."""
     load_project_env()
-    previous_day, _ = latest_article()
+    article_day, article_path = article_for_day(day)
+    with WRITING_LOCK:
+        existing = read_writing_practice(article_path)
+        if existing is not None:
+            return public_writing_practice(existing, article_day)
+        markdown = article_path.read_text(encoding="utf-8", errors="replace")
+        practice, _generator, _used_codex = generate_writing_practice(
+            article_day, article_path, markdown, article_target_words(article_path)
+        )
+        # This action is available only from the writing tab, which is the
+        # learner's explicit confirmation that this historical reading is done.
+        practice["readingCompletedAt"] = datetime.now(UTC).isoformat()
+        write_json(writing_practice_path(article_path), practice)
+        write_writing_workspace(article_path, practice)
+        return public_writing_practice(practice, article_day)
+
+
+def complete_reading(day: object | None = None) -> dict[str, object]:
+    article_day, article_path = article_for_day(day)
+    with WRITING_LOCK:
+        practice = read_writing_practice(article_path)
+        if practice is None:
+            return public_writing_practice(None, article_day)
+        if not practice.get("readingCompletedAt"):
+            practice["readingCompletedAt"] = datetime.now(UTC).isoformat()
+            write_json(writing_practice_path(article_path), practice)
+            write_writing_workspace(article_path, practice)
+        return public_writing_practice(practice, article_day)
+
+
+def save_writing_draft(
+    day: object, draft_text: str, draft_paragraphs: list[object] | None = None
+) -> dict[str, object]:
+    if len(draft_text) > MAX_WRITING_INPUT_LENGTH:
+        raise ValueError(f"英文内容最多 {MAX_WRITING_INPUT_LENGTH} 个字符")
+    article_day, article_path = article_for_day(day)
+    with WRITING_LOCK:
+        practice = read_writing_practice(article_path)
+        if practice is None:
+            raise FileNotFoundError("当前日期没有中译英练习")
+        if draft_paragraphs is not None:
+            expected_count = len(practice.get("paragraphs", []))
+            if len(draft_paragraphs) != expected_count:
+                raise ValueError("英文草稿段落数量与题目不一致")
+            drafts = [str(item) for item in draft_paragraphs]
+        else:
+            drafts = draft_paragraphs_for_practice({**practice, "draftText": draft_text})
+        combined_text = "\n\n".join(part.strip() for part in drafts if part.strip())
+        if len(combined_text) > MAX_WRITING_INPUT_LENGTH:
+            raise ValueError(f"英文内容最多 {MAX_WRITING_INPUT_LENGTH} 个字符")
+        practice["draftText"] = combined_text
+        practice["draftParagraphs"] = drafts
+        practice["draftUpdatedAt"] = datetime.now(UTC).isoformat()
+        write_json(writing_practice_path(article_path), practice)
+        write_writing_workspace(article_path, practice)
+        workspace_path = writing_workspace_path(article_path)
+        try:
+            workspace_reference = str(workspace_path.relative_to(PROJECT_ROOT))
+        except ValueError:
+            workspace_reference = str(workspace_path)
+        return {
+            "day": article_day,
+            "saved": True,
+            "draftUpdatedAt": practice["draftUpdatedAt"],
+            "workspacePath": workspace_reference,
+        }
+
+
+def _clean_feedback_list(value: object, limit: int = 6) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    return [str(item).strip() for item in value if str(item).strip()][:limit]
+
+
+def build_writing_feedback_prompt(
+    practice: dict[str, object], submitted_text: str, level: str
+) -> str:
+    level_instructions = {
+        "basic": "只修正拼写、语法、冠词、时态、单复数和明显的介词错误，最大程度保留学习者原句和语序。",
+        "natural": "在保留学习者原意的前提下，修正搭配、语序和衔接，使其成为自然常用的英文。",
+        "advanced": "允许重组句子和段落，使因果与衔接清晰，但保持在 IELTS 6.0-6.5 的常见英语范围，不展示偏词。",
+    }
+    target_text = "、".join(map(str, practice.get("suggestedWords", []))) or "（无）"
+    writing_focus = practice.get("writingFocus")
+    focus_title = (
+        str(writing_focus.get("focusTitle", "")).strip()
+        if isinstance(writing_focus, dict)
+        else ""
+    )
+    focus_feedback_rule = (
+        f"今天只教学和解释“{focus_title}”。修正版仍可保证全文正确，但 feedback 只反馈这一项，"
+        "不要再列出其他语法或表达问题。"
+        if focus_title
+        else "今天没有预设专项，可按通常方式给出不超过4条反馈。"
+    )
+    chinese_prompt = "\n\n".join(map(str, practice.get("paragraphs", [])))
+    return f"""你是中译英教练，不存在唯一标准答案。请根据中文题目审阅学习者的英文，并给出“{WRITING_LEVELS[level]}”级别的修正版。
+
+修正强度：{level_instructions[level]}
+今日建议使用词：{target_text}
+专项反馈规则：{focus_feedback_rule}
+
+所有英文都应以英语前3000-5000常见词为主。不能为了显得高级而引入罕见、专业或文学化词。如果学习者原句里某个概念已经用了一个常见词表达（例如用 "food hall" 表示食堂），请直接保留那个词，不要替换成更少见的同义词（例如 "cafeteria"）。不要因为学习者没有使用建议词就判错；可在 suggestions 中给出可选提示。
+
+只返回合法 JSON：
+{{
+  "correctedText": "完整修正版英文",
+  "feedback": ["不超过4条中文反馈"],
+  "usedTargetWords": ["正确使用的建议词"],
+  "suggestions": ["可以考虑使用但未强制的建议词"],
+  "coverage": ["内容覆盖或遗漏提示，最多3条"]
+}}
+
+中文题目：
+{chinese_prompt}
+
+学习者提交：
+{submitted_text}
+"""
+
+
+def submit_writing_attempt(day: object, submitted_text: str, level: str) -> dict[str, object]:
+    if level not in WRITING_LEVELS:
+        raise ValueError("修正等级无效")
+    submitted_text = submitted_text.strip()
+    if not submitted_text:
+        raise ValueError("请先输入英文内容")
+    if len(submitted_text) > MAX_WRITING_INPUT_LENGTH:
+        raise ValueError(f"英文内容最多 {MAX_WRITING_INPUT_LENGTH} 个字符")
+    load_project_env()
+    article_day, article_path = article_for_day(day)
+    with WRITING_LOCK:
+        practice = read_writing_practice(article_path)
+        if practice is None:
+            raise FileNotFoundError("当前日期没有中译英练习")
+
+        prompt = build_writing_feedback_prompt(practice, submitted_text, level)
+        last_error: RuntimeError | None = None
+        known_words = sorted(refresh_review_documents()[0].get("words", {}).keys())
+        feedback_payload: dict[str, object] | None = None
+        vocabulary_check: dict[str, object] | None = None
+        generator = ""
+        used_codex = False
+        for attempt in range(MAX_GENERATION_ATTEMPTS):
+            generated, generator, used_codex = request_generated_text(
+                prompt, max_output_tokens=3_500
+            )
+            try:
+                candidate = parse_model_json(generated)
+                corrected = str(candidate.get("correctedText", "")).strip()
+                if not corrected:
+                    raise RuntimeError("修正版为空")
+                vocabulary_check = vocabulary_report(
+                    corrected,
+                    allowed_words=list(practice.get("suggestedWords", [])),
+                    known_words=known_words,
+                )
+                flagged = report_words(vocabulary_check)
+                if flagged:
+                    raise RuntimeError("修正版仍含候选偏词：" + "、".join(flagged))
+                feedback_payload = {
+                    "correctedText": corrected,
+                    "feedback": _clean_feedback_list(candidate.get("feedback"), 4),
+                    "usedTargetWords": dedupe_words(candidate.get("usedTargetWords", [])),
+                    "suggestions": dedupe_words(candidate.get("suggestions", [])),
+                    "coverage": _clean_feedback_list(candidate.get("coverage"), 3),
+                    "commonVocabularyCheck": vocabulary_check,
+                }
+                break
+            except RuntimeError as exc:
+                last_error = exc
+                prompt += (
+                    f"\n\n上一次修正未通过高频词验证，原因：{exc}。"
+                    "请把列出的每个词都换成前3000-5000常见词范围内的替代表达"
+                    "（优先检查学习者原句是否已经用了一个常见词表示同样的意思，直接沿用即可）。"
+                    "只返回完整 JSON。"
+                )
+        if feedback_payload is None:
+            assert last_error is not None
+            raise last_error
+
+        attempts = practice.setdefault("attempts", [])
+        if not isinstance(attempts, list):
+            raise RuntimeError("中译英提交历史格式错误")
+        record = {
+            "id": len(attempts) + 1,
+            "submittedAt": datetime.now(UTC).isoformat(),
+            "level": level,
+            "levelLabel": WRITING_LEVELS[level],
+            "originalText": submitted_text,
+            **feedback_payload,
+        }
+        attempts.append(record)
+        write_json(writing_practice_path(article_path), practice)
+        write_writing_workspace(article_path, practice)
+        return {
+            "day": article_day,
+            "attempt": record,
+            "generator": generator,
+            "usedCodex": used_codex,
+            "practice": public_writing_practice(practice, article_day),
+        }
+
+
+def generate_next_article(extra_instruction: str = "") -> dict[str, object]:
+    load_project_env()
+    previous_day, previous_article_path = latest_article()
+    writing_focus = diagnose_previous_writing(previous_day, previous_article_path)
     review_history, review_plan = refresh_review_documents()
     words = dedupe_words(list(review_plan.get("targetWords", [])))
     recent_words = list(review_plan.get("recentWords", []))
@@ -1085,8 +1866,8 @@ def generate_next_article() -> dict[str, object]:
         int(dict(review_history.get("summary", {})).get("currentMarkedWords", 0)),
         int(review_plan.get("inboxWaitingCount", 0)),
     )
-    source = choose_source() if mode["usesSource"] else None
     next_day = previous_day + 1
+    source = choose_listening_source(next_day)
     prompt = build_generation_prompt(
         previous_day,
         next_day,
@@ -1094,11 +1875,55 @@ def generate_next_article() -> dict[str, object]:
         review_plan,
         mode,
         source,
+        extra_instruction,
+        writing_focus,
     )
+    known_words = sorted(review_history.get("words", {}).keys())
 
-    generated_text, generator = request_generated_markdown(prompt)
-    markdown = strip_model_fences(generated_text)
-    validate_generated_article(markdown, next_day, mode)
+    markdown = None
+    writer_generator = ""
+    critic_generator = ""
+    used_codex = False
+    last_error: RuntimeError | None = None
+    attempt_prompt = prompt
+    for attempt in range(1, MAX_GENERATION_ATTEMPTS + 1):
+        generated_text, writer_generator, writer_used_codex = request_generated_markdown(
+            attempt_prompt
+        )
+        candidate = strip_model_fences(generated_text)
+        try:
+            validate_generated_article(candidate, next_day, mode)
+            vocabulary_check = article_vocabulary_report(candidate, words, known_words)
+            critic_prompt = build_article_critic_prompt(
+                candidate, words, known_words, vocabulary_check
+            )
+            critic_text, critic_generator, critic_used_codex = request_generated_markdown(
+                critic_prompt
+            )
+            revised = strip_model_fences(critic_text)
+            validate_generated_article(revised, next_day, mode)
+            final_check = article_vocabulary_report(revised, words, known_words)
+            flagged = report_words(final_check)
+            if flagged:
+                raise RuntimeError("审稿后仍有候选偏词：" + "、".join(flagged))
+        except RuntimeError as exc:
+            last_error = exc
+            attempt_prompt = (
+                f"{prompt}\n\n"
+                f"第 {attempt} 次草稿或审稿未通过，原因：{exc}。"
+                "请重写完整文章，优先保证情节完整和高频词验证，不要只补几句。"
+            )
+            continue
+        markdown = revised
+        used_codex = writer_used_codex and critic_used_codex
+        last_error = None
+        break
+
+    if markdown is None:
+        assert last_error is not None
+        raise RuntimeError(
+            f"连续 {MAX_GENERATION_ATTEMPTS} 次生成与审稿都未通过，最后一次原因：{last_error}"
+        )
 
     title_match = re.search(r"^#\s+(.+)$", markdown, re.MULTILINE)
     title = title_match.group(1).strip() if title_match else "Daily Review"
@@ -1109,6 +1934,15 @@ def generate_next_article() -> dict[str, object]:
     day_dir.mkdir(parents=True)
     article_path = day_dir / f"{folder_name}.md"
     article_path.write_text(markdown, encoding="utf-8")
+
+    writing_warning = None
+    try:
+        practice, _practice_generator, _practice_used_codex = generate_writing_practice(
+            next_day, article_path, markdown, words, writing_focus
+        )
+        write_json(writing_practice_path(article_path), practice)
+    except RuntimeError as exc:
+        writing_warning = f"中译英题目未生成：{exc}"
 
     audio_warning = None
     uv = find_uv()
@@ -1132,15 +1966,18 @@ def generate_next_article() -> dict[str, object]:
             audio_warning = (audio_result.stderr or audio_result.stdout).strip()[-800:]
 
     updated_history, _ = refresh_review_documents()
-
+    warnings = [warning for warning in (audio_warning, writing_warning) if warning]
+    generator = f"写作：{writer_generator}；审稿：{critic_generator}"
     return {
         "day": next_day,
         "title": title,
         "mode": mode["name"],
         "markdownPath": str(article_path.relative_to(PROJECT_ROOT)),
         "audioGenerated": article_path.with_suffix(".mp3").exists(),
-        "warning": audio_warning,
+        "warning": "\n".join(warnings) if warnings else None,
         "generator": generator,
+        "usedCodex": used_codex,
+        "generatorNotice": None if used_codex else f"本篇含 API 生成步骤：{generator}",
         "reviewPlan": review_dashboard_payload(updated_history),
     }
 
@@ -1183,7 +2020,9 @@ class AppHandler(BaseHTTPRequestHandler):
             return
         file_stat = requested.stat()
         etag = f'"{file_stat.st_mtime_ns:x}-{file_stat.st_size:x}"'
-        cache_control = "no-cache" if requested.name == "index.html" else "public, max-age=86400"
+        # This is a local learning app under active development. Revalidate all
+        # static assets so a normal refresh immediately picks up CSS/JS edits.
+        cache_control = "no-cache"
         if self.headers.get("If-None-Match") == etag:
             self.send_response(HTTPStatus.NOT_MODIFIED)
             self.send_header("Cache-Control", cache_control)
@@ -1274,6 +2113,8 @@ class AppHandler(BaseHTTPRequestHandler):
             elif path == "/api/review-plan":
                 history, _ = refresh_review_documents()
                 self.send_json(review_dashboard_payload(history))
+            elif path == "/api/writing-practice":
+                self.send_json(get_writing_practice(day))
             elif path == "/api/dictionary":
                 self.send_json(lookup_dictionary(query.get("word", [""])[0]))
             elif path == "/api/audio":
@@ -1320,11 +2161,46 @@ class AppHandler(BaseHTTPRequestHandler):
                     }
                 )
                 return
+            if path == "/api/complete-reading":
+                self.send_json(complete_reading(payload.get("day")))
+                return
+            if path == "/api/create-writing-practice":
+                begin_operation()
+                try:
+                    practice = create_writing_practice(payload.get("day"))
+                finally:
+                    end_operation(self.server)
+                self.send_json(practice, HTTPStatus.CREATED)
+                return
+            if path == "/api/writing-draft":
+                self.send_json(
+                    save_writing_draft(
+                        payload.get("day"),
+                        str(payload.get("text", "") or ""),
+                        payload.get("paragraphs") if isinstance(payload.get("paragraphs"), list) else None,
+                    )
+                )
+                return
+            if path == "/api/writing-submit":
+                begin_operation()
+                try:
+                    result = submit_writing_attempt(
+                        payload.get("day"),
+                        str(payload.get("text", "") or ""),
+                        str(payload.get("level", "natural") or "natural"),
+                    )
+                finally:
+                    end_operation(self.server)
+                self.send_json(result, HTTPStatus.CREATED)
+                return
             if path == "/api/generate-next":
+                extra_instruction = str(payload.get("extraInstruction", "") or "").strip()
+                if len(extra_instruction) > MAX_EXTRA_INSTRUCTION_LENGTH:
+                    raise ValueError(f"额外要求最多 {MAX_EXTRA_INSTRUCTION_LENGTH} 个字符")
                 begin_operation()
                 try:
                     with WRITE_LOCK:
-                        result = generate_next_article()
+                        result = generate_next_article(extra_instruction)
                 finally:
                     end_operation(self.server)
                 self.send_json(result, HTTPStatus.CREATED)
